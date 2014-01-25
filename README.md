@@ -42,6 +42,8 @@ Please use Chrome (Windows / Mac) or Safari (Mac).
 
 * [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
 
+* [Panner / Listener](http://curtaincall.weblike.jp/portfolio-x-sound/javascript/myworks/tests/AudioModule/test-audio-panner-listener)
+
 Now, I'm creating website for Web Audio API. Please use the following site for understanding README.  
 
 * [WEB SOUNDER](http://curtaincall.weblike.jp/portfolio-web-sounder/)
@@ -92,13 +94,14 @@ Some constant values are defined by these global objects as static property.
   
 The "error" static method changes the destination of error message for developement.
   
+    X.error('ALERT');      //-> window.alert()
     X.error('CONSOLE');    //-> console.error()
     X.error('EXCEPTION');  //-> throw new Error()
     X.error('NONE');       //-> Not output
   
 ### Get "currentTime" property in the instance of AudioContext
   
-The way of accessing [the 'currentTime' property in AudioContext](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#attributes-AudioContext) is the following,
+The way of accessing [the "currentTime" property in AudioContext](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#attributes-AudioContext) is the following,
   
     //Can browser use this library ?
     if (X.IS_XSOUND) {
@@ -144,7 +147,7 @@ In the case of single sound,
 or,
   
     //440 Hz (A) is the 49th in keyboard of piano
-    X('oscillator').ready(0, 0).start(X.toFrequencies([49]));  //or, X('oscillator').ready(0, 0).start(X.toFrequencies([49]));
+    X('oscillator').ready(0, 0).start(X.toFrequencies([49]));  //or, X('oscillator').start(X.toFrequencies([49]));
   
 In the case of multi sounds (for example, chord),
   
@@ -350,8 +353,8 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
               //"buffers" is the instances of AudioBuffer
           },
           error     : function(object, textStatus){
-              //"object" is the instance of XMLHttpRequest or error object of "decodeAudioData"
-              //"textStatus" is one of 'error', 'timeout', 'decode');
+              //"object" is either the instance of XMLHttpRequest,  "onerror" event object in the instance of FileReader or error object of "decodeAudioData"
+              //"textStatus" is one of 'error', 'timeout', 'decode', error code of FileReader;
           },
           progress  : function(xhr){
               //"xhr" is the instance of XMLHttpRequest
@@ -459,11 +462,11 @@ Register callback functions.
           //"source" is the instance of AudioBufferSourceNode
           //"currentTime" is current time (position) in the played audio
       },
-      end : function(source, currentTime){
+      ended : function(source, currentTime){
           //When audio ended, this callback function is executed
           //for example, this callback clears UI for playing the audio
 
-          //'source' is instance of AudioBufferSourceNode
+          //'source' is the instance of AudioBufferSourceNode
           //'currentTime' is current time in audio
       }
     });
@@ -1147,9 +1150,9 @@ Reverb effect requires ArrayBuffer of impulse response.
           //ArrayBuffer -> AudioBuffer -> "buffer" property in the instance of ConvolverNode
           X(source).module('reverb').run.call(X(source).module('reverb'), arrayBuffer);
       },
-      error : function(xhr, textStatus){
-          //"xhr" is the instance of XMLHttpRequest
-          //"textStatus" is either 'error' or 'timeout'
+      error : function(object, textStatus){
+          //"object" is either the instance of XMLHttpRequest or "onerror" event object in the instance of FileReader
+          //"textStatus" is one of 'error', 'timeout', error code of FileReader;
       },
       progress : function(xhr){
           //"xhr" is the instance of XMLHttpRequest
@@ -1219,8 +1222,8 @@ If customized effector module is used, the module should be defined the followin
         /* this.input.connect( .... connect(this.output); */
     };
 
-    /** @extends {Effector} */
-    X(source).effector(MyEffector);
+     /** @extends {Effector} */
+    X(source).install('myeffector', MyEffector);
 
     /** @override */
     MyEffector.prototype.param = function(){
@@ -1245,9 +1248,6 @@ If customized effector module is used, the module should be defined the followin
     MyEffector.prototype.stop = function(stopTime, releaseTime){
         //....
     };
-
-    //Necessary
-    X(source).install('myeffector', MyEffector);
 
     X(source).start(/* the 1st argument */, [/* Other modules ,*/ X(source).module('myeffector') /*, Other modules */]);
   
@@ -1279,9 +1279,10 @@ for example,
 
         this.lfo.connect(this.feedback.gain);
 
-        this.delay.delayTime.value = 0;
-        this.dry.gain.value = 1;
-        this.wet.gain.value = 0;
+        this.predelay.delayTime.value = 1;
+        this.delay.delayTime.value    = 0;
+        this.dry.gain.value           = 1;
+        this.wet.gain.value           = 0;
 
         this.values = {
           pre  : this.predelay.delayTime,
@@ -1289,10 +1290,12 @@ for example,
           dry  : this.dry.gain,
           wet  : this.wet.gain
         };
+
+        this.isActive = true;
     };
 
     /** @extends {Effector} */
-    X('oscillator').effector(SuperModulation);
+    X('oscillator').install('supermodulation', SuperModulation);
 
     /** @override */
     SuperModulation.prototype.param = function(key, value){
@@ -1300,6 +1303,7 @@ for example,
             return this.values[key].value;  //Getter
         } else {
             this.values[key].value = value;  //Setter
+
         }
     };
 
@@ -1317,14 +1321,12 @@ for example,
         }
     };
 
-    X('oscillator').install('supermodulation', SuperModulation);
+    X('oscillator').module('supermodulation').param('pre',  0.025);
+    X('oscillator').module('supermodulation').param('time', 0.050);
+    X('oscillator').module('supermodulation').param('dry',  0.700);
+    X('oscillator').module('supermodulation').param('wet',  0.300);
 
-    X('oscillator').module('supermodulation').param('pre', 0.025);
-    X('oscillator').module('supermodulation').param('time', 0.05);
-    X('oscillator').module('supermodulation').param('dry', 0.7);
-    X('oscillator').module('supermodulation').param('wet', 0.3);
-
-    X('oscillator').start(440, [X(source).module('supermodulation')]);
+    X('oscillator').start(440, [X('oscillator').module('supermodulation')]);
   
 ### Panner
   
@@ -1626,6 +1628,7 @@ And, the variable ("domain") is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
 #### Overview in Time Domain
   
     var params = {
+      shape        : 'line',                      //Wave shape ('line' or 'rect')
       wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
       grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color (color sting or 'none')
       currentTime  : 'rgba(255, 255, 255, 1.0)',  //Shape color (for current time)
@@ -1673,6 +1676,7 @@ In the case of displaying current time according to playing the audio,
   
     var params = {
       interval     : 500,                         //at intervals of drawing sound wave [msec]
+      shape        : 'line',                      //Wave shape ('line' or 'rect')
       wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
       grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
       text         : 'rgba(255, 255, 255, 1.0)',  //Text color
@@ -1704,6 +1708,8 @@ In the case of displaying current time according to playing the audio,
   
     var params = {
       interval     : 500,                         //at intervals of drawing sound wave [msec]
+      shape        : 'line',                      //Wave shape ('line' or 'rect')
+      wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
       grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
       text         : 'rgba(255, 255, 255, 1.0)',  //Text color
       font         : '13px Arial',                //Text font
@@ -1907,7 +1913,9 @@ But, separator must not be the characters that are used by MML.
     var mml2 = 'T74O2B2O3C+2D1O2B2O3C+2D2E2O2A1E1F+2E2O3DD1EE1&EE1';
 
     //for example, '||' is separator.
-    var mml = mml1 + '||' + mml2;
+    var mml = mml1 + '||' + mml2;  //for example, Get this string from <input type="text">, <textarea> ... etc
+
+    var mmls = mml.split.split('||');
 
     X('mml').ready(X('oneshot'), mmls);
 

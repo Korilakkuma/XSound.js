@@ -13,10 +13,11 @@
     var XSound;
 
     //Global constant value for the determination that Web Audio API is either valid or invalid.
-    var IS_XSOUND = global.webkitAudioContext ? true : false;
+    var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
+    var FULL_MODE = global.webkitAudioContext ? true : false;  //for Firefox
 
     //for output of error
-    var ERROR_MODES = {NONE : 0, CONSOLE : 1, EXCEPTION : 2};
+    var ERROR_MODES = {NONE : 0, ALERT : 1, CONSOLE : 2, EXCEPTION : 3};
     var ERROR_MODE  = ERROR_MODES.CONSOLE;
 
     /**
@@ -25,6 +26,10 @@
      */
     var debug = function(message){
         switch (ERROR_MODE) {
+            case ERROR_MODES.ALERT :
+                console.trace();
+                alert(message);
+                break;
             case ERROR_MODES.CONSOLE :
                 console.trace();
                 console.error(message);
@@ -71,13 +76,18 @@
                 ERROR_MODE      = ERROR_MODES.NONE;
                 this.ERROR_MODE = ERROR_MODES.NONE;
                 break;
+            case 'ALERT' :
+            case '1'     :
+                ERROR_MODE      = ERROR_MODES.ALERT;
+                this.ERROR_MODE = ERROR_MODES.ALERT;
+                break;
             case 'CONSOLE' :
-            case '1'       :
+            case '2'       :
                 ERROR_MODE      = ERROR_MODES.CONSOLE;
                 this.ERROR_MODE = ERROR_MODES.CONSOLE;
                 break;
             case 'EXCEPTION' :
-            case '2'         :
+            case '3'         :
                 ERROR_MODE      = ERROR_MODES.EXCEPTION;
                 this.ERROR_MODE = ERROR_MODES.EXCEPTION;
                 break;
@@ -95,7 +105,7 @@
      * @param {function} progressCallback This argument is executed as "onprogress" event handler in the instance of FileReader.
      */
     var read = function(file, type, successCallback, errorCallback, progressCallback){
-        //The argument is associative array ? 
+        //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -147,8 +157,8 @@
                 var result = reader.result;
 
                 //Escape <script> in the case of text
-                if ((Object.prototype.toString.call(result) === '[object String]') && (result.indexOf('data:') === -1)) {
-                    result = result.replace(/<(script)>(.*)<(\/script)>/gi, '&lt;$1&gt;$2&lt;$3&gt;');
+                if ((Object.prototype.toString.call(result) === '[object String]') && (result.indexOf('data:') === -1) && (result.indexOf('blob:') === -1)) {
+                    result = result.replace(/<(\/?script.*?)>/gi, '&lt;$1&gt;');
                 }
 
                 successCallback(event, result);
@@ -168,20 +178,20 @@
 
     /** 
      * This static method gets the instance of File (extends Blob).
-     * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
      * @param {Event} event This argument is the instance of Event by Drag & Drop or "<input type="file">".
+     * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
      * @param {function} successCallback his argument is executed as next process on success of reading file.
      * @param {function} errorCallback This argument is executed on error.
      * @param {function} progressCallback This argument is executed as "onprogress" event handler in the instance of FileReader.
      * @return {File} This is returned as the instance of File (extends Blob).
      */
-    var file = function(type, event, successCallback, errorCallback, progressCallback){
+    var file = function(event, type, successCallback, errorCallback, progressCallback){
         //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
-            if ('type'     in properties) {type             = properties.type;}
             if ('event'    in properties) {event            = properties.event;}
+            if ('type'     in properties) {type             = properties.type;}
             if ('success'  in properties) {successCallback  = properties.success;}
             if ('error'    in properties) {errorCallback    = properties.error;}
             if ('progress' in properties) {progressCallback = properties.progress;}
@@ -197,10 +207,11 @@
 
         if (event.type === 'drop') {
             //Drag & Drop
+            event.stopImmediatePropagation();
             event.preventDefault();
 
-            file = ('items' in event.dataTransfer) ? event.dataTransfer.items[0].getAsFile() : event.dataTransfer.files[0];
-        } else if((event.type === 'change') && ('files' in event.target)) {
+            file = /*('items' in event.dataTransfer) ? event.dataTransfer.items[0].getAsFile() : */event.dataTransfer.files[0];
+        } else if ((event.type === 'change') && ('files' in event.target)) {
             //<input type="file">
             file = event.target.files[0];
         } else {
@@ -210,9 +221,9 @@
 
         if (!(file instanceof File)) {
             throw new Error('Please upload file !!');
-        } else if((/text/i.test(type)) && (file.type.indexOf('text') === -1)) {
+        } else if ((/text/i.test(type)) && (file.type.indexOf('text') === -1)) {
             throw new Error('Please upload text file !!');
-        } else if((/arraybuffer|dataurl/i.test(type)) && (file.type.indexOf('audio') === -1)) {
+        } else if ((/arraybuffer|dataurl/i.test(type)) && (file.type.indexOf('audio') === -1)) {
             throw new Error('Please upload audio file !!');
         } else {
             //Asynchronously
@@ -237,7 +248,7 @@
      * @param {function} progressCallback This argument is executed during receiving audio data.
      */
     var ajax = function(url, timeout, successCallback, errorCallback, progressCallback){
-        //The argument is associative array ? 
+        //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -255,8 +266,12 @@
         //Create the instance of XMLHttpRequest
         var xhr = new XMLHttpRequest();
 
-        //XMLHttpRequest Level 2
-        xhr.responseType = 'arraybuffer';
+        if ((FULL_MODE === undefined) || FULL_MODE) {
+            //XMLHttpRequest Level 2
+            xhr.responseType = 'arraybuffer';
+        } else {
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
+        }
 
         var t = parseInt(timeout);
 
@@ -279,10 +294,53 @@
                 global.clearTimeout(timerid);
 
                 if (xhr.status === 200) {
-                    var arrayBuffer = xhr.response;
+                    var arrayBuffer = null;
 
-                    if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
-                        successCallback(xhr, arrayBuffer);
+                    if ((FULL_MODE === undefined) || FULL_MODE) {
+                        arrayBuffer = xhr.response;
+
+                        if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
+                            successCallback(xhr, arrayBuffer);
+                        }
+                    } else {
+                        var binary = xhr.responseText;
+                        var buffer = [];
+
+                        for (var i = 0, len = binary.length; i < len; i++) {
+                            buffer.push(binary.charCodeAt(i) & 0xFF);
+                        }
+
+                        var ex     = url.slice(-3);
+                        var mime   = 'audio/' + ex;
+                        var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
+                        var reader = new FileReader();
+
+                        reader.readAsArrayBuffer(blob);
+
+                        reader.onerror = function(event){
+                            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                                var error = '';
+
+                                switch (reader.error.code) {
+                                    case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
+                                    case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
+                                    case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
+                                    case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
+                                    case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
+                                    default                            : error = 'ERR';              break;
+                                }
+
+                                errorCallback(event, error);
+                            }
+                        };
+
+                        reader.onload = function(){
+                            arrayBuffer = reader.result;
+
+                            if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
+                                successCallback(xhr, arrayBuffer);
+                            }
+                        };
                     }
                 }
             }
@@ -398,7 +456,7 @@
      * @return {MediaFallbackModule} This is returned for method chain.
      */
     MediaFallbackModule.prototype.setup = function(id, type, formats, callbacks){
-        //The argument is associative array ? 
+        //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -594,21 +652,18 @@
 
     /** 
      * This method prepares for playing the media anytime after loading the media resource.
-     * @param {string} source This argument is path name or Data URL for the media resource.
+     * @param {string} source This argument is path name or Data URL or Object URL for the media resource.
      * @return {MediaFallbackModule} This is returned for method chain.
      */
     MediaFallbackModule.prototype.ready = function(source){
         var src = String(source);
 
         try {
-            //Data URL ?
-            if (src.indexOf('data:') !== -1) {
-                //Data URL
-                this.media.src = src;
+            //Data URL or Object URL ?
+            if ((src.indexOf('data:') !== -1) || (src.indexOf('blob:') !== -1)) {
+                this.media.src = src;  //Data URL or Object URL
             } else {
-                //Path
-                var path = src + '.' + this.ex;
-                this.media.src = path;
+                this.media.src = src + '.' + this.ex;  //Path
             }
         } catch (error) {
             throw new Error('The designated resource cannot be loaded !!');
@@ -657,7 +712,11 @@
      */
     MediaFallbackModule.prototype.toggle = function(position){
         if (this.media instanceof HTMLMediaElement) {
-            this.media.paused ? this.start(position) : this.stop();
+            if (this.media.paused) {
+                this.start(position);
+            } else {
+                this.stop();
+            }
         }
 
         return this;
@@ -747,7 +806,7 @@
     ////////////////////////////////////////////////////////////////////////////////
 
     if (IS_XSOUND) {
-        //Chrome (Win / Mac), Safari (Mac)
+        //Chrome (Win / Mac), Safari (Mac), Firefox
         global.AudioContext = global.AudioContext || global.webkitAudioContext;
 
         audiocontext = new AudioContext();
@@ -758,7 +817,7 @@
         audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
         audiocontext.createPeriodicWave    = audiocontext.createPeriodicWave    || audiocontext.createWaveTable;
     } else {
-        //Firefox, Opera, IE
+        //Opera, IE
 
         //Create the instances of subclass
         var media = new MediaFallbackModule();
@@ -800,6 +859,8 @@
         return;
     }
 
+    //If the browser can use Web Audio API, the following code is valid.
+
     /** 
      * This interface is in order to manage state of module that implements this interface.
      * @param {boolean} state This argument means state either active or inactive. The default value is false.
@@ -827,8 +888,6 @@
         //In the case of setter
         return this;
     };
-
-    //If the browser can use Web Audio API, the following code is valid.
 
     /** 
      * This class is superclass that is the top in "xsound.js".
@@ -1173,7 +1232,7 @@
             function Draw(sampleRate){
                 this.SAMPLE_RATE = sampleRate;
 
-                //'canvas' or 'svg'
+                //either 'canvas' or 'svg'
                 this.drawType = '';
 
                 //In the case of using HTML5 Canvas
@@ -1377,7 +1436,7 @@
             Draw.prototype.start = function(datas, minDecibels, maxDecibels){
                 switch (this.drawType) {
                     case 'canvas' : this.drawToCanvas(datas, minDecibels, maxDecibels); break;
-                    case 'svg'    : this.drawToSVG(datas, minDecibels, maxDecibels); break;
+                    case 'svg'    : this.drawToSVG(datas, minDecibels, maxDecibels);    break;
                     default       : break;
                 }
 
@@ -1537,7 +1596,11 @@
                                 x = Math.floor((i / len) * modw) + this.styles.left;
                                 y = Math.floor((1 - datas[i]) * (modh / 2)) + this.styles.top;
 
-                                (i === 0) ? context.moveTo(x, y) : context.lineTo(x, y);
+                                if (i === 0) {
+                                    context.moveTo(x, y);
+                                } else {
+                                    context.lineTo(x, y);
+                                }
                             }
                         }
 
@@ -2069,7 +2132,7 @@
                         switch (k) {
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this.textinterval //Getter
+                                    return this.textinterval; //Getter
                                 } else {
                                     var v = parseFloat(value);
 
@@ -2139,7 +2202,11 @@
                             x = Math.floor((i / len) * modw) + this.styles.left;
                             y = Math.floor((1 - (datas[i] / 255)) * modh) + this.styles.top;
 
-                            (i === 0) ? context.moveTo(x, y) : context.lineTo(x, y);
+                            if (i === 0) {
+                                context.moveTo(x, y);
+                            } else {
+                                context.lineTo(x, y);
+                            }
                         }
 
                         context.stroke();
@@ -2566,7 +2633,11 @@
                             x = Math.floor((i / drawnSize) * modw) + this.styles.left;
                             y = (Math.abs(datas[i] - maxdB) * (modh / range)) + this.styles.top;  //[dB] * [px / dB] = [px]
 
-                            (i === 0) ? context.moveTo(x, y) : context.lineTo(x, y);
+                            if (i === 0) {
+                                context.moveTo(x, y);
+                            } else {
+                                context.lineTo(x, y);
+                            }
                         }
 
                         context.stroke();
@@ -2589,7 +2660,11 @@
                                     x = Math.floor((i / drawnSize) * modw) + this.styles.left;
                                     y = Math.floor((1 - (datas[i] / 255)) * modh) + this.styles.top;
 
-                                    (i === 0) ? context.moveTo(x, y) : context.lineTo(x, y);
+                                    if (i === 0) {
+                                        context.moveTo(x, y);
+                                    } else {
+                                        context.lineTo(x, y);
+                                    }
                                 }
 
                                 context.stroke();
@@ -3012,7 +3087,7 @@
                                     this.analyser.fftSize = v;   //Setter
                                     break;
                                 default :
-                                    debug(this + ' param() : The value of "' + key + '" is one of 32 or 64 or 128 or 256 or 512 or 1024 or 2048 !!');
+                                    debug(this + ' param() : The value of "' + key + '" is one of 32, 64, 128, 256, 512, 1024, 2048 !!');
                                     break;
                             }
                         }
@@ -3132,7 +3207,7 @@
 
                     break;
                 default :
-                    debug(this + ' start() : The 1st argument is one of "timeAllL" or "timeAllR" or "time" or "fft" !!');
+                    debug(this + ' start() : The 1st argument is one of "timeAllL", "timeAllR", "time", "fft" !!');
                     break;
             }
 
@@ -3162,7 +3237,7 @@
 
                     break;
                 default :
-                    debug(this + ' stop() : The 1st argument is one of "timeAllL" or "timeAllR" or "time" or "fft" !!');
+                    debug(this + ' stop() : The 1st argument is one of "timeAllL", "timeAllR", "time", "fft" !!');
                     break;
             }
 
@@ -3185,7 +3260,7 @@
                 case 'fft'  :
                     return this[d];
                 default :
-                    debug(this + ' domain() : The 1st argument is one of "timeAllL" or "timeAllR" or "time" or "fft" !!');
+                    debug(this + ' domain() : The 1st argument is one of "timeAllL", "timeAllR", "time", "fft" !!');
                     break;
             }
         };
@@ -3235,7 +3310,7 @@
                 this.numTrack = n;
 
                 this.trackLs = new Array(this.numTrack);
-                this.trackRs = new Array(this.numTrackn);
+                this.trackRs = new Array(this.numTrack);
 
                 for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  //n * array
                 for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  //n * array
@@ -3302,7 +3377,7 @@
          */
         Recorder.prototype.ready = function(track){
             if (this.isTrack(track)) {
-                this.activeTrack = track - 1;
+                this.activeTrack = track;
             }
 
             return this;
@@ -3313,13 +3388,13 @@
          * @return {Recorder} This is returned for method chain.
          */
         Recorder.prototype.start = function(){
-            if ((this.getActiveTrack() !== -1) && this.paused) {
+            if ((this.activeTrack !== -1) && this.paused) {
                 var self = this;
 
                 this.paused = false;
 
                 this.processor.onaudioprocess = function(event){
-                    if (self.getActiveTrack() !== -1) {
+                    if (self.activeTrack !== -1) {
                         var inputLs = event.inputBuffer.getChannelData(0);
                         var inputRs = event.inputBuffer.getChannelData(1);
 
@@ -3329,6 +3404,7 @@
                         }
                     } else {
                         this.disconnect(0);
+                        this.onaudioprocess = function(){};  //for Firefox
                     }
                 };
             }
@@ -3344,6 +3420,7 @@
             this.activeTrack = -1;  //Flag becomes inactive
             this.paused      = true;
             this.processor.disconnect(0);  //Stop onaudioprocess event
+            this.processor.onaudioprocess = function(){};  //for Firefox
             return this;
         };
 
@@ -3353,14 +3430,9 @@
          * @return {boolean} If the designated track is valid range, this value is true. Otherwise, this value is false.
          */
         Recorder.prototype.isTrack = function(track){
-            var t = parseInt(track) - 1;
+            var t = parseInt(track);
 
-            if ((t >= 0) && (t < this.numTrack)) {
-                return true;
-            } else {
-                debug(this + ' isTrack() : The 1st argument is number type between 0 and ' + (this.numTrack - 1) + ' !!');
-                return false;
-            }
+            return ((t >= 0) && (t < this.numTrack)) ? true : false;
         };
 
         /** 
@@ -3377,7 +3449,7 @@
          */
         Recorder.prototype.mix = function(){
             //on the way of recording ?
-            if (this.getActiveTrack() !== -1) {
+            if (this.activeTrack !== -1) {
                 this.stop();
             }
 
@@ -3426,7 +3498,7 @@
          */
         Recorder.prototype.clear = function(track){
             //on the way of recording ?
-            if (this.getActiveTrack() !== -1) {
+            if (this.activeTrack !== -1) {
                 this.stop();
             }
 
@@ -3435,8 +3507,8 @@
                 for (var i = 0, len = this.trackRs.length; i < len; i++) {this.trackRs[i].length = 0;}
             } else {
                 if (this.isTrack(track)) {
-                    this.trackLs[track - 1].length = 0;
-                    this.trackRs[track - 1].length = 0;
+                    this.trackLs[track].length = 0;
+                    this.trackRs[track].length = 0;
                 }
             }
 
@@ -3448,12 +3520,12 @@
          * @param {string|number} track This argument is target track.
          * @param {number} channelType This argument is in order to select stereo or monaural of WAVE file. The default value is 2.
          * @param {number} qbit This argument is quantization bit of PCM. The default value is 16 (bit).
-         * @param {string} dataType This argument is in order to select Object URL or Data URL. The default value is 'blob'.
-         * @return {string} Object URL or Data URL for WAVE file.
+         * @param {string} dataType This argument is in order to select Object URL or Data URL. The default value is 'blob' (Object URL).
+         * @return {string} This is returned as Object URL or Data URL for WAVE file.
          */
         Recorder.prototype.create = function(track, channelType, qbit, dataType){
             //on the way of recording ?
-            if (this.getActiveTrack() !== -1) {
+            if (this.activeTrack !== -1) {
                 this.stop();
             }
 
@@ -3491,11 +3563,9 @@
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            //Left channel
-                            binary = ((Ls[i] + 1) / 2) * (Math.pow(2, 8) - 1);
+                            binary = ((Ls[i] + 1) / 2) * (Math.pow(2, 8) - 1);  //Left channel
                         } else {
-                            //Right channel
-                            binary = ((Rs[i - 1] + 1) / 2) * (Math.pow(2, 8) - 1);
+                            binary = ((Rs[i - 1] + 1) / 2) * (Math.pow(2, 8) - 1);  //Right channel
                         }
 
                         //for preventing from clipping
@@ -3512,11 +3582,9 @@
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            //Left channel
-                            binary = Math.floor(Ls[i] * Math.pow(2, 15));
+                            binary = Math.floor(Ls[i] * Math.pow(2, 15));  //Left channel
                         } else {
-                            //Right channel
-                            binary = Math.floor(Rs[i - 1] * Math.pow(2, 15));
+                            binary = Math.floor(Rs[i - 1] * Math.pow(2, 15));  //Right channel
                         }
 
                         //for preventing from clipping
@@ -3708,17 +3776,17 @@
          */
         Session.prototype.setup = function(tls, host, port, path, openCallback, closeCallback, errorCallback){
             if (navigator.onLine) {
-                //The argument is associative array ? 
+                //The argument is associative array ?
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
                     var properties = arguments[0];
 
-                    if ('tls'      in properties) {tls           = properties.tls;}
-                    if ('host'     in properties) {host          = properties.host;}
-                    if ('port'     in properties) {port          = properties.port;}
-                    if ('path'     in properties) {path          = properties.path;}
-                    if ('open'     in properties) {openCallback  = properties.open;}
-                    if ('close'    in properties) {closeCallback = properties.close;}
-                    if ('error'    in properties) {errorCallback = properties.error;}
+                    if ('tls'   in properties) {tls           = properties.tls;}
+                    if ('host'  in properties) {host          = properties.host;}
+                    if ('port'  in properties) {port          = properties.port;}
+                    if ('path'  in properties) {path          = properties.path;}
+                    if ('open'  in properties) {openCallback  = properties.open;}
+                    if ('close' in properties) {closeCallback = properties.close;}
+                    if ('error' in properties) {errorCallback = properties.error;}
                 }
 
                 var scheme = tls ? 'wss://' : 'ws://';
@@ -3764,7 +3832,7 @@
                             var length = Math.floor(total / 2);
                             var offset = length * Float32Array.BYTES_PER_ELEMENT;
 
-                            var bufferLs = new Float32Array(event.data, 0, length);       //Get Left  channel data
+                            var bufferLs = new Float32Array(event.data,      0, length);  //Get Left  channel data
                             var bufferRs = new Float32Array(event.data, offset, length);  //Get Right channel data
 
                             self.receiver.connect(self.analyser.input);
@@ -3788,6 +3856,7 @@
 
                                     //Stop onaudioprocess event
                                     this.disconnect(0);
+                                    this.onaudioprocess = function(){};  //for Firefox
                                 }
                             };
                         }
@@ -3798,6 +3867,7 @@
 
                         //Stop onaudioprocess event
                         self.receiver.disconnect(0);
+                        self.receiver.onaudioprocess = function(){};  //for Firefox
                     }
                 };
             } else {
@@ -3839,6 +3909,7 @@
 
                         //Stop onaudioprocess event
                         self.sender.disconnect(0);
+                        self.sender.onaudioprocess = function(){};  //for Firefox
                     }
                 };
             }
@@ -4081,9 +4152,9 @@
             this.clean      = context.createGain();
             this.drive      = context.createGain();
 
-            this.size = 16384;
+            this.size = 256;
 
-            //This method creates {Float32Array} for distortion
+            //This method creates the instance of Float32Array for distortion
             this.createCurve = function(amount, numSample){
                 if ((amount > 0) && (amount < 1)) {
                     var curves = new Float32Array(numSample);
@@ -4182,7 +4253,7 @@
                                     this.createCurve(0.9, this.size);
                                     break;
                                 default :
-                                    debug(this + ' param() : The value of "' + key + '" is one of "clean" or "crunch" or "overdrive" or "distortion" or "fuzz" !!');
+                                    debug(this + ' param() : The value of "' + key + '" is one of "clean", "crunch", "overdrive", "distortion", "fuzz" !!');
                                     break;
                             }
                         }
@@ -4516,7 +4587,7 @@
                             if (v in FILTER_TYPE) {
                                 this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPE[v];  //Setter
                             } else {
-                                debug(this + ' param() : The value of "' + key + '" is one of "lowpass" or "highpass" or "bandpass" or "lowshelf" or "highshelf" or "peaking" or "notch" or "allpass" !!');
+                                debug(this + ' param() : The value of "' + key + '" is one of "lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass" !!');
                             }
                         }
 
@@ -4988,6 +5059,7 @@
             if (this.isActive) {
                 //Stop onaudioprocess event
                 this.processor.disconnect(0);
+                this.processor.onaudioprocess = function(){};  //for Firefox
 
                 //Connect nodes again
                 this.lfo.connect(this.depth);
@@ -5830,7 +5902,7 @@
                             if (v in MODELS) {
                                 this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? v : MODELS[v];  //Setter
                             } else {
-                                debug(this + ' param() : The value of "' + key + '" is one of "linear" or "inverse" or "exponential" !!');
+                                debug(this + ' param() : The value of "' + key + '" is one of "linear", "inverse", "exponential" !!');
                             }
                         }
 
@@ -6232,29 +6304,19 @@
     };
 
     /** 
-     * This method extends the assigned class for Effector.
-     * @@param {CustomizedEffector} CustomizedEffector This argument is the subclass of Effector.
-     * @return {CustomizedEffector} This value is the subclass of Effector.
-     */
-    SoundModule.prototype.effector = function(CustomizedEffector){
-        if (Object.prototype.toString.call(CustomizedEffector) === '[object Function]') {
-            CustomizedEffector.prototype = inherit(Effector.prototype);
-            CustomizedEffector.prototype.constructor = CustomizedEffector;
-
-            return CustomizedEffector;
-        } else {
-            debug(this + ' effector : The 1st argument is class (function) for created effector !!');
-        }
-    };
-
-    /** 
-     * This method sets the instance of CustomizedEffector.
-     * @param {string} modulename This argument is in order to select the instance of CustomizedEffector.
-     * @param {CustomizedEffector} module This argument is CustomizedEffector.
+     * This method extends the assigned class for Effector, and creates the instance of CustomizedEffector.
+     * @param {string} effector This argument is in order to select the instance of CustomizedEffector.
+     * @param {CustomizedEffector} CustomizedEffector This argument is the subclass of Effector.
      * @return {SoundModule} This is returned for method chain.
      */
-    SoundModule.prototype.install = function(modulename, module){
-        this.plugins.push({name : String(modulename).toLowerCase(), plugin : new module(audiocontext)});
+    SoundModule.prototype.install = function(effector, CustomizedEffector){
+        if (Object.prototype.toString.call(CustomizedEffector) === '[object Function]') {
+            CustomizedEffector.prototype = new this.Effector(audiocontext, this.BUFFER_SIZE);
+            this.plugins.push({name : String(effector).toLowerCase(), plugin : new CustomizedEffector(audiocontext)});
+        } else {
+            debug(this + ' install() : The 1st argument is class (function) for created effector !!');
+        }
+
         return this;
     };
 
@@ -6472,7 +6534,7 @@
             this.volume = context.createGain();
 
             //in order to not call in duplicate "start" or "stop"  method in the instance of OscillatorNode
-            this.isStart  = false;
+            this.isStart = false;
 
             this.octave = 0;
             this.fine   = 0;
@@ -6519,7 +6581,7 @@
                             if (v in WAVE_TYPE) {
                                 this.source.type = (Object.prototype.toString.call(this.source.type) === '[object String]') ? v : WAVE_TYPE[v];  //Setter
                             } else {
-                                debug(this + ' param() : The value of "' + key + '" is one of "sine" or "square" or "sawtooth" or "triangle" !!');
+                                debug(this + ' param() : The value of "' + key + '" is one of "sine", "square", "sawtooth", "triangle" !!');
                             }
                         }
 
@@ -6663,6 +6725,7 @@
         //Clear previous
         this.eg.clear();
         this.processor.disconnect(0);
+        this.processor.onaudioprocess = function(){};  //for Firefox
 
         //(->) ScriptProcessorNode (composite active oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
@@ -6784,6 +6847,28 @@
 
         var self = this;
 
+        if (!((FULL_MODE === undefined) || FULL_MODE)) {
+            global.setTimeout(function(){
+                //Stop Effectors
+                self.chorus.stop(0);
+                self.flanger.stop(0);
+                self.phaser.stop(0);
+                self.autopanner.stop(0);
+                self.tremolo.stop(0);
+                self.ringmodulator.stop(0);
+                self.wah.stop(0);
+
+                //Stop drawing sound wave
+                self.analyser.stop('time');
+                self.analyser.stop('fft');
+                self.isAnalyser = false;
+
+                //Stop onaudioprocess event
+                self.processor.disconnect(0);
+                self.processor.onaudioprocess = function(){};  //for Firefox
+            }, ((this.times.stop + this.eg.release) * 1000));
+        }
+
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
             this.processor.onaudioprocess = processCallback;
         } else {
@@ -6840,11 +6925,11 @@
         //Call superclass constructor
         SoundModule.call(this, context);
 
-        this.sources  = [];  //{@type Array.<AudioBufferSourceNode>}
-        this.urls     = [];  //{@type Array.<string>}
-        this.buffers  = [];  //{@type Array.<AudioBuffer>}
-        this.volumes  = [];  //{@type Array.<GainNode>}
-        this.isStarts = [];  //{@type Array.<boolean>}  in order to not call in duplicate "start" or "stop"  method in the instance of AudioBufferSourceNode
+        this.sources   = [];  //{@type Array.<AudioBufferSourceNode>}
+        this.resources = [];  //{@type Array.<string>}
+        this.buffers   = [];  //{@type Array.<AudioBuffer>}
+        this.volumes   = [];  //{@type Array.<GainNode>}
+        this.isStarts  = [];  //{@type Array.<boolean>}  in order to not call in duplicate "start" or "stop"  method in the instance of AudioBufferSourceNode
 
         //for audio sources
         this.settings = [];  //{@type Array.<object>}
@@ -6865,7 +6950,7 @@
 
     /** 
      * This method creates the instances of {AudioBuffer} by Ajax.
-     * @param {Array.<string>} urls This argument is URLs for audio resources.
+     * @param {Array.<string>} resources This argument is either URLs or the instances of AudioBuffer for audio resources.
      * @param {Array.<object>} settings This argument is the properties of each audio sources.
      * @param {number} timeout This argument is timeout of Ajax. The default value is 60000 msec (1 minutes).
      * @param {function} successCallback This argument is executed as next process on success of reading file.
@@ -6874,30 +6959,30 @@
      * @return {OneshotModule} This is returned for method chain.
      * @override
      */
-    OneshotModule.prototype.setup = function(urls, settings, timeout, successCallback, errorCallback, progressCallback){
-        //The argument is associative array ? 
+    OneshotModule.prototype.setup = function(resources, settings, timeout, successCallback, errorCallback, progressCallback){
+        //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
-            if ('urls'     in properties) {urls             = properties.urls;}
-            if ('settings' in properties) {settings         = properties.settings;}
-            if ('timeout'  in properties) {timeout          = properties.timeout;}
-            if ('success'  in properties) {successCallback  = properties.success;}
-            if ('error'    in properties) {errorCallback    = properties.error;}
-            if ('progress' in properties) {progressCallback = properties.progress;}
+            if ('resources' in properties) {resources        = properties.resources;}
+            if ('settings'  in properties) {settings         = properties.settings;}
+            if ('timeout'   in properties) {timeout          = properties.timeout;}
+            if ('success'   in properties) {successCallback  = properties.success;}
+            if ('error'     in properties) {errorCallback    = properties.error;}
+            if ('progress'  in properties) {progressCallback = properties.progress;}
         }
 
-        if (!Array.isArray(urls)) {
-            urls = [urls];
+        if (!Array.isArray(resources)) {
+            resources = [resources];
         }
 
-        this.urls = urls;
+        this.resources = resources;
 
         if (!Array.isArray(settings)) {
             settings = [settings];
         }
 
-        this.buffers.length = urls.length;
+        this.buffers.length = resources.length;
 
         for (var i = 0, len = settings.length; i < len; i++) {
             if ('buffer' in settings[i]) {
@@ -6943,12 +7028,18 @@
         //Therefore, this flag are shared with the all instances of XMLHttpRequest.
         var isError = false;
 
+        var self = this;
+
         //Get ArrayBuffer by Ajax -> Create the instances of AudioBuffer
         var load = function(url, index){
             var xhr = new XMLHttpRequest();
 
-            //XMLHttpRequest Level 2
-            xhr.responseType = 'arraybuffer';
+            if ((FULL_MODE === undefined) || FULL_MODE) {
+                //XMLHttpRequest Level 2
+                xhr.responseType = 'arraybuffer';
+            } else {
+                xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            }
 
             //Timeout
             var timerid = global.setTimeout(function(){
@@ -6973,21 +7064,25 @@
                     global.clearTimeout(timerid);
 
                     if (xhr.status === 200) {
-                        var arrayBuffer = xhr.response;  //Get ArrayBuffer
+                        var arrayBuffer = null;
 
-                        if (arrayBuffer instanceof ArrayBuffer) {
+                        var decode = function(arrayBuffer){
+                            if (!(arrayBuffer instanceof ArrayBuffer)) {
+                                return;
+                            }
+
                             var decodeSuccessCallback = function(audioBuffer){
-                                this.buffers[index] = audioBuffer;  //Save instance of AudioBuffer
+                                self.buffers[index] = audioBuffer;  //Save instance of AudioBuffer
 
                                 //The creating the instances of AudioBuffer has completed ?
-                                for (var i = 0, len = this.buffers.length; i < len; i++) {
-                                    if (this.buffers[i] === undefined) {
+                                for (var i = 0, len = self.buffers.length; i < len; i++) {
+                                    if (self.buffers[i] === undefined) {
                                         return;
                                     }
                                 }
 
                                 if (Object.prototype.toString.call(successCallback) === '[object Function]') {
-                                    successCallback.call(this, this.buffers);
+                                    successCallback.call(self, self.buffers);
                                 }
                             };
 
@@ -6998,11 +7093,52 @@
                             };
 
                             //Create instance of AudioBuffer (Asynchronously)
-                            this.context.decodeAudioData(arrayBuffer, decodeSuccessCallback.bind(this), decodeErrorCallback.bind(this));
+                            self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
+                        };
+
+                        if ((FULL_MODE === undefined) || FULL_MODE) {
+                            arrayBuffer = xhr.response;
+                            decode.call(self, arrayBuffer);
+                        } else {
+                            var binary = xhr.responseText;
+                            var buffer = [];
+
+                            for (var i = 0, len = binary.length; i < len; i++) {
+                                buffer.push(binary.charCodeAt(i) & 0xFF);
+                            }
+
+                            var ex     = url.slice(-3);
+                            var mime   = 'audio/' + ex;
+                            var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
+                            var reader = new FileReader();
+
+                            reader.readAsArrayBuffer(blob);
+
+                            reader.onerror = function(event){
+                                if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                                    var error = '';
+
+                                    switch (reader.error.code) {
+                                        case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
+                                        case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
+                                        case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
+                                        case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
+                                        case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
+                                        default                            : error = 'ERR';              break;
+                                    }
+
+                                    errorCallback(event, error);
+                                }
+                            };
+
+                            reader.onload = function(){
+                                arrayBuffer = reader.result;
+                                decode.call(self, arrayBuffer);
+                            };
                         }
                     }
                 }
-            }.bind(this);
+            };
 
             xhr.onerror = function(){
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
@@ -7016,8 +7152,16 @@
             xhr.send(null);
         };
 
-        for (var i = 0, len = this.urls.length; i < len; i++) {
-            load.call(this, this.urls[i], i);
+        for (var i = 0, len = this.resources.length; i < len; i++) {
+            if (Object.prototype.toString.call(this.resources[i]) === '[object String]') {
+                load.call(this, this.resources[i], i);
+            } else if (this.resources[i] instanceof AudioBuffer) {
+                this.buffers[i] = this.resources[i];
+
+                if (i === (len - 1)) {
+                    successCallback.call(this, this.buffers);
+                }
+            }
         }
 
         return this;
@@ -7198,6 +7342,7 @@
 
                     //Stop onaudioprocess event
                     self.processor.disconnect(0);
+                    self.processor.onaudioprocess = function(){};  //for Firefox
                 }
             };
         }
@@ -7524,9 +7669,14 @@
             this.source.playbackRate.value = playbackRate;
             this.source.loop               = loop;
 
-            //AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
-            this.source.connect(this.processor);
-            this.connect(this.processor, connects);
+            if ((FULL_MODE === undefined) || FULL_MODE) {
+                //AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+                this.source.connect(this.processor);
+                this.connect(this.processor, connects);
+            } else {
+                //AudioBufferSourceNode (input) -> ... -> AudioDestinationNode (output)
+                this.connect(this.source, connects);
+            }
 
             //for legacy browsers
             this.source.start = this.source.start || this.source.noteGrainOn;
@@ -7629,7 +7779,10 @@
             this.analyser.stop('fft');
 
             //Clear
-            this.processor.disconnect(0);  //Stop onaudioprocess event
+
+            //Stop onaudioprocess event
+            this.processor.disconnect(0);
+            this.processor.onaudioprocess = function(){};  //for Firefox
             this.paused = true;
             this.callbacks.stop(this.source, this.currentTime);
         }
@@ -7741,7 +7894,7 @@
      * @override
      */
     MediaModule.prototype.setup = function(id, type, formats, callbacks){
-        //The argument is associative array ? 
+        //The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -7832,7 +7985,7 @@
 
                         //Stop onaudioprocess event
                         self.processor.disconnect(0);
-
+                        self.processor.onaudioprocess = function(){};  //for Firefox
                         self.callbacks.ended(event, this);
                     }, false);
 
@@ -7969,7 +8122,7 @@
 
     /** 
      * This method prepares for playing the media anytime after loading the media resource.
-     * @param {string} source This argument is path name or Data URL for the media resource.
+     * @param {string} source This argument is path name or Data URL or Object URL for the media resource.
      * @return {MediaModule} This is returned for method chain.
      * @override
      */
@@ -7977,13 +8130,11 @@
         var src = String(source);
 
         try {
-            //Data URL ?
-            if (src.indexOf('data:') !== -1) {
-                //Data URL
-                this.media.src = src;
+            //Data URL or Object URL ?
+            if ((src.indexOf('data:') !== -1) || (src.indexOf('blob:') !== -1)) {
+                this.media.src = src;  //Data URL or Object URL
             } else {
-                //Path
-                this.media.src = src + '.' + this.ex;
+                this.media.src = src + '.' + this.ex;  //Path
             }
         } catch (error) {
             throw new Error('The designated resource cannot be loaded !!');
@@ -8087,6 +8238,7 @@
 
             //Stop onaudioprocess event
             this.processor.disconnect(0);
+            this.processor.onaudioprocess = function(){};  //for Firefox
         }
 
         return this;
@@ -8102,7 +8254,11 @@
      */
     MediaModule.prototype.toggle = function(position, connects, processCallback){
         if (this.media instanceof HTMLMediaElement) {
-            this.media.paused ? this.start(position, connects, processCallback) : this.stop();
+            if (this.media.paused) {
+                this.start(position, connects, processCallback);
+            } else {
+                this.stop();
+            }
         }
 
         return this;
@@ -8362,7 +8518,7 @@
                         return;
                     }
 
-                    var chord = note.replace(/((?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*/i, '$1');
+                    var chord = note.match(/((?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*/i)[1];
 
                     var indexes = [];
 
@@ -8420,7 +8576,7 @@
                     var duration  = 0;
 
                     while (durations.length > 0) {
-                        var d = durations.shift().replace(/(?:[CDEFGABR][#+-]?)+((?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*)/i, '$1');
+                        var d = durations.shift().match(/(?:[CDEFGABR][#+-]?)+((?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*)/i)[1];
 
                         switch (parseInt(d)) {
                             case   1 :
@@ -8691,7 +8847,7 @@
 
     /** 
      * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or MML.
-     * @param {string} source This argument is one of 'oscillator' or 'oneshot' or 'audio' or 'media' or 'fallback' or 'mml'.
+     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'mml'.
      * @param {number} index This argument is in order to select one of some oscillators.
      * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule}
      */
@@ -8724,13 +8880,14 @@
             case 'mml' :
                 return mml;
             default :
-                debug('XSound() : The value of the 1st argument ("' + source + '") is one of "oscillator" or "oneshot" or "audio" or "media" or "fallback" or "mml" !!');
+                debug('XSound() : The value of the 1st argument ("' + source + '") is one of "oscillator", "oneshot", "audio", "media", "fallback", "mml" !!');
                 break;
         }
     };
 
     //Static properties
     XSound.IS_XSOUND   = IS_XSOUND;
+    XSound.FULL_MODE   = FULL_MODE;
     XSound.ERROR_MODE  = ERROR_MODE;
     XSound.SAMPLE_RATE = sound.SAMPLE_RATE;
     XSound.BUFFER_SIZE = sound.BUFFER_SIZE;
