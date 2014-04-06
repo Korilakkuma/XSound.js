@@ -36,7 +36,7 @@ etc...
 ## Demo
   
 The application that uses this library is in the following URL.  
-Please use Chrome (Windows / Mac) or Safari (Mac).  
+Please use Chrome (Mac / Windows) or Safari (Mac) or Opera (Mac / Windows).  
 
 * [X Sound](http://curtaincall.weblike.jp/portfolio-x-sound/)
 
@@ -151,7 +151,7 @@ or,
   
 In the case of multi sounds (for example, chord),
   
-    //Set up four sources
+    //Set up 4 sources
     X('oscillator').setup([true, true, true, false]);
 
     var base = 40;
@@ -353,8 +353,8 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
               //"buffers" is the instances of AudioBuffer
           },
           error     : function(object, textStatus){
-              //"object" is either the instance of XMLHttpRequest,  "onerror" event object in the instance of FileReader or error object of "decodeAudioData"
-              //"textStatus" is one of 'error', 'timeout', 'decode', error code of FileReader;
+              //"object" is either the instance of XMLHttpRequest,  "onerror" event object in the instance of FileReader or null
+              //"textStatus" is one of 'error', 'timeout', 'decode', error code of FileReader
           },
           progress  : function(xhr){
               //"xhr" is the instance of XMLHttpRequest
@@ -468,6 +468,9 @@ Register callback functions.
 
           //'source' is the instance of AudioBufferSourceNode
           //'currentTime' is current time in audio
+      },
+      error : function(){
+          //When "decodeAudioData" failed, this callback function is executed
       }
     });
   
@@ -498,7 +501,7 @@ It is required to create the instance of AudioBuffer in order to to play the aud
     });
 
     //<input type="file">
-    document.getElementById('file-upload').addEventListener('change', function(event){
+    document.querySelector('[type="file"]').addEventListener('change', function(event){
         try {
             //The returned value is the instance of File (extends Blob)
             var file = X.file(
@@ -694,7 +697,7 @@ In the case of starting media on the way of media,
   
 Vocal Canceler requires to use Web Audio API.
 Therefore, it is requires to check flag.
-
+  
     if (X.IS_XSOUND) {
         //Getter
         var canceler = X('media').module('vocalCanceler').param('depth');  //The default value is 0
@@ -707,6 +710,24 @@ Therefore, it is requires to check flag.
     } else {
         //Cannot use Vocal Canceler
     }
+  
+## Mix Sound Source
+  
+In the case of mixing the cloned sound source with the original sound source,
+  
+    //for example, in the case of mixing 2 sound sources,
+
+    //Please refer "Clone Sound Source" section about "clone" method in "X" object
+    var cloned = X.clone();
+
+    var main = X('oscillator');
+    var sub  = cloned('oscillator');
+
+    main.setup([true]).ready(0, 0).start(440);
+    sub.setup([true]).ready(0, 0).start(880);
+
+    //Mix sounds
+    X('mixer').mix([main, sub]);
   
 ## Select Connected Module
   
@@ -784,9 +805,9 @@ In ths case of customizing "onaudioprocess" event handler in the instance of Scr
   
 ## Effectors
     
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
   
 If effectors are used to X('media'), it is necessary to determine global flag (X.IS_XSOUND).  
 However, this is omitted the following.
@@ -1160,7 +1181,7 @@ Reverb effect requires ArrayBuffer of impulse response.
     });
 
     //<input type="file">
-    document.getElementById('file-upload').addEventListener('change', function(event){
+    document.querySelector('[type="file"]').addEventListener('change', function(event){
         try {
             //The returned value is the instance of File (extends Blob)
             var file = X.file(
@@ -1675,7 +1696,7 @@ In the case of displaying current time according to playing the audio,
 #### Time Domain
   
     var params = {
-      interval     : 500,                         //at intervals of drawing sound wave [msec]
+      interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
       shape        : 'line',                      //Wave shape ('line' or 'rect')
       wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
       grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
@@ -1707,7 +1728,7 @@ In the case of displaying current time according to playing the audio,
 #### Frequency Domain (Spectrum)
   
     var params = {
-      interval     : 500,                         //at intervals of drawing sound wave [msec]
+      interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
       shape        : 'line',                      //Wave shape ('line' or 'rect')
       wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
       grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
@@ -1739,9 +1760,9 @@ In the case of displaying current time according to playing the audio,
   
 ## Recording
   
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
   
 ### Initialization
   
@@ -1799,9 +1820,9 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media'.
   
 ## Session
   
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
   
 ### Initialization
   
@@ -1919,13 +1940,29 @@ But, separator must not be the characters that are used by MML.
 
     X('mml').ready(X('oneshot'), mmls);
 
-or,
+In the case of using "X('oscillator')", (Please refer "Clone Sound Source" section about "clone" method in "X" object)
 
-    X('mml').ready(X('oscillator'), mmls);  //If "X('oscillator')" is used, this library cannot corresponds to multipart
+    var clones  = [];
+    var sources = [];
+
+    for (var i = 0, len = mmls.length; i < len; i++) {
+        var cloned = X.clone();
+
+        clones.push(cloned);
+        sources.push(cloned('oscillator'));
+    }
+  
+    for (var i = 0, len = clones.length i < len; i++) {
+        clones[i]('mml').setup({
+          start : function(sequence, index){
+              X('mixer').mix(sources);
+          }
+        }).ready(clones[i]('oscillator'), mmls[i]);
+    }
   
 ### Start MML
   
-    var parts = X('mml').getSequences();
+    var parts = X('mml').get();
 
     for (var i = 0, len = parts.length; i < len; i++) {
         X('mml').start(i);
@@ -1933,9 +1970,31 @@ or,
   
 In the case of using "X('oscillator')",
   
-    X('mml').start(0);
+    var sources = [];
+
+    for (var i = 0, len = clones.length; i < len; i++) {
+        clones[i]('mml').start(0);
+    }
+
+    X('mixer').mix(sources);
   
 ### Stop MML
   
     X('mml').stop();
+  
+## Clone Sound Source
+  
+In the case of cloning sound source,
+  
+    //Clone "X" object
+    var cloned = X.clone();
+
+    console.assert(X               === cloned);                //Assertion failed
+    console.assert(X('oscillator') === cloned('oscillator'));  //Assertion failed
+    console.assert(X('oneshot')    === cloned('oneshot'));     //Assertion failed
+    console.assert(X('audio')      === cloned('audio'));       //Assertion failed
+    console.assert(X('media')      === cloned('media'));       //Assertion failed
+    console.assert(X('fallback')   === cloned('fallback'));    //Assertion failed
+    console.assert(X('mixer')      === cloned('mixer'));       //Assertion failed
+    console.assert(X('mml')        === cloned('mml'));         //Assertion failed
   
