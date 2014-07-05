@@ -304,79 +304,79 @@
         var t = parseInt(timeout);
 
         //Timeout
-        var timerid = global.setTimeout(function(){
-            xhr.abort();
+        xhr.timeout = (t > 0) ? t : 60000;
 
+        xhr.ontimeout = function(event){
             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                errorCallback(xhr, ERROR_AJAX_TIMEOUT);
-            }
-        }, ((t > 0) ? t : 60000));
-
-        xhr.onreadystatechange = function(){
-            if ((xhr.readyState === xhr.LOADING) && (Object.prototype.toString.call(progressCallback) === '[object Function]')) {
-                progressCallback(xhr);
-            }
-
-            if (xhr.readyState === xhr.DONE) {
-                //Clear timer
-                global.clearTimeout(timerid);
-
-                if (xhr.status === 200) {
-                    var arrayBuffer = null;
-
-                    if ((FULL_MODE === undefined) || FULL_MODE) {
-                        arrayBuffer = xhr.response;
-
-                        if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
-                            successCallback(xhr, arrayBuffer);
-                        }
-                    } else {
-                        var binary = xhr.responseText;
-                        var buffer = [];
-
-                        for (var i = 0, len = binary.length; i < len; i++) {
-                            buffer.push(binary.charCodeAt(i) & 0xFF);
-                        }
-
-                        var ex     = url.slice(-3);
-                        var mime   = 'audio/' + ex;
-                        var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
-                        var reader = new FileReader();
-
-                        reader.readAsArrayBuffer(blob);
-
-                        reader.onerror = function(event){
-                            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                var error = '';
-
-                                switch (reader.error.code) {
-                                    case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
-                                    case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
-                                    case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
-                                    case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
-                                    case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
-                                    default                            : error = 'ERR';              break;
-                                }
-
-                                errorCallback(event, error);
-                            }
-                        };
-
-                        reader.onload = function(){
-                            arrayBuffer = reader.result;
-
-                            if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
-                                successCallback(xhr, arrayBuffer);
-                            }
-                        };
-                    }
-                }
+                errorCallback(event, ERROR_AJAX_TIMEOUT);
             }
         };
 
-        xhr.onerror = function(){
+        //Progress
+        xhr.onprogress = function(event){
+            if (Object.prototype.toString.call(progressCallback) === '[object Function]') {
+                progressCallback(event);
+            }
+        };
+
+        //Error
+        xhr.onerror = function(event){
             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                errorCallback(xhr, ERROR_AJAX);
+                errorCallback(event, ERROR_AJAX);
+            }
+        };
+
+        //Success
+        xhr.onload = function(event){
+            if (xhr.status === 200) {
+                var arrayBuffer = null;
+
+                if ((FULL_MODE === undefined) || FULL_MODE) {
+                    arrayBuffer = xhr.response;
+
+                    if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
+                        successCallback(event, arrayBuffer);
+                    }
+                } else {
+                    var binary = xhr.responseText;
+                    var buffer = [];
+
+                    for (var i = 0, len = binary.length; i < len; i++) {
+                        buffer.push(binary.charCodeAt(i) & 0xFF);
+                    }
+
+                    var ex     = url.slice(-3);
+                    var mime   = 'audio/' + ex;
+                    var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
+                    var reader = new FileReader();
+
+                    reader.readAsArrayBuffer(blob);
+
+                    reader.onerror = function(event){
+                        if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                            var error = '';
+
+                            switch (reader.error.code) {
+                                case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
+                                case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
+                                case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
+                                case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
+                                case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
+                                default                            : error = 'ERR';              break;
+                            }
+
+                            errorCallback(event, error);
+                        }
+                    };
+
+                    reader.onload = function(){
+                        arrayBuffer = reader.result;
+
+                        if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
+                            successCallback(event, arrayBuffer);
+                        }
+                    };
+                }
             }
         };
 
@@ -754,7 +754,7 @@
      * This method gets the HTMLMediaElement that is used in MediaFallbackModule.
      * @return {HTMLMediaElement}
      */
-    MediaFallbackModule.prototype.getMedia = function(){
+    MediaFallbackModule.prototype.get = function(){
         return this.media;
     };
 
@@ -834,7 +834,7 @@
     ////////////////////////////////////////////////////////////////////////////////
 
     if (IS_XSOUND) {
-        //Chrome (Win / Mac), Safari (Mac), Opera, Firefox
+        //Chrome, Opera, Firefox (Mac / Windows), Safari (Mac)
         global.AudioContext = global.AudioContext || global.webkitAudioContext;
 
         audiocontext = new AudioContext();
@@ -845,7 +845,7 @@
         audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
         audiocontext.createPeriodicWave    = audiocontext.createPeriodicWave    || audiocontext.createWaveTable;
     } else {
-        //IE
+        //Internet Explorer
 
         //Create instance
         var media = new MediaFallbackModule();
@@ -1875,9 +1875,6 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //for measureText()
-                    var context = document.createElement('canvas').getContext('2d');
-
                     //Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
@@ -1889,11 +1886,9 @@
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + modh + '" />';
                             }
 
-                            x -= Math.floor(context.measureText(t).width / 2);
-
                             //Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
+                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
                             }
                         }
                     }
@@ -1903,7 +1898,7 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = w - Math.floor(1.5 * context.measureText(t).width); 
+                        x = w; 
                         y = Math.floor((1 - parseFloat(t.trim())) * (modh / 2)) + this.styles.top;
 
                         //Draw grid
@@ -1915,7 +1910,7 @@
 
                         //Draw text
                         if (this.styles.text !== 'none') {
-                            svg += '<text style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                            svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                         }
                     }
                 }
@@ -2458,9 +2453,6 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //for measureText()
-                    var context = document.createElement('canvas').getContext('2d');
-
                     //Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
@@ -2472,11 +2464,9 @@
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + modh + '" />';
                             }
 
-                            x -= Math.floor(context.measureText(t).width / 2);
-
                             //Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
+                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
                             }
                         }
                     }
@@ -2486,7 +2476,7 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = w - Math.floor(1.5 * context.measureText(t).width); 
+                        x = w; 
                         y = Math.floor((1 - parseFloat(t.trim())) * (modh / 2)) + this.styles.top;
 
                         //Draw grid
@@ -2498,7 +2488,7 @@
 
                         //Draw text
                         if (this.styles.text !== 'none') {
-                            svg += '<text style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                            svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                         }
                     }
                 }
@@ -2995,9 +2985,6 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //for measureText()
-                    var context = document.createElement('canvas').getContext('2d');
-
                     //Draw grid and text (X axis)
                     var f = 0;
 
@@ -3013,11 +3000,9 @@
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + modh + '" />';
                             }
 
-                            x -= Math.floor(context.measureText(t).width / 2);
-
                             //Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
+                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + h + '">' + t + '</text>';
                             }
                         }
                     }
@@ -3027,7 +3012,7 @@
                         case 'float' :
                             for (var i = mindB; i <= maxdB; i += 10) {
                                 t = i + 'dB';
-                                x = w - Math.floor(1.5 * context.measureText(t).width);
+                                x = w;
                                 y = Math.floor(((-1 * (i - maxdB)) / range) * modh) + this.styles.top;
 
                                 //Draw grid
@@ -3039,7 +3024,7 @@
 
                                 //Draw text
                                 if (this.styles.text !== 'none') {
-                                    svg += '<text style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                                    svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                                 }
                             }
 
@@ -3050,7 +3035,7 @@
 
                             for (var i = 0, len = texts.length; i < len; i++) {
                                 t = texts[i];
-                                x = w - Math.floor(1.5 * context.measureText(t).width);
+                                x = w;
                                 y = ((1 - parseFloat(t)) * modh) + this.styles.top;
 
                                 //Draw grid
@@ -3062,7 +3047,7 @@
 
                                 //Draw text
                                 if (this.styles.text !== 'none') {
-                                    svg += '<text style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                                    svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                                 }
                             }
 
@@ -3826,7 +3811,7 @@
          * @param {string} path This argument is file that is executed in server side.
          * @param {function} openCallback This argument is executed as "onopen" event handler in the instance of WebSocket.
          * @param {function} closeCallback This argument is executed as "onclose" event handler in the instance of WebSocket.
-         * @param {function} errorCallback This argument is executed as "onerro" event handler in the instance of WebSocket.
+         * @param {function} errorCallback This argument is executed as "onerror" event handler in the instance of WebSocket.
          * @return {Session} This is returned for method chain.
          */
         Session.prototype.setup = function(tls, host, port, path, openCallback, closeCallback, errorCallback){
@@ -4309,7 +4294,12 @@
                                     this.createCurve(0.9, this.size);
                                     break;
                                 default :
-                                    _debug(this + ' param() : The value of "' + key + '" is one of "clean", "crunch", "overdrive", "distortion", "fuzz" !!');
+                                    if (value instanceof Float32Array) {
+                                        this.distortion.curve = value;
+                                    } else {
+                                        _debug(this + ' param() : The value of "' + key + '" is one of "clean", "crunch", "overdrive", "distortion", "fuzz", the instance of Float32Array !!');
+                                    }
+
                                     break;
                             }
                         }
@@ -4607,7 +4597,7 @@
             this.maxFrequency = this.filter.frequency.value;
             this.attack  = 0.01;
             this.decay   = 0.3;
-            this.sustain = 0.5;
+            this.sustain = 1.0;
             this.release = 1.0;
         }
 
@@ -5161,7 +5151,7 @@
             //GainNode (input) -> GainNode (output)
             this.input.connect(this.output);
 
-            //GainNode (input) -> BiquadFilterNode (allpass) (* 8) -> GainNode (mix) -> GainNode (output)
+            //GainNode (input) -> BiquadFilterNode (allpass) (* 12) -> GainNode (mix) -> GainNode (output)
             this.input.connect(this.filters[0]);
 
             for (var i = 0; i < this.NUM_FILTER; i++) {
@@ -5695,6 +5685,9 @@
                         }
 
                         break;
+                    case 'rir' :
+                        return this.convolver.buffer;  //Getter only
+                        break;
                     default :
                         _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties !!');
                         break;
@@ -6046,7 +6039,8 @@
          * @return {boolean} If the all of gain schedulings have ended, this value is true. Otherwise, this value is false.
          */
         EnvelopeGenerator.prototype.isStop = function(){
-            var checks = [];
+            var MIN_GAIN = 1e-3;
+            var counter  = 0;
 
             for (var i = 0, len = this.activeIndexes.length; i < len; i++) {
                 var activeIndex = this.activeIndexes[i];
@@ -6055,13 +6049,13 @@
                     continue;
                 }
 
-                if (this.generators[activeIndex].gain.value > 1e-3) {
+                if (this.generators[activeIndex].gain.value > MIN_GAIN) {
                     return false;
                 } else {
-                    checks.push(activeIndex);
+                    counter++;
 
                     //the all of schedulings are stopped ?
-                    if (checks.length === this.activeCounter) {
+                    if (counter === this.activeCounter) {
                         return true;
                     }
                 }
@@ -6616,7 +6610,7 @@
                 switch (k) {
                     case 'type' :
                         if (value === undefined) {
-                            return this.type;  //Getter
+                            return this.source.type;  //Getter
                         } else {
                             var v = String(value).toLowerCase();
 
@@ -6829,6 +6823,7 @@
             frequencies = [frequencies];
         }
 
+        /*
         if (frequencies.length < this.sources.length) {
             var diff = this.sources.length - frequencies.length;
 
@@ -6836,6 +6831,7 @@
                 frequencies.push(0);  //0 Hz
             }
         }
+        */
 
         for (var i = 0, len = frequencies.length; i < len; i++) {
             var f = parseFloat(frequencies[i]);
@@ -6850,9 +6846,13 @@
         //(... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
 
-        for (var i = 0, len = this.sources.length; i < len; i++) {
+        for (var i = 0, len = frequencies.length; i < len; i++) {
+            if (i >= this.sources.length) {
+                break;
+            }
+
             var oscillator = this.sources[i];
-            var frequency  = frequencies.shift();
+            var frequency  = frequencies[i];
 
             //Start sound
             oscillator.start(this.processor, startTime);
@@ -7073,8 +7073,8 @@
     OneshotModule.prototype.constructor = OneshotModule;
 
     /** 
-     * This method creates the instances of {AudioBuffer} by Ajax.
-     * @param {Array.<string>} resources This argument is either URLs or the instances of AudioBuffer for audio resources.
+     * This method creates the instances of AudioBuffer by Ajax.
+     * @param {Array.<string>|Array.<AudioBuffer>} resources This argument is either URLs or the instances of AudioBuffer for audio resources.
      * @param {Array.<object>} settings This argument is the properties of each audio sources.
      * @param {number} timeout This argument is timeout of Ajax. The default value is 60000 msec (1 minutes).
      * @param {function} successCallback This argument is executed as next process on success of reading file.
@@ -7141,8 +7141,6 @@
             this.settings = settings;
         }
 
-        var t = parseInt(timeout);
-
         //for errorCallback
         var ERROR_AJAX         = 'error';
         var ERROR_AJAX_TIMEOUT = 'timeout';
@@ -7151,6 +7149,8 @@
         //If the error is at least 1, this method aborts the all of connections.
         //Therefore, this flag are shared with the all instances of XMLHttpRequest.
         var isError = false;
+
+        var t = parseInt(timeout);
 
         var self = this;
 
@@ -7166,110 +7166,110 @@
             }
 
             //Timeout
-            var timerid = global.setTimeout(function(){
-                xhr.abort();
+            xhr.timeout = (t > 0) ? t : 60000;
 
+            xhr.ontimeout = function(event){
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(xhr, ERROR_AJAX_TIMEOUT);
+                    errorCallback(event, ERROR_AJAX_TIMEOUT);
                 }
 
                 isError = true;
-            }, ((t > 0) ? t : 60000));
+            };
 
-            xhr.onreadystatechange = function(){
+            //Progress
+            xhr.onprogress = function(event){
                 if (isError) {
                     xhr.abort();
-                } else if (xhr.readyState === xhr.LOADING) {
-                    if (Object.prototype.toString.call(progressCallback) === '[object Function]') {
-                        progressCallback(xhr);
-                    }
-                } else if (xhr.readyState === xhr.DONE) {
-                    //Clear timer
-                    global.clearTimeout(timerid);
-
-                    if (xhr.status === 200) {
-                        var arrayBuffer = null;
-
-                        var decode = function(arrayBuffer){
-                            if (!(arrayBuffer instanceof ArrayBuffer)) {
-                                return;
-                            }
-
-                            var decodeSuccessCallback = function(audioBuffer){
-                                self.buffers[index] = audioBuffer;  //Save instance of AudioBuffer
-
-                                //The creating the instances of AudioBuffer has completed ?
-                                for (var i = 0, len = self.buffers.length; i < len; i++) {
-                                    if (self.buffers[i] === undefined) {
-                                        return;
-                                    }
-                                }
-
-                                if (Object.prototype.toString.call(successCallback) === '[object Function]') {
-                                    successCallback.call(self, self.buffers);
-                                }
-                            };
-
-                            var decodeErrorCallback = function(){
-                                if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                    errorCallback(null, ERROR_DECODE);
-                                }
-                            };
-
-                            //Create instance of AudioBuffer (Asynchronously)
-                            self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
-                        };
-
-                        if ((FULL_MODE === undefined) || FULL_MODE) {
-                            arrayBuffer = xhr.response;
-                            decode.call(self, arrayBuffer);
-                        } else {
-                            var binary = xhr.responseText;
-                            var buffer = [];
-
-                            for (var i = 0, len = binary.length; i < len; i++) {
-                                buffer.push(binary.charCodeAt(i) & 0xFF);
-                            }
-
-                            var ex     = url.slice(-3);
-                            var mime   = 'audio/' + ex;
-                            var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
-                            var reader = new FileReader();
-
-                            reader.readAsArrayBuffer(blob);
-
-                            reader.onerror = function(event){
-                                if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                    var error = '';
-
-                                    switch (reader.error.code) {
-                                        case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
-                                        case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
-                                        case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
-                                        case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
-                                        case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
-                                        default                            : error = 'ERR';              break;
-                                    }
-
-                                    errorCallback(event, error);
-                                }
-                            };
-
-                            reader.onload = function(){
-                                arrayBuffer = reader.result;
-                                decode.call(self, arrayBuffer);
-                            };
-                        }
-                    }
+                } else if (Object.prototype.toString.call(progressCallback) === '[object Function]') {
+                    progressCallback(event);
                 }
             };
 
-            xhr.onerror = function(){
+            //Error
+            xhr.onerror = function(event){
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(xhr, ERROR_AJAX);
+                    errorCallback(event, ERROR_AJAX);
                 }
 
                 isError = true;
+            };
+
+            //Success
+            xhr.onload = function(event){
+                if (xhr.status === 200) {
+                    var arrayBuffer = null;
+
+                    var decodeArrayBuffer = function(arrayBuffer){
+                        if (!(arrayBuffer instanceof ArrayBuffer)) {
+                            return;
+                        }
+
+                        var decodeSuccessCallback = function(audioBuffer){
+                            self.buffers[index] = audioBuffer;  //Save instance of AudioBuffer
+
+                            //The creating the instances of AudioBuffer has completed ?
+                            for (var i = 0, len = self.buffers.length; i < len; i++) {
+                                if (self.buffers[i] === undefined) {
+                                    return;
+                                }
+                            }
+
+                            if (Object.prototype.toString.call(successCallback) === '[object Function]') {
+                                successCallback.call(self, event, self.buffers);
+                            }
+                        };
+
+                        var decodeErrorCallback = function(){
+                            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                                errorCallback(null, ERROR_DECODE);
+                            }
+                        };
+
+                        //Create the instance of AudioBuffer (Asynchronously)
+                        self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
+                    };
+
+                    if ((FULL_MODE === undefined) || FULL_MODE) {
+                        arrayBuffer = xhr.response;
+                        decodeArrayBuffer.call(self, arrayBuffer);
+                    } else {
+                        var binary = xhr.responseText;
+                        var buffer = [];
+
+                        for (var i = 0, len = binary.length; i < len; i++) {
+                            buffer.push(binary.charCodeAt(i) & 0xFF);
+                        }
+
+                        var ex     = url.slice(-3);
+                        var mime   = 'audio/' + ex;
+                        var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
+                        var reader = new FileReader();
+
+                        reader.readAsArrayBuffer(blob);
+
+                        reader.onerror = function(event){
+                            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                                var error = '';
+
+                                switch (reader.error.code) {
+                                    case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
+                                    case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
+                                    case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
+                                    case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
+                                    case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
+                                    default                            : error = 'ERR';              break;
+                                }
+
+                                errorCallback(event, error);
+                            }
+                        };
+
+                        reader.onload = function(){
+                            arrayBuffer = reader.result;
+                            decodeArrayBuffer.call(self, arrayBuffer);
+                        };
+                    }
+                }
             };
 
             xhr.open('GET', url, true);
@@ -7278,13 +7278,11 @@
 
         for (var i = 0, len = this.resources.length; i < len; i++) {
             if (Object.prototype.toString.call(this.resources[i]) === '[object String]') {
+                //Get the instances of AudioBuffer from the designated URLs.
                 load.call(this, this.resources[i], i);
             } else if (this.resources[i] instanceof AudioBuffer) {
+                //Get the instances of AudioBuffer directly
                 this.buffers[i] = this.resources[i];
-
-                if (i === (len - 1)) {
-                    successCallback.call(this, this.buffers);
-                }
             }
         }
 
@@ -8594,7 +8592,7 @@
 
         var self = this;
 
-        this.processor.onaudioprocess = function(event) {
+        this.processor.onaudioprocess = function(event){
             var inputLs  = event.inputBuffer.getChannelData(0);
             var inputRs  = event.inputBuffer.getChannelData(1);
             var outputLs = event.outputBuffer.getChannelData(0);
@@ -8983,11 +8981,20 @@
 
                     currentTime += duration;
 
-                    sequences.push({indexes : indexes, frequencies : frequencies, start : start, duration : duration, stop : stop});
+                    sequences.push({
+                      indexes     : indexes,
+                      frequencies : frequencies,
+                      start       : start,
+                      duration    : duration,
+                      stop        : stop
+                    });
                 }
             };
 
             if (sequences.length > 0) {
+                //"start" method gets element by "pop" for performance
+                sequences.reverse();
+
                 this.sequences.push(sequences);
                 this.timerids.push(null);
             }
@@ -9008,7 +9015,7 @@
 
         if ((p >= 0) && (p < this.sequences.length)) {
             if (!Array.isArray(this.sequences[p])) {
-                return;
+                return this;
             }
 
             //End ?
@@ -9019,7 +9026,7 @@
                 return this;
             }
 
-            var sequence = this.sequences[p].shift();
+            var sequence = this.sequences[p].pop();
 
             if (Array.isArray(this.source)) {
                 for (var i = 0, len = this.source.length; i < len; i++) {
@@ -9122,6 +9129,8 @@
 
                 //Start next sound by recursive call
                 self.start(p, connects, processCallback);
+
+                sequence = null;
             }, (sequence.duration * 1000));
         } else {
             _debug(this + ' start() : The range of designated MML part is between 0 and ' + (this.sequences.length - 1) + ' !!');
@@ -9139,7 +9148,7 @@
         var sequence = this.prev;
 
         if (sequence.length === 0) {
-            return;
+            return this;
         }
 
         if (Array.isArray(this.source)) {
@@ -9201,6 +9210,8 @@
         } else {
             this.stop();
         }
+
+        return this;
     };
 
     /** 
@@ -9236,7 +9247,23 @@
      * @return {string} This is returned as text file that writes MML.
      */
     MML.prototype.download = function(mml){
-        var base64  = global.btoa(String(mml));
+        var toAscii = function(string){
+            var converted = '';
+
+            for (var i = 0, len = string.length; i < len; i++) {
+                var charCode = string.charCodeAt(i);
+
+                if (charCode > 0xFF) {
+                    converted += ('&#' + charCode + ';');
+                } else {
+                    converted += string.charAt(i);
+                }
+            }
+
+            return converted;
+        };
+
+        var base64  = global.btoa(toAscii(String(mml)));
         var dataURL = 'data:text/plain;base64,' + base64;
 
         return dataURL;

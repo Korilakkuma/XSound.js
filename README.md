@@ -6,7 +6,7 @@ HTML5 Web Audio API Library
 ## Overview
   
 This library enables developers to use **Web Audio API by description like jQuery**.  
-In concrete, this library may be useful to implement the following functions.
+In concrete, this library may be useful to implement the following features.
   
 * Create Sound
 * Play the One-Shot Audio
@@ -48,12 +48,16 @@ Now, I'm creating website for Web Audio API. Please use the following site for u
 
 * [WEB SOUNDER](http://curtaincall.weblike.jp/portfolio-web-sounder/)
   
+## Usage
+  
+    <script type="text/javascript" src="xsound.min.js"></script>
+  
 ## Global Objects
   
 This library defines 2 global objects. These are "X" and "XSound".  
 If "X" is used already in the application, "X" can be removed by "noConflict" method
   
-    //Remove 'X'
+    //Remove "X"
     XSound.noConflict();
 
     XSound(/* .... */);
@@ -62,7 +66,7 @@ If "X" is used already in the application, "X" can be removed by "noConflict" me
   
 In the case of removing both of global objects,
   
-    //Remove 'X', 'XSound'
+    //Remove "X", "XSound"
     var $ = XSound.noConflict(true);  //change variable name "$" freely
   
 Some constant values are defined by these global objects as static property.
@@ -349,15 +353,16 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
           resources : urls,
           settings  : settings,
           timeout   : 60000,
-          success   : function(buffers){
+          success : function(event, buffers){
+              //"event" is XMLHttpRequestProgressEvent
               //"buffers" is the instances of AudioBuffer
           },
-          error     : function(object, textStatus){
-              //"object" is either the instance of XMLHttpRequest,  "onerror" event object in the instance of FileReader or null
-              //"textStatus" is one of 'error', 'timeout', 'decode', error code of FileReader
+          error : function(event, textStatus){
+              //"event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
+              //"textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
           },
-          progress  : function(xhr){
-              //"xhr" is the instance of XMLHttpRequest
+          progress : function(event){
+              //"event" is XMLHttpRequestProgressEvent
           }
         });
     } catch (error) {
@@ -484,19 +489,19 @@ It is required to create the instance of AudioBuffer in order to to play the aud
     X.ajax({
       url     : 'http://xxx.jp/sample.wav',  //Resource URL
       timeout : 60000,                       //Timeout (1 minutes)
-      success : function(xhr, arrayBuffer){
-          //"xhr" is the instance of XMLHttpRequest
+      success : function(event, arrayBuffer){
+          //"event" is XMLHttpRequestProgressEvent
           //"arrayBuffer" is the instance of ArrayBuffer
 
           //ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
           X('audio').ready.call(X('audio'), arrayBuffer);
       },
-      error : function(xhr, textStatus){
-          //"xhr" is the instance of XMLHttpRequest
-          //"textStatus" is either 'error' or 'timeout'
+      error : function(event, textStatus){
+          //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
+          //"textStatus" is one of 'error', 'timeout', error code of FileReader
       },
-      progress : function(xhr){
-          //"xhr" is the instance of XMLHttpRequest
+      progress : function(event){
+          //"event" is XMLHttpRequestProgressEvent
       }
     });
 
@@ -1164,19 +1169,19 @@ Reverb effect requires ArrayBuffer of impulse response.
     X.ajax({
       url     : 'http://xxx.jp/impulse.wav',  //Resource URL
       timeout : 60000,                        //Timeout (1 minutes)
-      success : function(xhr, arrayBuffer){
-          //"xhr" is the instance of XMLHttpRequest
+      success : function(event, arrayBuffer){
+          //"event" is XMLHttpRequestProgressEvent
           //"arrayBuffer" is the instance of ArrayBuffer
 
           //ArrayBuffer -> AudioBuffer -> "buffer" property in the instance of ConvolverNode
-          X(source).module('reverb').run.call(X(source).module('reverb'), arrayBuffer);
+          X(source).module('reverb').start.call(X(source).module('reverb'), arrayBuffer);
       },
-      error : function(object, textStatus){
-          //"object" is either the instance of XMLHttpRequest or "onerror" event object in the instance of FileReader
-          //"textStatus" is one of 'error', 'timeout', error code of FileReader;
+      error : function(event, textStatus){
+          //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
+          //"textStatus" is one of 'error', 'timeout', error code of FileReader
       },
-      progress : function(xhr){
-          //"xhr" is the instance of XMLHttpRequest
+      progress : function(event){
+          //"event" is XMLHttpRequestProgressEvent
       }
     });
 
