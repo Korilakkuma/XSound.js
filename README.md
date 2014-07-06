@@ -52,6 +52,20 @@ Now, I'm creating website for Web Audio API. Please use the following site for u
   
     <script type="text/javascript" src="xsound.min.js"></script>
   
+In the case of displaying error message for development,
+  
+    <script type="text/javascript" src="xsound.dev.js"></script>
+  
+In the case of using WebSocket,
+  
+    $ node xsound-server-websocket.js  //Use "websocket" module
+  
+Default port number is 8000.  
+This port number can be changed by designating argument.  
+For example,
+  
+    $ node xsound-server-websocket.js 8080  //Listen by 8080 ...
+  
 ## Global Objects
   
 This library defines 2 global objects. These are "X" and "XSound".  
@@ -96,12 +110,14 @@ Some constant values are defined by these global objects as static property.
   
 ### Error Message
   
-The "error" static method changes the destination of error message for developement.
+The "error" static method changes the destination of error message for development.
   
     X.error('ALERT');      //-> window.alert()
     X.error('CONSOLE');    //-> console.error()
     X.error('EXCEPTION');  //-> throw new Error()
     X.error('NONE');       //-> Not output
+  
+Of course, the library for development (xsound-dev.js) must be read.
   
 ### Get "currentTime" property in the instance of AudioContext
   
@@ -220,10 +236,10 @@ In the case of multi sounds (for example, chord),
 
      //Associative array
     X('oscillator').module('eg').param({
-      attack  : 0.5,
-      decay   : 0.5,
-      sustain : 0.5,
-      release : 0.5
+        attack  : 0.5,
+        decay   : 0.5,
+        sustain : 0.5,
+        release : 0.5
     });
   
 ### Glide
@@ -234,12 +250,12 @@ In the case of multi sounds (for example, chord),
 
     //Setter
     X('oscillator').module('glide').param('type', 'exponential');  //either 'linear' or 'exponential'
-    X('oscillator').module('glide').param('time', 5);              //This value is greater than or equal 0
+    X('oscillator').module('glide').param('time', 5);              //This value is greater than or equal to 0
 
     //Associative array
     X('oscillator').module('glide').param({
-      type : 'exponential',
-      time : 5
+        type : 'exponential',
+        time : 5
     });
   
 ### Wave Type / Gain / Octave / Fine
@@ -267,10 +283,10 @@ For example, if 3 oscillators are used, this argument is either 0, 1 or 2.
 
     //Associative array
     X('oscillator', 0).param({
-      type   : 'sawtooth',
-      volume : 0.5,
-      octave : 1.0,
-      fine   : 100
+        type   : 'sawtooth',
+        volume : 0.5,
+        octave : 1.0,
+        fine   : 100
     });
   
 ### Manage State
@@ -293,18 +309,18 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
   
     var base = 'http://xxx.jp/one-shots/';
     var urls = [
-      (base + 'C.mp3'),
-      (base + 'Ch.mp3'),
-      (base + 'D.mp3'),
-      (base + 'Dh.mp3'),
-      (base + 'E.mp3'),
-      (base + 'F.mp3'),
-      (base + 'Fh.mp3'),
-      (base + 'G.mp3'),
-      (base + 'Gh.mp3'),
-      (base + 'A.mp3'),
-      (base + 'Ah.mp3'),
-      (base + 'B.mp3')
+        (base + 'C.mp3'),
+        (base + 'Ch.mp3'),
+        (base + 'D.mp3'),
+        (base + 'Dh.mp3'),
+        (base + 'E.mp3'),
+        (base + 'F.mp3'),
+        (base + 'Fh.mp3'),
+        (base + 'G.mp3'),
+        (base + 'Gh.mp3'),
+        (base + 'A.mp3'),
+        (base + 'Ah.mp3'),
+        (base + 'B.mp3')
     ];
 
     //for "X('oneshot').setup()"
@@ -312,12 +328,12 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
 
     for (var i = 0, len = settings.length; i < len; i++) {
         var setting = {
-          buffer : 0,      //for selecting the instance of AudioBuffer
-          rate   : 1,      //for "playbackRate" property in the instance of AudioBufferSourceNode
-          loop   : false,  //for "loop" property in the instance of AudioBufferSourceNode
-          start  : 0,      //for "loopStart" property in the instance of AudioBufferSourceNode
-          end    : 0,      //for "loopEnd" property in the instance of AudioBufferSourceNode
-          volume : 1       //for the instance of GainNode
+            buffer : 0,      //for selecting the instance of AudioBuffer
+            rate   : 1,      //for "playbackRate" property in the instance of AudioBufferSourceNode
+            loop   : false,  //for "loop" property in the instance of AudioBufferSourceNode
+            start  : 0,      //for "loopStart" property in the instance of AudioBufferSourceNode
+            end    : 0,      //for "loopEnd" property in the instance of AudioBufferSourceNode
+            volume : 1       //for the instance of GainNode
         };
 
         //Compute index for selecting the instance of AudioBuffer
@@ -350,20 +366,20 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
     //Load one-shot audios
     try {
         X('oneshot').setup({
-          resources : urls,
-          settings  : settings,
-          timeout   : 60000,
-          success : function(event, buffers){
-              //"event" is XMLHttpRequestProgressEvent
-              //"buffers" is the instances of AudioBuffer
-          },
-          error : function(event, textStatus){
-              //"event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
-              //"textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
-          },
-          progress : function(event){
-              //"event" is XMLHttpRequestProgressEvent
-          }
+            resources : urls,
+            settings  : settings,
+            timeout   : 60000,
+            success : function(event, buffers) {
+                //"event" is XMLHttpRequestProgressEvent
+                //"buffers" is the instances of AudioBuffer
+            },
+            error : function(event, textStatus) {
+                //"event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
+                //"textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+            },
+            progress : function(event) {
+                //"event" is XMLHttpRequestProgressEvent
+            }
         });
     } catch (error) {
         window.alert(error.message);
@@ -421,10 +437,10 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
 
      //Associative array
     X('oneshot').module('eg').param({
-      attack  : 0.5,
-      decay   : 0.5,
-      sustain : 0.5,
-      release : 0.5
+        attack  : 0.5,
+        decay   : 0.5,
+        sustain : 0.5,
+        release : 0.5
     });
   
 ## Play the Audio
@@ -434,49 +450,49 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
 Register callback functions.
   
     X('audio').setup({
-      decode : function(arrayBuffer){
-          //While "decodeAudioData" is executing, this callback function is executed
-          //for example, this callback function displays progress bar
+        decode : function(arrayBuffer) {
+            //While "decodeAudioData" is executing, this callback function is executed
+            //for example, this callback function displays progress bar
 
-          //"arrayBuffer" is the instance of ArrayBuffer
-      },
-      ready : function(buffer){
-          //When "decodeAudioData" ended, this callback function is executed
-          //for example, this callback function makes UI valid for starting audio
+            //"arrayBuffer" is the instance of ArrayBuffer
+        },
+        ready : function(buffer) {
+            //When "decodeAudioData" ended, this callback function is executed
+            //for example, this callback function makes UI valid for starting audio
 
-          //"buffer" is the instance of AudioBuffer
-      },
-      start : function(source, currentTime){
-          //When audio starts, this callback function is executed
-          //for example, this callback function updates UI for stopping audio
+            //"buffer" is the instance of AudioBuffer
+        },
+        start : function(source, currentTime) {
+            //When audio starts, this callback function is executed
+            //for example, this callback function updates UI for stopping audio
 
-          //"source" is the instance of AudioBufferSourceNode
-          //"currentTime" is current time (position) in the played audio
-      },
-      stop : function(source, currentTime){
-          //When audio stopped, this callback function is executed
-          //for example, this callback function updates UI for starting audio
+            //"source" is the instance of AudioBufferSourceNode
+            //"currentTime" is current time (position) in the played audio
+        },
+        stop : function(source, currentTime) {
+            //When audio stopped, this callback function is executed
+            //for example, this callback function updates UI for starting audio
 
-          //"source" is the instance of AudioBufferSourceNode
-          //"currentTime" is current time (position) in the played audio
-      },
-      update : function(source, currentTime){
-          //While audio is playing, this callback function is executed
-          //for example, this callback updates text for displaying current time
+            //"source" is the instance of AudioBufferSourceNode
+            //"currentTime" is current time (position) in the played audio
+        },
+        update : function(source, currentTime) {
+            //While audio is playing, this callback function is executed
+            //for example, this callback updates text for displaying current time
 
-          //"source" is the instance of AudioBufferSourceNode
-          //"currentTime" is current time (position) in the played audio
-      },
-      ended : function(source, currentTime){
-          //When audio ended, this callback function is executed
-          //for example, this callback clears UI for playing the audio
+            //"source" is the instance of AudioBufferSourceNode
+            //"currentTime" is current time (position) in the played audio
+        },
+        ended : function(source, currentTime) {
+            //When audio ended, this callback function is executed
+            //for example, this callback clears UI for playing the audio
 
-          //'source' is the instance of AudioBufferSourceNode
-          //'currentTime' is current time in audio
-      },
-      error : function(){
-          //When "decodeAudioData" failed, this callback function is executed
-      }
+            //'source' is the instance of AudioBufferSourceNode
+            //'currentTime' is current time in audio
+        },
+        error : function() {
+            //When "decodeAudioData" failed, this callback function is executed
+        }
     });
   
 ### Ready
@@ -487,44 +503,44 @@ It is required to create the instance of AudioBuffer in order to to play the aud
 
     //Ajax
     X.ajax({
-      url     : 'http://xxx.jp/sample.wav',  //Resource URL
-      timeout : 60000,                       //Timeout (1 minutes)
-      success : function(event, arrayBuffer){
-          //"event" is XMLHttpRequestProgressEvent
-          //"arrayBuffer" is the instance of ArrayBuffer
+        url     : 'http://xxx.jp/sample.wav',  //Resource URL
+        timeout : 60000,                       //Timeout (1 minutes)
+        success : function(event, arrayBuffer) {
+            //"event" is XMLHttpRequestProgressEvent
+            //"arrayBuffer" is the instance of ArrayBuffer
 
-          //ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
-          X('audio').ready.call(X('audio'), arrayBuffer);
-      },
-      error : function(event, textStatus){
-          //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
-          //"textStatus" is one of 'error', 'timeout', error code of FileReader
-      },
-      progress : function(event){
-          //"event" is XMLHttpRequestProgressEvent
-      }
+            //ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
+            X('audio').ready.call(X('audio'), arrayBuffer);
+        },
+        error : function(event, textStatus) {
+            //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
+            //"textStatus" is one of 'error', 'timeout', error code of FileReader
+        },
+        progress : function(event) {
+            //"event" is XMLHttpRequestProgressEvent
+        }
     });
 
     //<input type="file">
-    document.querySelector('[type="file"]').addEventListener('change', function(event){
+    document.querySelector('[type="file"]').addEventListener('change', function(event) {
         try {
             //The returned value is the instance of File (extends Blob)
             var file = X.file(
-              event   : event,
-              type    : 'ArrayBuffer',
-              success : function(event, arrayBuffer){
-                  //"event" is "onload" event object in the instance of FileReader
-                  //"arrayBuffer" is the instance of ArrayBuffer
+                event   : event,
+                type    : 'ArrayBuffer',
+                success : function(event, arrayBuffer) {
+                    //"event" is "onload" event object in the instance of FileReader
+                    //"arrayBuffer" is the instance of ArrayBuffer
 
-                  //the instance of File -> ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
-                  X('audio').ready.call(X('audio'), arrayBuffer);
-              },
-              error : function(event, error){
-                  //"event" is "onerror" event object in the instance of FileReader
-              },
-              progress : function(event){
-                  //"event" is "onprogress" event object in the instance of FileReader
-              }
+                    //the instance of File -> ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
+                    X('audio').ready.call(X('audio'), arrayBuffer);
+                },
+                error : function(event, error) {
+                    //"event" is "onerror" event object in the instance of FileReader
+                },
+                progress : function(event) {
+                    //"event" is "onprogress" event object in the instance of FileReader
+                }
             });
         } catch (error) {
             window.alert(error.message);
@@ -564,7 +580,7 @@ In the case of starting audio on the way of audio,
 
     //Setter
     X('audio').param('masterVolume', 0.5);  //The range of value is between 0 and 1
-    X('audio').param('playbackRate', 0.5);  //The range of value is greater than or equal 0
+    X('audio').param('playbackRate', 0.5);  //The range of value is greater than or equal to 0
     X('audio').param('loop', false);
     X('audio').param('currentTime', 60);    //The range of value is between 0 and audio duration
 
@@ -576,10 +592,10 @@ In the case of starting audio on the way of audio,
 
     //Associative array
     X('audio').param({
-      masterVolume : 0.5,
-      playbackRate : 0.5,
-      loop         : false,
-      currentTime  : 60
+        masterVolume : 0.5,
+        playbackRate : 0.5,
+        loop         : false,
+        currentTime  : 60
     });
   
 ### Vocal Canceler
@@ -615,10 +631,10 @@ Get node object of HTMLMediaElement and select media format and register callbac
     //Element ID, Media type ('audio' or 'video'), Media format array, callback
     try {
         X('media').setup({
-          id        : 'audio-element',        //If this value is empty string, this method creates HTMLMediaElement
-          type      : 'audio',                //either 'audio' or 'video'
-          formats   : ['wav', 'ogg', 'mp3'],
-          callbacks : callbacks
+            id        : 'audio-element',        //If this value is empty string, this method creates HTMLMediaElement
+            type      : 'audio',                //either 'audio' or 'video'
+            formats   : ['wav', 'ogg', 'mp3'],
+            callbacks : callbacks
         });
     } catch (error) {
         //Cannot use HTML5 MediaElement (for example, less than IE9)
@@ -668,7 +684,7 @@ In the case of starting media on the way of media,
 
     //Setter
     X('media').param('masterVolume', 0.5);  //The range of value is between 0 and 1
-    X('media').param('playbackRate', 0.5);  //The range of value is greater than or equal 0
+    X('media').param('playbackRate', 0.5);  //The range of value is greater than or equal to 0
     X('media').param('currentTime', 60);    //The range of value is between 0 and audio duration
     X('media').param('loop', false);
     X('media').param('muted', false);
@@ -688,14 +704,14 @@ In the case of starting media on the way of media,
 
     //Associative array
     X('media').param({
-      masterVolume : 0.5,
-      playbackRate : 0.5,
-      currentTime  : 60,
-      loop         : false,
-      muted        : false,
-      controls     : false,
-      width        : 600,
-      height       : 480
+        masterVolume : 0.5,
+        playbackRate : 0.5,
+        currentTime  : 60,
+        loop         : false,
+        muted        : false,
+        controls     : false,
+        width        : 600,
+        height       : 480
     });
   
 ### Vocal Canceler
@@ -739,6 +755,8 @@ In the case of mixing the cloned sound source with the original sound source,
 The default connection is the follwing.
   
 
+1. panner
+
 1. compressor
 
 1. distortion
@@ -749,22 +767,34 @@ The default connection is the follwing.
 
 1. filter
 
+1. autopanner
+
 1. tremolo
 
 1. ringmodulator
 
-1. autopanner
+1. phaser
 
 1. flanger
-
-1. phaser
 
 1. chorus
 
 1. delay
 
 1. reverb
+  
+If application does not use some effectors, the effector should be disconnected by "state" method.  
+For example,
+  
+    var source   = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
+    var effector = /* 'panner' or 'compressor' or 'distortion' or 'wah' or 'equalizer' or 'filter' or 'autopanner' or 'tremolo' or 'ringmodulator' or 'phaser' or 'flanger' or 'chorus' or 'delay' or 'reverb' */;
 
+    //Getter
+    var state  = X(source).module(effector).state();  //Boolean type
+
+    //Setter
+    X(source).module(effector).state(false);     //Disconnect the designated effector
+    X(source).module(effector).state('toggle');  //Change state according to current state
   
 In the case of selecting module,
   
@@ -785,7 +815,7 @@ In the case of selecting module,
 In ths case of customizing "onaudioprocess" event handler in the instance of ScriptProcessorNode,
   
     //for exmale, white noise
-    X('oscillator').start(440, [], function(event){
+    X('oscillator').start(440, [], function(event) {
         var outputLs = event.outputBuffer.getChannelData(0);
         var outputRs = event.outputBuffer.getChannelData(1);
 
@@ -796,7 +826,7 @@ In ths case of customizing "onaudioprocess" event handler in the instance of Scr
     });
 
     //for exmale, audio and white noise
-    X('audio').start(0, [], function(event){
+    X('audio').start(0, [], function(event) {
         var inputLs = event.inputBuffer.getChannelData(0);
         var inputRs = event.inputBuffer.getChannelData(1);
         var outputLs = event.outputBuffer.getChannelData(0);
@@ -844,11 +874,11 @@ However, this is omitted the following.
 
     //Associative array
     X(source).module('compressor').param({
-      threshold : 24,
-      knee      : 30,
-      ratio     : 12,
-      attack    : 0.003,
-      release   : 0.25
+        threshold : 24,
+        knee      : 30,
+        ratio     : 12,
+        attack    : 0.003,
+        release   : 0.25
     });
   
 ### Distortion
@@ -856,21 +886,33 @@ However, this is omitted the following.
     var params = {};
 
     //Getter
-    params.curve = X(source).module('distortion').param('curve');  //The default value is 'clean'
-    params.drive = X(source).module('distortion').param('drive');  //The default value is 0
+    params.curve   = X(source).module('distortion').param('curve');    //The default value is 'clean'
+    params.samples = X(source).module('distortion').param('samples');  //The default value is 4096
+    params.drive   = X(source).module('distortion').param('drive');    //The default value is 1
+    params.color   = X(source).module('distortion').param('color');    //The default value is 350
+    params.tone    = X(source).module('distortion').param('tone');     //The default value is 350
 
     //Setter
     X(source).module('distortion').param('curve', 'overdirve');  //one of 'clean', 'crunch', 'overdrive', 'distortion', 'fuzz'
+    X(source).module('distortion').param('samples', 4096);       //The value must be greater than 0
     X(source).module('distortion').param('drive', 0.5);          //The range of value is between 0 and 1
+    X(source).module('distortion').param('color', 4000);         //The range of value is between 10 and half the sample-rate
+    X(source).module('distortion').param('tone', 4000);          //The range of value is between 10 and half the sample-rate
 
     //Method chain
     X(source).module('distortion').param('curve', 'overdirve')
-                                  .param('drive', 0.5);
+                                  .param('samples', 4096)
+                                  .param('drive', 0.5)
+                                  .param('color', 4000)
+                                  .param('tone', 4000);
 
     //Associative array
     X(source).module('distortion').param({
-      curve : 'overdrive',
-      drive : 0.5
+        curve   : 'overdrive',
+        samples : 4096,
+        drive   : 0.5,
+        color   : 4000,
+        tone    : 4000
     });
   
 ### Wah
@@ -878,29 +920,29 @@ However, this is omitted the following.
     var params = {};
   
     //Getter
+    params.frequency = X(source).module('wah').param('frequency');  //The default value is 350
     params.depth     = X(source).module('wah').param('depth');      //The default value is 0
     params.rate      = X(source).module('wah').param('rate');       //The default value is 0
-    params.mix       = X(source).module('wah').param('mix');        //The default value is 0
     params.resonance = X(source).module('wah').param('resonance');  //The default value is 1
 
     //Setter
-    X(source).module('wah').param('depth', 500);     //The range of value is between 0 and 500
-    X(source).module('wah').param('rate', 5);        //The range of value is greater than or equal 0
-    X(source).module('wah').param('mix', 0.5);       //The range of value is between 0 and 1
-    X(source).module('wah').param('resonance', 20);  //The range of value is between 0.0001 and 1000
+    X(source).module('wah').param('frequency', 1000);  //The range of value is between 10 and half the sample-rate
+    X(source).module('wah').param('depth', 0.5);       //The range of value is between 0 and 1
+    X(source).module('wah').param('rate', 5);          //The range of value is greater than or equal to 0
+    X(source).module('wah').param('resonance', 20);    //The range of value is between 0.0001 and 1000
 
     //Method chain
-    X(source).module('wah').param('depth', 500)
+    X(source).module('wah').param('frequency', 1000)
+                           .param('depth', 0.5)
                            .param('rate', 5)
-                           .param('mix', 0.5)
                            .param('resonance', 20);
 
     //Associative array
     X(source).module('wah').param({
-      depth     : 500,
-      rate      : 5,
-      mix       : 0.5,
-      resonance : 20
+        frequency : 1000,
+        depth     : 0.5,
+        rate      : 5,
+        resonance : 20
     });
   
 ### Equalizer
@@ -927,10 +969,10 @@ However, this is omitted the following.
 
     //Associative array
     X(source).module('equalizer').param({
-      bass     : 18,
-      middle   : 18,
-      treble   : 18,
-      presence : 18
+        bass     : 18,
+        middle   : 18,
+        treble   : 18,
+        presence : 18
     });
   
 ### Filter
@@ -969,58 +1011,14 @@ However, this is omitted the following.
 
     //Associative array
     X(source).module('filter').param({
-      type      : 'lowpass',
-      frequency : 1000,
-      Q         : 20,
-      gain      : 18,
-      attack    : 0.5,
-      decay     : 0.5,
-      sustain   : 0.5,
-      release   : 0.5
-    });
-  
-### Tremolo
-  
-    var params = {};
-
-    //Getter
-    params.depth = X(source).module('tremolo').param('depth');  //The default value is 0
-    params.rate  = X(source).module('tremolo').param('rate');   //The default value is 0
-
-    //Setter
-    X(source).module('tremolo').param('depth', 0.5);  //The range of value is between 0 and 1
-    X(source).module('tremolo').param('rate', 5);     //The range of value is greater than or equal 0
-
-    //Method chain
-    X(source).module('tremolo').param('depth', 0.5)
-                               .param('rate', 5);
-
-    //Associative array
-    X(source).module('tremolo').param({
-      depth : 0.5,
-      rate  : 5
-    });
-  
-### Ring Modulator
-  
-    var params = {};
-
-    //Getter
-    params.depth = X(source).module('ringmodulator').param('depth');  //The default value is 0
-    params.rate  = X(source).module('ringmodulator').param('rate');   //The default value is 0
-
-    //Setter
-    X(source).module('ringmodulator').param('depth', 0.5);  //The range of value is between 0 and 1
-    X(source).module('ringmodulator').param('rate', 1000);  //The range of value is greater than or equal 0
-
-    //Method chain
-    X(source).module('ringmodulator').param('depth', 0.5)
-                                     .param('rate', 1000);
-
-    //Associative array
-    X(source).module('ringmodulator').param({
-      depth : 0.5,
-      rate  : 1000
+        type      : 'lowpass',
+        frequency : 1000,
+        Q         : 20,
+        gain      : 18,
+        attack    : 0.5,
+        decay     : 0.5,
+        sustain   : 0.5,
+        release   : 0.5
     });
   
 ### Auto Panner
@@ -1033,7 +1031,7 @@ However, this is omitted the following.
 
     //Setter
     X(source).module('autopanner').param('depth', 0.5);  //The range of value is between 0 and 1
-    X(source).module('autopanner').param('rate', 0.5);   //The range of value is greater than or equal 0
+    X(source).module('autopanner').param('rate', 0.5);   //The range of value is greater than or equal to 0
 
     //Method chain
     X(source).module('autopanner').param('depth', 0.5)
@@ -1041,8 +1039,56 @@ However, this is omitted the following.
 
     //Associative array
     X(source).module('autopanner').param({
-      depth : 0.5,
-      rate  : 0.5
+        depth : 0.5,
+        rate  : 0.5
+    });
+  
+### Tremolo
+  
+    var params = {};
+
+    //Getter
+    params.depth = X(source).module('tremolo').param('depth');  //The default value is 0
+    params.rate  = X(source).module('tremolo').param('rate');   //The default value is 0
+    params.wave  = X(source).module('tremolo').param('wave');   //The default value is 'sine'
+
+    //Setter
+    X(source).module('tremolo').param('depth', 0.5);        //The range of value is between 0 and 1
+    X(source).module('tremolo').param('rate', 5);           //The range of value is greater than or equal to 0
+    X(source).module('tremolo').param('wave', 'triangle');  //one of 'sine', 'square', 'sawtooth', 'triangle'
+
+    //Method chain
+    X(source).module('tremolo').param('depth', 0.5)
+                               .param('rate', 5)
+                               .param('wave', 'triangle');
+
+    //Associative array
+    X(source).module('tremolo').param({
+        depth : 0.5,
+        rate  : 5,
+        wave  : 'triangle'
+    });
+  
+### Ring Modulator
+  
+    var params = {};
+
+    //Getter
+    params.depth = X(source).module('ringmodulator').param('depth');  //The default value is 1
+    params.rate  = X(source).module('ringmodulator').param('rate');   //The default value is 0
+
+    //Setter
+    X(source).module('ringmodulator').param('depth', 0.5);  //The range of value is between 0 and 1
+    X(source).module('ringmodulator').param('rate', 1000);  //The range of value is greater than or equal to 0
+
+    //Method chain
+    X(source).module('ringmodulator').param('depth', 0.5)
+                                     .param('rate', 1000);
+
+    //Associative array
+    X(source).module('ringmodulator').param({
+        depth : 0.5,
+        rate  : 1000
     });
   
 ### Phaser
@@ -1050,25 +1096,41 @@ However, this is omitted the following.
     var params = {};
 
     //Getter
-    params.depth = X(source).module('phaser').param('depth');  //The default value is 0
-    params.rate  = X(source).module('phaser').param('rate');   //The default value is 0
-    params.mix   = X(source).module('phaser').param('mix');    //The default value is 0
+    params.stage     = X(source).module('pahser').param('stage');      //The default value is 12
+    params.frequency = X(source).module('phaser').param('frequnecy');  //The default value is 350
+    params.resonance = X(source).module('phaser').param('resonance');  //The default value is 1
+    params.depth     = X(source).module('phaser').param('depth');      //The default value is 0
+    params.rate      = X(source).module('phaser').param('rate');       //The default value is 0
+    params.mix       = X(source).module('phaser').param('mix');        //The default value is 0
+    params.feedback  = X(source).module('phaser').param('feedback');   //The default value is 0
 
     //Setter
-    X(source).module('phaser').param('depth', 100);  //The range of value is between 0 and 350
-    X(source).module('phaser').param('rate', 5);     //The range of value is greater than or equal 0
-    X(source).module('phaser').param('mix', 0.5);    //The range of value is between 0 and 1
+    X(source).module('phaser').param('stage', 8);         //The range of value is between 0 and 24
+    X(source).module('phaser').param('frequency', 1000);  //The range of value is between 10 and half the sample-rate
+    X(source).module('phaser').param('resonance', 10);    //The range of value is between 0.0001 and 1000
+    X(source).module('phaser').param('depth', 0.5);       //The range of value is between 0 and 1
+    X(source).module('phaser').param('rate', 5);          //The range of value is greater than or equal to 0
+    X(source).module('phaser').param('mix', 0.5);         //The range of value is between 0 and 1
+    X(source).module('phaser').param('feedback', 0.5);    //The range of value is between 0 and 1
 
     //Method chain
-    X(source).module('phaser').param('depth', 100)
+    X(source).module('phaser').param('stage', 8)
+                              .param('frequency', 1000)
+                              .param('resonance', 10)
+                              .param('depth', 0.5)
                               .param('rate', 5)
-                              .param('mix', 0.5);
+                              .param('mix', 0.5)
+                              .param('feedback', 0.5);
 
     //Associative array
     X(source).module('phaser').param({
-      depth : 100,
-      rate  : 5,
-      mix   : 0.5
+        stage     : 8,
+        frequency : 1000,
+        resonance : 10,
+        depth     : 0.5,
+        rate      : 5,
+        mix       : 0.5,
+        feedback  : 0.5
     });
   
 ### Flanger
@@ -1076,29 +1138,38 @@ However, this is omitted the following.
     var params = {};
 
     //Getter
+    params.time     = X(source).module('flanger').param('time');      //The default value is 0
     params.depth    = X(source).module('flanger').param('depth');     //The default value is 0
     params.rate     = X(source).module('flanger').param('rate');      //The default value is 0
     params.mix      = X(source).module('flanger').param('mix');       //The default value is 0
+    params.tone     = X(source).module('flanger').param('tone');      //The default value is 350
     params.feedback = X(source).module('flanger').param('feedback');  //The default value is 0
 
     //Setter
-    X(source).module('flanger').param('depth', 0.005);   //The range of value is between 0 and 0.005 (5 msec)
-    X(source).module('flanger').param('rate', 5);        //The range of value is greater than or equal 0
+    X(source).module('flanger').param('time', 0.005);    //The range of value is between 0 and 1 (sec)
+    X(source).module('flanger').param('depth', 0.5);     //The range of value is between 0 and 1
+    X(source).module('flanger').param('rate', 5);        //The range of value is greater than or equal to 0
     X(source).module('flanger').param('mix', 0.5);       //The range of value is between 0 and 1
+    X(source).module('flanger').param('tone', 4000);     //The range of value is between 10 and half the sample-rate
     X(source).module('flanger').param('feedback', 0.5);  //The range of value is between 0 and 1
+    
 
     //Method chain
-    X(source).module('flanger').param('depth', 0.005)
+    X(source).module('flanger').param('time', 0.005)
+                               .param('depth', 0.5)
                                .param('rate', 5)
                                .param('mix', 0.5)
+                               .param('tone', 4000)
                                .param('feedback', 0.5);
 
     //Associative array
     X(source).module('flanger').param({
-      depth    : 0.005,
-      rate     : 5,
-      mix      : 0.5,
-      feedback : 0.5
+        time     : 0.005,
+        depth    : 0.5,
+        rate     : 5,
+        mix      : 0.5,
+        tone     : 4000,
+        feedback : 0.5
     });
   
 ### Chorus
@@ -1106,29 +1177,37 @@ However, this is omitted the following.
     var params = {};
 
     //Getter
+    params.time     = X(source).module('chorus').param('time');      //The default value is 0
     params.depth    = X(source).module('chorus').param('depth');     //The default value is 0
     params.rate     = X(source).module('chorus').param('rate');      //The default value is 0
     params.mix      = X(source).module('chorus').param('mix');       //The default value is 0
+    params.tone     = X(source).module('chorus').param('tone');      //The default value is 350
     params.feedback = X(source).module('chorus').param('feedback');  //The default value is 0
 
     //Setter
-    X(source).module('chorus').param('depth', 0.015);    //The range of value is between 0 and 0.020 (20 msec)
-    X(source).module('chorus').param('rate', 0.5);       //The range of value is greater than or equal 0
+    X(source).module('chorus').param('time',  0.020);    //The range of value is between 0 and 1 (sec)
+    X(source).module('chorus').param('depth', 0.05);     //The range of value is between 0 and 1
+    X(source).module('chorus').param('rate', 0.5);       //The range of value is greater than or equal to 0
     X(source).module('chorus').param('mix', 0.5);        //The range of value is between 0 and 1
+    X(source).module('chorus').param('tone', 4000);      //The range of value is between 10 and half the sample-rate
     X(source).module('chorus').param('feedback', 0.05);  //The range of value is between 0 and 1
 
     //Method chain
-    X(source).module('chorus').param('depth', 0.015)
+    X(source).module('chorus').param('time',  0.020)
+                              .param('depth', 0.05)
                               .param('rate', 0.5)
                               .param('mix', 0.5)
+                              .param('tone', 4000)
                               .param('feedback', 0.05);
 
     //Associative array
     X(source).module('chorus').param({
-      depth    : 0.015,
-      rate     : 0.5,
-      mix      : 0.5,
-      feedback : 0.05
+        time     : 0.020,
+        depth    : 0.05,
+        rate     : 0.5,
+        mix      : 0.5,
+        tone     : 4000,
+        feedback : 0.05
     });
   
 ### Delay
@@ -1139,26 +1218,30 @@ However, this is omitted the following.
     params.time     = X(source).module('delay').param('delayTime');  //The default value is 0
     params.dry      = X(source).module('delay').param('dry');        //The default value is 1
     params.wet      = X(source).module('delay').param('wet');        //The default value is 0
+    params.tone     = X(source).module('delay').param('tone');       //The default value is 350
     params.feedback = X(source).module('delay').param('feedback');   //The default value is 0
 
     //Setter
     X(source).module('delay').param('delayTime', 0.500);  //The range of value is between 0 and 5 (5000 msec)
     X(source).module('delay').param('dry', 0.5);          //The range of value is between 0 and 1
     X(source).module('delay').param('wet', 0.5);          //The range of value is between 0 and 1
+    X(source).module('delay').param('tone', 4000);        //The range of value is between 10 and half the sample-rate
     X(source).module('delay').param('feedback', 0.5);     //The range of value is between 0 and 1
 
     //Method chain
     X(source).module('delay').param('delayTime', 0.500)
                              .param('dry', 0.5)
                              .param('wet', 0.5)
+                             .param('tone', 4000)
                              .param('feedback', 0.5);
 
     //Associative array
     X(source).module('delay').param({
-      delayTime : 0.500,
-      dry       : 0.5,
-      wet       : 0.5,
-      feedback  : 0.5
+        delayTime : 0.500,
+        dry       : 0.5,
+        wet       : 0.5,
+        tone      : 4000,
+        feedback  : 0.5
     });
   
 ### Reverb
@@ -1167,75 +1250,139 @@ Reverb effect requires ArrayBuffer of impulse response.
   
     //Ajax
     X.ajax({
-      url     : 'http://xxx.jp/impulse.wav',  //Resource URL
-      timeout : 60000,                        //Timeout (1 minutes)
-      success : function(event, arrayBuffer){
-          //"event" is XMLHttpRequestProgressEvent
-          //"arrayBuffer" is the instance of ArrayBuffer
+        url     : 'http://xxx.jp/impulse.wav',  //Resource URL
+        timeout : 60000,                        //Timeout (1 minutes)
+        success : function(event, arrayBuffer) {
+            //"event" is XMLHttpRequestProgressEvent
+            //"arrayBuffer" is the instance of ArrayBuffer
 
-          //ArrayBuffer -> AudioBuffer -> "buffer" property in the instance of ConvolverNode
-          X(source).module('reverb').start.call(X(source).module('reverb'), arrayBuffer);
-      },
-      error : function(event, textStatus){
-          //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
-          //"textStatus" is one of 'error', 'timeout', error code of FileReader
-      },
-      progress : function(event){
-          //"event" is XMLHttpRequestProgressEvent
-      }
+            //ArrayBuffer -> AudioBuffer -> "buffer" property in the instance of ConvolverNode
+            X(source).module('reverb').start.call(X(source).module('reverb'), arrayBuffer);
+        },
+        error : function(event, textStatus) {
+            //"event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
+            //"textStatus" is one of 'error', 'timeout', error code of FileReader
+        },
+        progress : function(event) {
+            //"event" is XMLHttpRequestProgressEvent
+        }
     });
 
     //<input type="file">
-    document.querySelector('[type="file"]').addEventListener('change', function(event){
+    document.querySelector('[type="file"]').addEventListener('change', function(event) {
         try {
             //The returned value is the instance of File (extends Blob)
             var file = X.file(
-              event   : event,
-              type    : 'ArrayBuffer',
-              success : function(event, arrayBuffer){
-                  //"event" is "onload" event object in the instance of FileReader
-                  //"arrayBuffer" is the instance of ArrayBuffer
+                event   : event,
+                type    : 'ArrayBuffer',
+                success : function(event, arrayBuffer) {
+                    //"event" is "onload" event object in the instance of FileReader
+                    //"arrayBuffer" is the instance of ArrayBuffer
 
-                  //the instance of File -> ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
-                  X(source).module('reverb').run.call(X(source).module('reverb'), arrayBuffer);
-              },
-              error : function(event, error){
-                  //"event" is "onerror" event object in the instance of FileReader
-              },
-              progress : function(event){
-                  //"event" is "onprogress" event object in the instance of FileReader
-              }
+                    //the instance of File -> ArrayBuffer -> AudioBuffer -> AudioBufferSourceNode
+                    X(source).module('reverb').start.call(X(source).module('reverb'), arrayBuffer);
+                },
+                error : function(event, error) {
+                    //"event" is "onerror" event object in the instance of FileReader
+                },
+                progress : function(event) {
+                    //"event" is "onprogress" event object in the instance of FileReader
+                }
             });
         } catch (error) {
             window.alert(error.message);
         }
     }, false);
+  
+If application requires many impulse responses, this library defines better method.
+  
+    //Array contains URLs for impulse response
+    var urls = [
+        'impulse-responses/s1_r1_b.wav',
+        'impulse-responses/s1_r2_b.wav',
+        'impulse-responses/s1_r3_b.wav',
+        'impulse-responses/s1_r4_b.wav',
+        'impulse-responses/s2_r1_b.wav',
+        'impulse-responses/s2_r2_b.wav',
+        'impulse-responses/s2_r3_b.wav',
+        'impulse-responses/s2_r4_b.wav',
+        'impulse-responses/s3_r1_b.wav',
+        'impulse-responses/s3_r2_b.wav',
+        'impulse-responses/s3_r3_b.wav',
+        'impulse-responses/s3_r4_b.wav',
+    ]
+
+    X(source).preset({
+        rirs    : urls,
+        timeout : 60000,
+        success : function(event, rirs) {
+            //"event" is XMLHttpRequestProgressEvent
+            //"rirs" is the instances of AudioBuffer for impulse response
+        },
+        error : function(event, textStatus) {
+            //"event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
+            //"textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+        },
+        progress : function(event) {
+            //"event" is XMLHttpRequestProgressEvent
+        }
+    });
+  
+or,
+  
+    //{@type Array.<AudioBuffer>}
+    var reverbs = [];
+
+    for (var i = 0, len = rirs.length; i < len; i++) {
+        X.ajax(rirs[i], 60000, function(event, arrayBuffer) {
+            X.decode(X.get(), arrayBuffer, function(audioBuffer) {
+                reverbs.push(audioBuffer);
+
+                //Complete ?
+                if (reverbs.length === rirs.length) {
+                    X(source).module('reverb').preset(reverbs);
+                }
+            }, function() {
+                //"decodeAudioData" method encountered an error.
+                window.alert('Decode error !!');
+            });
+        }, function(event, textStatus) {
+            //"event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
+            //"textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+        });
+    }
 
     var params = {};
 
     //Getter
-    params.dry = X(source).module('reverb').param('dry');  //The default value is 1
-    params.wet = X(source).module('reverb').param('wet');  //The default value is 0
+    params.dry  = X(source).module('reverb').param('dry');   //The default value is 1
+    params.wet  = X(source).module('reverb').param('wet');   //The default value is 0
+    params.tone = X(source).module('reverb').param('tone');  //The default value is 350
+    params.type = X(source).module('reverb').param('type');  //"buffer" property in ConvolverNode (Getter only)
+    params.rirs = X(source).module('reverb').param('rirs');  //Array contains the instances of AudioBuffer for impulse response (Getter only)
 
     //Setter
-    X(source).module('reverb').param('dry', 0.5);  //The range of value is between 0 and 1
-    X(source).module('reverb').param('wet', 0.5);  //The range of value is between 0 and 1
+    X(source).module('reverb').param('dry', 0.5);    //The range of value is between 0 and 1
+    X(source).module('reverb').param('wet', 0.5);    //The range of value is between 0 and 1
+    X(source).module('reverb').param('tone', 4000);  //The range of value is between 10 and half the sample-rate
 
     //Method chain
     X(source).module('reverb').param('dry', 0.5)
-                              .param('wet', 0.5);
+                              .param('wet', 0.5)
+                              .param('tone', 4000);
 
     //Associative array
     X(source).module('reverb').param({
-      dry : 0.5,
-      wet : 0.5
+        dry  : 0.5,
+        wet  : 0.5,
+        tone : 4000
     });
   
 ### Customized Effector
   
 If customized effector module is used, the module should be defined the following.
   
-    function MyEffector(context){
+    function MyEffector(context) {
         /* "context" is the instance of AudioContext */
 
         this.isActive;         //Boolean type from Effector class
@@ -1252,7 +1399,7 @@ If customized effector module is used, the module should be defined the followin
     X(source).install('myeffector', MyEffector);
 
     /** @override */
-    MyEffector.prototype.param = function(){
+    MyEffector.prototype.param = function() {
         /* Getter and Setter for accessible parameters */
     };
 
@@ -1261,7 +1408,7 @@ If customized effector module is used, the module should be defined the followin
      * @param {number} startTime This argument is in order to schedule parameter.
      * @override
      */
-    MyEffector.prototype.start = function(startTime){
+    MyEffector.prototype.start = function(startTime) {
         //....
     };
 
@@ -1271,7 +1418,7 @@ If customized effector module is used, the module should be defined the followin
      * @param {number} releaseTime This argument is in order to schedule parameter when it is necessary to consider release time.
      * @override
      */
-    MyEffector.prototype.stop = function(stopTime, releaseTime){
+    MyEffector.prototype.stop = function(stopTime, releaseTime) {
         //....
     };
 
@@ -1279,7 +1426,7 @@ If customized effector module is used, the module should be defined the followin
   
 for example,
   
-    function SuperModulation(context){
+    function SuperModulation(context) {
         this.predelay = context.createDelay();
         this.delay    = context.createDelay();
         this.splitter = context.createChannelSplitter();
@@ -1311,10 +1458,10 @@ for example,
         this.wet.gain.value           = 0;
 
         this.values = {
-          pre  : this.predelay.delayTime,
-          time : this.delay.delayTime,
-          dry  : this.dry.gain,
-          wet  : this.wet.gain
+            pre  : this.predelay.delayTime,
+            time : this.delay.delayTime,
+            dry  : this.dry.gain,
+            wet  : this.wet.gain
         };
 
         this.isActive = true;
@@ -1324,7 +1471,7 @@ for example,
     X('oscillator').install('supermodulation', SuperModulation);
 
     /** @override */
-    SuperModulation.prototype.param = function(key, value){
+    SuperModulation.prototype.param = function(key, value) {
         if (value === undefined) {
             return this.values[key].value;  //Getter
         } else {
@@ -1334,14 +1481,14 @@ for example,
     };
 
     /** @override */
-    SuperModulation.prototype.start = function(startTime){
+    SuperModulation.prototype.start = function(startTime) {
         if (this.isActive) {
             this.lfo.start(startTime);
         }
     };
 
     /** @override */
-    SuperModulation.prototype.stop = function(stopTime, releaseTime){
+    SuperModulation.prototype.stop = function(stopTime, releaseTime) {
         if (this.isActive) {
             this.lfo.stop(stopTime + releaseTime);
         }
@@ -1427,29 +1574,24 @@ for example,
 
     //Associative array
     X(source).module('panner').param({
-      x  : 0,
-      y  : 0,
-      z  : 0,
-      ox : 1,
-      oy : 0,
-      oz : 0,
-      vx : 0,
-      vy : 0,
-      vz : 0,
-      refDistance    : 1,
-      maxDistance    : 10000,
-      rolloffFactor  : 1,
-      coneInnerAngle : 360,
-      coneOuterAngle : 360,
-      coneOuterGain  : 0,
-      panningModel   : 'HRTF',
-      distanceModel  : 'inverse'
+        x  : 0,
+        y  : 0,
+        z  : 0,
+        ox : 1,
+        oy : 0,
+        oz : 0,
+        vx : 0,
+        vy : 0,
+        vz : 0,
+        refDistance    : 1,
+        maxDistance    : 10000,
+        rolloffFactor  : 1,
+        coneInnerAngle : 360,
+        coneOuterAngle : 360,
+        coneOuterGain  : 0,
+        panningModel   : 'HRTF',
+        distanceModel  : 'inverse'
     });
-  
-The Panner does not connect in default.  
-Therefore, it is necessary to connect the Panner.
-  
-    X(source).start(/* the 1st argument */, [/* Other modules ,*/ X(source).module('panner') /*, Other modules */]);
   
 ### Listener
   
@@ -1511,25 +1653,23 @@ Therefore, it is necessary to connect the Panner.
 
     //Associative array
     X(source).module('listener').param({
-      dopplerFactor : 1,
-      speedOfSound  : 343.3,
-      x  : 0,
-      y  : 0,
-      z  : 0,
-      fx : 0,
-      fy : 0,
-      fz : -1,
-      ux : 0,
-      uy : 1,
-      uz : 0,
-      vx : 0,
-      vy : 0,
-      vz : 0
+        dopplerFactor : 1,
+        speedOfSound  : 343.3,
+        x  : 0,
+        y  : 0,
+        z  : 0,
+        fx : 0,
+        fy : 0,
+        fz : -1,
+        ux : 0,
+        uy : 1,
+        uz : 0,
+        vx : 0,
+        vy : 0,
+        vz : 0
     });
   
 It is necessary to connect Panner for using the Listener.
-  
-    X(source).start(/* the 1st argument */, [/* Other modules ,*/ X(source).module('panner') /*, Other modules */]);
   
 ## Visualization
   
@@ -1645,30 +1785,30 @@ And, the variable ("domain") is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
 
     //Associative array
     X(source).module('analyser').param({
-      fftSize               : 2048,
-      mindecibels           : -100,
-      maxDecibels           : -30,
-      smoothingTimeConstant : 0.8
+        fftSize               : 2048,
+        mindecibels           : -100,
+        maxDecibels           : -30,
+        smoothingTimeConstant : 0.8
     });
   
 #### Overview in Time Domain
   
     var params = {
-      shape        : 'line',                      //Wave shape ('line' or 'rect')
-      wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
-      grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color (color sting or 'none')
-      currentTime  : 'rgba(255, 255, 255, 1.0)',  //Shape color (for current time)
-      text         : 'rgba(255, 255, 255, 1.0)',  //Text color (color string or 'none')
-      font         : '13px Arial',                //Text font
-      top          : 15,                          //Between audio wave graph and canvas border [px]
-      right        : 15,                          //Between audio wave graph and canvas border [px]
-      bottom       : 15,                          //Between audio wave graph and canvas border [px]
-      left         : 15,                          //Between audio wave graph and canvas border [px]
-      width        : 1.5,                         //Wave width (lineWidth)
-      cap          : 'round',                     //lineCap
-      join         : 'miter',                     //lineJoin
-      plotInterval : 0.0625,                      //Draw wave at intervals of this value [sec]
-      textInterval : 60                           //Draw text at intervals of this value [sec]
+        shape        : 'line',                      //Wave shape ('line' or 'rect')
+        wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
+        grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color (color sting or 'none')
+        currentTime  : 'rgba(255, 255, 255, 1.0)',  //Shape color (for current time)
+        text         : 'rgba(255, 255, 255, 1.0)',  //Text color (color string or 'none')
+        font         : '13px Arial',                //Text font
+        top          : 15,                          //Between audio wave graph and canvas border [px]
+        right        : 15,                          //Between audio wave graph and canvas border [px]
+        bottom       : 15,                          //Between audio wave graph and canvas border [px]
+        left         : 15,                          //Between audio wave graph and canvas border [px]
+        width        : 1.5,                         //Wave width (lineWidth)
+        cap          : 'round',                     //lineCap
+        join         : 'miter',                     //lineJoin
+        plotInterval : 0.0625,                      //Draw wave at intervals of this value [sec]
+        textInterval : 60                           //Draw text at intervals of this value [sec]
     };
   
     The following, the variable "key" is one of properties in "params".  
@@ -1689,7 +1829,7 @@ And, the variable ("domain") is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
   
 In the case of displaying current time according to playing the audio,
   
-    var drawCallback = function(currentTime){
+    var drawCallback = function(currentTime) {
         X('audio').param('currentTime', currentTime);
 
         //....
@@ -1701,20 +1841,20 @@ In the case of displaying current time according to playing the audio,
 #### Time Domain
   
     var params = {
-      interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
-      shape        : 'line',                      //Wave shape ('line' or 'rect')
-      wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
-      grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
-      text         : 'rgba(255, 255, 255, 1.0)',  //Text color
-      font         : '13px Arial',                //Text font
-      top          : 15,                          //Between audio wave graph and canvas border [px]
-      right        : 15,                          //Between audio wave graph and canvas border [px]
-      bottom       : 15,                          //Between audio wave graph and canvas border [px]
-      left         : 15,                          //Between audio wave graph and canvas border [px]
-      width        : 1.5,                         //Wave width (lineWidth)
-      cap          : 'round',                     //lineCap
-      join         : 'miter',                     //lineJoin
-      textinterval : 60                           //Draw text at intervals of this value [sec]
+        interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
+        shape        : 'line',                      //Wave shape ('line' or 'rect')
+        wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
+        grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
+        text         : 'rgba(255, 255, 255, 1.0)',  //Text color
+        font         : '13px Arial',                //Text font
+        top          : 15,                          //Between audio wave graph and canvas border [px]
+        right        : 15,                          //Between audio wave graph and canvas border [px]
+        bottom       : 15,                          //Between audio wave graph and canvas border [px]
+        left         : 15,                          //Between audio wave graph and canvas border [px]
+        width        : 1.5,                         //Wave width (lineWidth)
+        cap          : 'round',                     //lineCap
+        join         : 'miter',                     //lineJoin
+        textinterval : 60                           //Draw text at intervals of this value [sec]
     };
   
     The following, the variable "key" is one of properties in "params".  
@@ -1733,21 +1873,21 @@ In the case of displaying current time according to playing the audio,
 #### Frequency Domain (Spectrum)
   
     var params = {
-      interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
-      shape        : 'line',                      //Wave shape ('line' or 'rect')
-      wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
-      grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
-      text         : 'rgba(255, 255, 255, 1.0)',  //Text color
-      font         : '13px Arial',                //Text font
-      top          : 15,                          //Between audio wave graph and canvas border [px]
-      right        : 15,                          //Between audio wave graph and canvas border [px]
-      bottom       : 15,                          //Between audio wave graph and canvas border [px]
-      left         : 15,                          //Between audio wave graph and canvas border [px]
-      width        : 1.5,                         //Wave width (lineWidth)
-      cap          : 'round',                     //lineCap
-      join         : 'miter',                     //lineJoin
-      range        : 256,                         //the number of plots
-      textinterval : 1000                         //Draw text at intervals of this value [Hz]
+        interval     : 500,                         //at intervals of drawing sound wave [msec] (by setTimeout) or 'auto' (by requestAnimationFrame)
+        shape        : 'line',                      //Wave shape ('line' or 'rect')
+        wave         : 'rgba(0, 0, 255, 1.0)',      //Wave color
+        grid         : 'rgba(255, 0, 0, 1.0)',      //Grid color
+        text         : 'rgba(255, 255, 255, 1.0)',  //Text color
+        font         : '13px Arial',                //Text font
+        top          : 15,                          //Between audio wave graph and canvas border [px]
+        right        : 15,                          //Between audio wave graph and canvas border [px]
+        bottom       : 15,                          //Between audio wave graph and canvas border [px]
+        left         : 15,                          //Between audio wave graph and canvas border [px]
+        width        : 1.5,                         //Wave width (lineWidth)
+        cap          : 'round',                     //lineCap
+        join         : 'miter',                     //lineJoin
+        range        : 256,                         //the number of plots
+        textinterval : 1000                         //Draw text at intervals of this value [Hz]
     };
   
     The following, the variable "key" is one of properties in "params".  
@@ -1819,8 +1959,8 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media',
 
     //Associative array
     X(source).module('recorder').param({
-      gainL : 0.5,
-      gainR : 0.5
+        gainL : 0.5,
+        gainR : 0.5
     });
   
 ## Session
@@ -1836,22 +1976,22 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media',
         //Connection to server has existed already
     } else {
         X(source).module('session').setup({
-          tls   : false,                                   //Whether non TLS (ws:) or TLS (wss:)
-          host  : '210.152.156.200',                       //IP address or Host name
-          port  :'8000',                                   //Port number
-          path  : '/home/node/websocket/',                 //Path name
-          open  : function(event, socket){
-              //"event" is event object on "onopen" event handler in the instance of WebSokcet
-              //"socket" is the instance of WebSokcet
-          },
-          close : function(event, socket){
-              //"event" is event object on "onclose" event handler in the instance of WebSokcet
-              //"socket" is the instance of WebSokcet
-          },
-          error : function(event, socket){
-              //"event" is event object on "open" event handler in the instance of WebSokcet
-              //"socket" is the instance of WebSokcet
-          }
+            tls   : false,                                   //Whether non TLS (ws:) or TLS (wss:)
+            host  : '210.152.156.200',                       //IP address or Host name
+            port  :'8000',                                   //Port number
+            path  : '/home/node/websocket/',                 //Path name
+            open  : function(event, socket) {
+                //"event" is event object on "onopen" event handler in the instance of WebSokcet
+                //"socket" is the instance of WebSokcet
+            },
+            close : function(event, socket) {
+                //"event" is event object on "onclose" event handler in the instance of WebSokcet
+                //"socket" is the instance of WebSokcet
+            },
+            error : function(event, socket) {
+                //"event" is event object on "open" event handler in the instance of WebSokcet
+                //"socket" is the instance of WebSokcet
+            }
         });
     }
   
@@ -1910,7 +2050,7 @@ But, separator must not be the characters that are used by MML.
 ### Initialization
   
     X('mml').setup({
-        start : function(sequence, index){
+        start : function(sequence, index) {
             //When the MML starts, this callback function is executed
 
             //"sequence" is associative array for playing the MML.
@@ -1921,13 +2061,13 @@ But, separator must not be the characters that are used by MML.
             //    sequence.duration;     //the duration of notes
             //    sequence.stop;         //the stop time of notes (this is total of "start" and "duration")
         },
-        stop : function(sequence, index){
+        stop : function(sequence, index) {
             //When the MML stopped, this callback function is executed
         },
-        ended : function(){
+        ended : function() {
             //When the MML ended, this callback function is executed
         },
-        error : function(error, note){
+        error : function(error, note) {
             //"error" is one of 'TEMPO', 'OCTAVE', 'NOTE', 'MML'
             //"note" is invalid MML string
         }
@@ -1959,9 +2099,9 @@ In the case of using "X('oscillator')", (Please refer "Clone Sound Source" secti
   
     for (var i = 0, len = clones.length i < len; i++) {
         clones[i]('mml').setup({
-          start : function(sequence, index){
-              X('mixer').mix(sources);
-          }
+            start : function(sequence, index) {
+                X('mixer').mix(sources);
+            }
         }).ready(clones[i]('oscillator'), mmls[i]);
     }
   
