@@ -3807,10 +3807,12 @@
         Session.prototype.setup = function(tls, host, port, path, openCallback, closeCallback, errorCallback) {
             if (!navigator.onLine) {
                 //Clear
+                this.isActive = false;
+                this.paused   = true;
+                this.connect();
                 this.websocket = null;
-                this.isActive  = false;
 
-                throw new Error('Now offline !!');
+                throw new Error('Now Offline !!');
             }
 
             //The argument is associative array ?
@@ -3851,62 +3853,90 @@
             };
 
             this.websocket.onclose = function(event) {
+                self.isActive = false;
+                self.paused   = true;
+
+                self.connect();
+
                 if (Object.prototype.toString.call(closeCallback) === '[object Function]') {
                     closeCallback(event, self.websocket);
                 }
             };
 
             this.websocket.onerror = function(event) {
+                self.isActive = false;
+                self.paused   = true;
+
+                self.connect();
+
                 if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
                     errorCallback(event, self.websocket);
                 }
             };
 
             this.websocket.onmessage = function(event) {
-                if (self.isActive) {
-                    if (event.data instanceof ArrayBuffer) {
-                        var total  = event.data.byteLength / Float32Array.BYTES_PER_ELEMENT;
-                        var length = Math.floor(total / 2);
-                        var offset = length * Float32Array.BYTES_PER_ELEMENT;
-
-                        var bufferLs = new Float32Array(event.data,      0, length);  //Get Left  channel data
-                        var bufferRs = new Float32Array(event.data, offset, length);  //Get Right channel data
-
-                        self.receiver.connect(self.analyser.input);
-                        self.analyser.output.connect(self.context.destination);
-
-                        //Draw sound wave
-                        self.analyser.start('time');
-                        self.analyser.start('fft');
-
-                        self.receiver.onaudioprocess = function(event) {
-                            var outputLs = event.outputBuffer.getChannelData(0);
-                            var outputRs = event.outputBuffer.getChannelData(1);
-
-                            outputLs.set(bufferLs);
-                            outputRs.set(bufferRs);
-
-                            if (!self.isActive || (self.websocket === null)) {
-                                //Stop drawing sound wave
-                                self.analyser.stop('time');
-                                self.analyser.stop('fft');
-
-                                //Stop onaudioprocess event
-                                this.disconnect(0);
-                                this.onaudioprocess = null;  //for Firefox
-                            }
-                        };
-                    }
-                } else {
+                if (!self.isActive) {
                     //Stop drawing sound wave
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
 
-                    //Stop onaudioprocess event
-                    self.receiver.disconnect(0);
-                    self.receiver.onaudioprocess = null;  //for Firefox
+                    return;
+                }
+
+                if (event.data instanceof ArrayBuffer) {
+                    var total  = event.data.byteLength / Float32Array.BYTES_PER_ELEMENT;
+                    var length = Math.floor(total / 2);
+                    var offset = length * Float32Array.BYTES_PER_ELEMENT;
+
+                    var bufferLs = new Float32Array(event.data,      0, length);  //Get Left  channel data
+                    var bufferRs = new Float32Array(event.data, offset, length);  //Get Right channel data
+
+                    //Start drawing sound wave
+                    self.analyser.start('time');
+                    self.analyser.start('fft');
+
+                    self.receiver.onaudioprocess = function(event) {
+                        var outputLs = event.outputBuffer.getChannelData(0);
+                        var outputRs = event.outputBuffer.getChannelData(1);
+
+                        if (bufferLs instanceof Float32Array) {outputLs.set(bufferLs);}
+                        if (bufferRs instanceof Float32Array) {outputRs.set(bufferRs);}
+
+                        bufferLs = null;
+                        bufferRs = null;
+
+                        if (!self.isActive || (self.websocket === null)) {
+                            //Stop drawing sound wave
+                            self.analyser.stop('time');
+                            self.analyser.stop('fft');
+                        }
+                    };
                 }
             };
+
+            return this;
+        };
+
+        /**
+         * This method connects nodes according to state.
+         * @return {Session} This is returned for method chain.
+         */
+        Session.prototype.connect = function() {
+            //Clear connection
+            this.receiver.disconnect(0);
+            this.sender.disconnect(0);
+
+            //for Firefox
+            this.receiver.onaudioprocess = null;
+            this.sender.onaudioprocess   = null;
+
+            if (this.isActive) {
+                //ScriptProcessorNode (input) -> Analyser -> AudioDestinationNode (output)
+                this.receiver.connect(this.analyser.input);
+                this.analyser.output.connect(this.context.destination);
+            } else {
+                this.paused = true;
+            }
 
             return this;
         };
@@ -3919,8 +3949,6 @@
             if (this.isActive && this.isConnected() && this.paused) {
                 this.paused = false;
 
-                var buffers = new Float32Array(2 * this.sender.bufferSize);
-
                 var self = this;
 
                 this.sender.onaudioprocess = function(event) {
@@ -3928,18 +3956,16 @@
                         var inputLs = event.inputBuffer.getChannelData(0);
                         var inputRs = event.inputBuffer.getChannelData(1);
 
+                        var buffers = new Float32Array(2 * this.bufferSize);
+
                         for (var i = 0; i < this.bufferSize; i++) {
                             buffers[i]                        = inputLs[i];
                             buffers[(buffers.length / 2) + i] = inputRs[i];
                         }
 
-                        self.websocket.send(buffers);
-                    } else {
-                        self.paused = true;
-
-                        //Stop onaudioprocess event
-                        self.sender.disconnect(0);
-                        self.sender.onaudioprocess = null;  //for Firefox
+                        if (self.websocket.bufferedAmount === 0) {
+                            self.websocket.send(buffers);
+                        }
                     }
                 };
             }
@@ -3953,7 +3979,12 @@
          */
         Session.prototype.close = function() {
             if (this.websocket instanceof WebSocket) {
+                this.isActive = false;
+                this.paused   = true;
+
+                this.connect();
                 this.websocket.close();
+
                 this.websocket = null;
             }
 
@@ -3969,14 +4000,36 @@
         };
 
         /** @override */
-        Session.prototype.state = function(value) {
+        Session.prototype.state = function(value, stateCallback, waitCallback) {
             if (value === undefined) {
                 return this.isActive;  //Getter
-            } else if (String(value).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  //Setter
-            } else {
-                this.isActive = Boolean(value);  //Setter
             }
+
+            if (Object.prototype.toString.call(waitCallback) === '[object Function]') {
+                waitCallback();
+            }
+
+            var self = this;
+
+            var intervalid = global.setInterval(function() {
+                if ((self.websocket instanceof WebSocket) && (self.websocket.bufferedAmount !== 0)) {
+                    return;
+                }
+
+                if (String(value).toLowerCase() === 'toggle') {
+                    self.isActive = !self.isActive;  //Setter
+                } else {
+                    self.isActive = Boolean(value);  //Setter
+                }
+
+                self.connect();
+
+                if (Object.prototype.toString.call(stateCallback) === '[object Function]') {
+                    stateCallback();
+                }
+
+                global.clearInterval(intervalid);
+            }, 10);
 
             //In the case of setter
             return this;
