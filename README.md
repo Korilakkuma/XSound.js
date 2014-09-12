@@ -121,7 +121,7 @@ Of course, the library for development (xsound-dev.js) must be read.
   
 ### Get "currentTime" property in the instance of AudioContext
   
-The way of accessing [the "currentTime" property in AudioContext](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#attributes-AudioContext) is the following,
+The way of accessing [the "currentTime" property in AudioContext](http://www.w3.org/TR/webaudio/#attributes-AudioContext) is the following,
   
     //Can browser use this library ?
     if (X.IS_XSOUND) {
@@ -288,6 +288,15 @@ For example, if 3 oscillators are used, this argument is either 0, 1 or 2.
         octave : 1.0,
         fine   : 100
     });
+  
+### Custom Wave
+  
+  In the case of using [custom type in "OscillatorNode"](http://www.w3.org/TR/webaudio/#attributes-OscillatorNode),
+  
+    var reals = new Float32Array([0, 1, 0.5, 0.25, 0.125]);  //Array size must be less than or equal to 4096
+    var imags = new Float32Array([0, 1, 0.5, 0.25, 0.125]);  //Array size must be less than or equal to 4096
+
+    X('oscillator', 0).param('type', {real : reals, imag : images});
   
 ### Manage State
   
