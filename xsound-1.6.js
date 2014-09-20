@@ -353,16 +353,21 @@
     /** 
      * This static method calculates minutes and seconds from the designated time in seconds.
      * @param {number} time This argument is the time in seconds.
-     * @return {object} This is returned as associative array that has "minutes" and "seconds" keys.
+     * @return {object} This is returned as associative array that has "minutes", "seconds" and "milliseconds" keys.
      */
     var convertTime = function(time) {
         var t = parseFloat(time);
 
         if (t >= 0) {
-            var m = Math.floor(t / 60);
-            var s = Math.floor(t % 60);
+            var m  = Math.floor(t / 60);
+            var s  = Math.floor(t % 60);
+            var ms = t - parseInt(t);
 
-            return {minutes : m, seconds : s};
+            return {
+                minutes      : m,
+                seconds      : s,
+                milliseconds : ms
+            };
         }
     };
 
@@ -3141,11 +3146,11 @@
             this.context   = context;
             this.processor = context.createScriptProcessor(bufferSize, numInput, numOutput);
 
-            this.mixLs = [];
-            this.mixRs = [];
+            this.mixLs = null;  //{@type Float32Array}
+            this.mixRs = null;  //{@type Float32Array}
 
-            this.trackLs     = [];  //2 dimensions array
-            this.trackRs     = [];  //2 dimensions array
+            this.trackLs     = [];  //{@type Array.<Array.<Float32Array>>} 2 dimensions array
+            this.trackRs     = [];  //{@type Array.<Array.<Float32Array>>} 2 dimensions array
             this.numtrack    = 0;
 
             this.activeTrack = -1;      //There is not any active track in the case of -1
@@ -3252,10 +3257,16 @@
                         var inputLs = event.inputBuffer.getChannelData(0);
                         var inputRs = event.inputBuffer.getChannelData(1);
 
+                        var recordLs = new Float32Array(this.bufferSize);
+                        var recordRs = new Float32Array(this.bufferSize);
+
                         for (var i = 0; i < this.bufferSize; i++) {
-                            self.trackLs[self.activeTrack].push(self.gainL * inputLs[i]);
-                            self.trackRs[self.activeTrack].push(self.gainR * inputRs[i]);
+                            recordLs[i] = self.gainL * inputLs[i];
+                            recordRs[i] = self.gainR * inputRs[i];
                         }
+
+                        self.trackLs[self.activeTrack].push(recordLs);
+                        self.trackRs[self.activeTrack].push(recordRs);
                     } else {
                         this.disconnect(0);
                         this.onaudioprocess = null;  //for Firefox
@@ -3308,30 +3319,50 @@
             }
 
             var mixTrack = function(channel) {
-                var tracks = (channel === 'L') ? this.trackLs : this.trackRs;
-                var mixs = {values : [], sum : 0, num : 0};
-                var i = 0;
+                var tracks        = this['track' + channel + 's'];
+                var mixs          = {values : null, sum : 0, num : 0};
+                var currentBuffer = 0;
+                var index         = 0;
+
+                //Calculate sound data size
+                var maxNumBuffers = 0;
+
+                //Search max number of Float32Arrays each track
+                for (var i = 0, num = tracks.length; i < num; i++) {
+                    if (maxNumBuffers < tracks[i].length) {
+                        maxNumBuffers = tracks[i].length;
+                    }
+                }
+
+                mixs.values = new Float32Array(maxNumBuffers * this.processor.bufferSize);
 
                 while (true) {
-                    for (var j = 0, len = tracks.length; j < len; j++) {
-                        if (tracks[j][i] !== undefined) {
-                            mixs.sum += tracks[j][i];
+                    for (var currentTrack = 0, len = tracks.length; currentTrack < len; currentTrack++) {
+                        if (tracks[currentTrack][currentBuffer] instanceof Float32Array) {
+                            mixs.sum += tracks[currentTrack][currentBuffer][index];
                             mixs.num++;
                         }
                     }
 
                     if (mixs.num > 0) {
-                        mixs.values[i] = mixs.sum / mixs.num;
+                        var offset = currentBuffer * this.processor.bufferSize;
+                        mixs.values[offset + index] = mixs.sum / mixs.num;  //Average
 
                         //Clear
                         mixs.sum = 0;
                         mixs.num = 0;
 
                         //Next data
-                        i++;
+                        if (index < (this.processor.bufferSize - 1)) {
+                            //Next Element in Float32Array
+                            index++;
+                        } else {
+                            //Next Float32Array
+                            currentBuffer++;
+                            index = 0;
+                        }
                     } else {
-                        if (channel === 'L') {this.mixLs = mixs.values.slice(0, mixs.values.length);}
-                        if (channel === 'R') {this.mixRs = mixs.values.slice(0, mixs.values.length);}
+                        this['mix' + channel + 's'] = mixs.values;
 
                         //End
                         break;
@@ -3383,8 +3414,8 @@
                 this.stop();
             }
 
-            var Ls = [];
-            var Rs = [];
+            var Ls = null;  //{@type Float32Array}
+            var Rs = null;  //{@type Float32Array}
 
             if (String(track).toLowerCase() === 'all') {
                 this.mix();
@@ -3406,50 +3437,51 @@
             //PCM parameters
             var CHANNEL = (channelType === 1) ? 1 : 2;
             var QBIT    = (qbit        === 8) ? 8 : 16;
+            var SIZE    = (CHANNEL === 1) ? Math.min(Ls.length, Rs.length) : (2 * Math.min(Ls.length, Rs.length));
 
-            var sounds = [];
-            var length = Math.min(Ls.length, Rs.length);
+            //{@type Uint8Array|Int16Array}
+            var sounds = null;
 
             switch (QBIT) {
                 case 8 :
-                    for (var i = 0; i < length; i++) {
-                        //Convert 8bit unsigned int (-1 -> 0, 0 -> 128, 1 -> 255)
+                    sounds = new Uint8Array(SIZE);
+
+                    for (var i = 0; i < SIZE; i++) {
+                        //Convert 8bit unsigned integer (-1 -> 0, 0 -> 128, 1 -> 255)
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = ((Ls[i] + 1) / 2) * (Math.pow(2, 8) - 1);  //Left channel
+                            binary = ((Ls[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  //Left channel
                         } else {
-                            binary = ((Rs[i - 1] + 1) / 2) * (Math.pow(2, 8) - 1);  //Right channel
+                            binary = ((Rs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  //Right channel
                         }
 
                         //for preventing from clipping
                         if (binary > (Math.pow(2, 8) - 1)) {binary = (Math.pow(2, 8) - 1);}
                         if (binary < (Math.pow(2, 0) - 1)) {binary = (Math.pow(2, 0) - 1);}
 
-                        sounds.push(Math.floor(binary));
+                        sounds[i] = parseInt(binary);
                     }
 
                     break;
                 case 16 :
-                    for (var i = 0; i < length; i++) {
-                        //Convert 16bit float (-1 -> -32768, 0 -> 0, 1 -> 32767)
+                    sounds = new Int16Array(SIZE);
+
+                    for (var i = 0; i < SIZE; i++) {
+                        //Convert 16bit integer (-1 -> -32768, 0 -> 0, 1 -> 32767)
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = Math.floor(Ls[i] * Math.pow(2, 15));  //Left channel
+                            binary = Ls[parseInt(i / CHANNEL)] * Math.pow(2, 15);  //Left channel
                         } else {
-                            binary = Math.floor(Rs[i - 1] * Math.pow(2, 15));  //Right channel
+                            binary = Rs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  //Right channel
                         }
 
                         //for preventing from clipping
-                        if (binary >  (Math.pow(2, 15) - 1)) {binary =  Math.pow(2, 15) - 1;}
+                        if (binary > (+Math.pow(2, 15) - 1)) {binary =  Math.pow(2, 15) - 1;}
                         if (binary < (-Math.pow(2, 15) - 1)) {binary = -Math.pow(2, 15) - 1;}
 
-                        if (binary < 0) {
-                            binary += Math.pow(2, 16);
-                        }
-
-                        sounds.push(binary);
+                        sounds[i] = parseInt(binary);
                     }
 
                     break;
@@ -3459,14 +3491,13 @@
 
             //Create WAVE file (Object URL or Data URL)
             var FMT_CHUNK  = 28;
-            var DATA_CHUNK =  8 + (length * CHANNEL * (QBIT / 8));
-            var CHUNK_SIZE = 36 + (length * CHANNEL * (QBIT / 8));
+            var DATA_CHUNK =  8 + (SIZE * (QBIT / 8));
+            var CHUNK_SIZE = 36 + (SIZE * (QBIT / 8));
             var RIFF_CHUNK =  8 + (FMT_CHUNK + DATA_CHUNK);
-            var RATE       = (this.SAMPLE_RATE * 0.5);
-            var BPS        = (this.SAMPLE_RATE * 0.5) * CHANNEL * (QBIT / 8);
-            var DATA_SIZE  = length * CHANNEL * (QBIT / 8);
+            var RATE       = this.SAMPLE_RATE;
+            var BPS        = RATE * CHANNEL * (QBIT / 8);
+            var DATA_SIZE  = SIZE * (QBIT / 8);
 
-            //The byte order in WAVE file is little endian
             switch (String(dataType).toLowerCase()) {
                 case 'base64' :
                     var wave = '';
@@ -3498,8 +3529,18 @@
                     wave += 'data';
                     wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
 
-                    for (var i = 0, len = sounds.length; i < len; i++) {
-                        wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
+                    for (var i = 0; i < SIZE; i++) {
+                        switch (QBIT) {
+                            case  8 :
+                                wave += String.fromCharCode(sounds[i]);
+                                break;
+                            case 16 :
+                                //The byte order in WAVE file is little endian
+                                wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
+                                break;
+                            default :
+                                break;
+                        }
                     }
 
                     var base64  = global.btoa(wave);
@@ -3574,9 +3615,19 @@
                     waves[42] = (DATA_SIZE >> 16) & 0xFF;
                     waves[43] = (DATA_SIZE >> 24) & 0xFF;
 
-                    for (var i = 0, len = sounds.length; i < len; i++) {
-                        waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i)]     = ((sounds[i] >> 0) & 0xFF);
-                        waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
+                    for (var i = 0; i < SIZE; i++) {
+                        switch (QBIT) {
+                            case  8 :
+                                waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
+                                break;
+                            case 16 :
+                                //The byte order in WAVE file is little endian
+                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
+                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
+                                break;
+                            default :
+                                break;
+                        }
                     }
 
                     global.URL = global.URL || global.webkitURL;
@@ -3782,10 +3833,11 @@
                         var inputRs = event.inputBuffer.getChannelData(1);
 
                         var buffers = new Float32Array(2 * this.bufferSize);
+                        var offset  = parseInt(buffers.length / 2);
 
                         for (var i = 0; i < this.bufferSize; i++) {
-                            buffers[i]                        = inputLs[i];
-                            buffers[(buffers.length / 2) + i] = inputRs[i];
+                            buffers[i]          = inputLs[i];
+                            buffers[offset + i] = inputRs[i];
                         }
 
                         if (self.websocket.bufferedAmount === 0) {
@@ -4141,8 +4193,8 @@
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
 
-            //Connect nodes
-            this.connect();
+            //Distortion is not connected by default
+            this.state(false);
         }
 
         /**
@@ -4336,8 +4388,8 @@
             this.rate.value        = 0;
             this.depthRate         = 0;
 
-            //Connect nodes
-            this.connect();
+            //Wah is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
@@ -4618,8 +4670,8 @@
             this.sustain = 1.0;
             this.release = 1.0;
 
-            //Connect nodes
-            this.connect();
+            //Filter is not connected by default
+            this.state(false);
         }
 
         /** @override */
@@ -4840,8 +4892,8 @@
             this.depth.gain.value = 0;
             this.rate.value       = 0;
 
-            //Connect nodes
-            this.connect();
+            //Autopanner is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> ScriptProcessorNode -> ChannelSplitterNode -> AudioParam (GainNode.gain) (L) / (R)
@@ -5005,8 +5057,8 @@
             this.depth.gain.value = 0;
             this.rate.value       = 0;
 
-            //Connect nodes
-            this.connect();
+            //Tremolo is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
@@ -5145,8 +5197,8 @@
             this.depth.gain.value = 1;
             this.rate.value       = 0;
 
-            //Connect nodes
-            this.connect();
+            //Ring Modulator is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
@@ -5275,8 +5327,8 @@
             this.feedback.gain.value = 0;
             this.depthRate           = 0;
 
-            //Connect nodes
-            this.connect();
+            //Phaser is not connected by default
+            this.state(false);
 
             //LFO
             //GainNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
@@ -5491,8 +5543,8 @@
             this.feedback.gain.value   = 0;
             this.depthRate             = 0;
 
-            //Connect nodes
-            this.connect();
+            //Flanger is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
@@ -5673,8 +5725,8 @@
             this.feedback.gain.value   = 0;
             this.depthRate             = 0;
 
-            //Connect nodes
-            this.connect();
+            //Chorus is not connected by default
+            this.state(false);
 
             //LFO
             //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
@@ -5857,8 +5909,8 @@
             this.tone.gain.value       = 0;  //Not used
             this.feedback.gain.value   = 0;
 
-            //Connect nodes
-            this.connect();
+            //Delay is not connected by default
+            this.state(false);
         };
 
         /** @override */
@@ -5997,8 +6049,8 @@
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
 
-            //Connect nodes
-            this.connect();
+            //Reverb is not connected by default
+            this.state(false);
         }
 
         /** @override */
@@ -6371,8 +6423,8 @@
             this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
             this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
 
-            //Connect nodes
-            this.connect();
+            //Panner is not connected by default
+            this.state(false);
         }
 
         /** @override */
@@ -6798,7 +6850,7 @@
         this.panner        = new Panner(context, this.BUFFER_SIZE);
 
         //The default order for connection
-        this.nodes = [
+        this.modules = [
             this.panner,
             this.compressor,
             this.distortion,
@@ -6885,28 +6937,28 @@
     SoundModule.prototype.connect = function(source, connects) {
         //Customize connection ?
         if (Array.isArray(connects)) {
-            this.nodes = connects;
+            this.modules = connects;
         }
 
         //Start connection
         //source -> node -> ... -> node -> GainNode (masterVolume) -> AnalyserNode (analyser) -> AudioDestinationNode (output)
         source.disconnect(0);  //Clear connection
 
-        if (this.nodes.length > 0) {
-            source.connect(this.nodes[0].input);
+        if (this.modules.length > 0) {
+            source.connect(this.modules[0].input);
         } else {
             source.connect(this.masterVolume);
         }
 
-        for (var i = 0, len = this.nodes.length; i < len; i++) {
+        for (var i = 0, len = this.modules.length; i < len; i++) {
             //Clear connection
-            this.nodes[i].output.disconnect(0);
+            this.modules[i].output.disconnect(0);
 
-            if (i < (this.nodes.length - 1)) {
+            if (i < (this.modules.length - 1)) {
                 //Connect to next node
-                this.nodes[i].output.connect(this.nodes[i + 1].input);
+                this.modules[i].output.connect(this.modules[i + 1].input);
             } else {
-                this.nodes[i].output.connect(this.masterVolume);
+                this.modules[i].output.connect(this.masterVolume);
             }
         }
 
@@ -6979,6 +7031,65 @@
 
                 break;
         }
+    };
+
+    /**
+     * This method starts effectors.
+     * @param {number} startTime This argument is used for scheduling parameter.
+     * @return {SoundModule} This is returned for method chain.
+     */
+    SoundModule.prototype.on = function(startTime) {
+        var s = parseFloat(startTime);
+
+        if (isNaN(s) || (s < this.context.currentTime)) {
+            s = this.context.currentTime;
+        }
+
+        this.chorus.start(s);
+        this.flanger.start(s);
+        this.phaser.start(s);
+        this.autopanner.start(s);
+        this.tremolo.start(s);
+        this.ringmodulator.start(s);
+        this.wah.start(s);
+        this.filter.start(s);
+
+        for (var i = 0, len = this.plugins.length; i < len; i++) {
+            this.plugins[i].plugin.start(s);
+        }
+
+        return this;
+    };
+
+    /**
+     * This method stops effectors.
+     * @param {number} stopTime This argument is used for scheduling parameter.
+     * @param {boolean} isPlugin This argument is in order to determine whether effectors that were added as plug-in are stopped.
+     * @return {SoundModule} This is returned for method chain.
+     */
+    SoundModule.prototype.off = function(stopTime, isPlugin) {
+        var s = parseFloat(stopTime);
+
+        if (isNaN(s) || (s < this.context.currentTime)) {
+            s = this.context.currentTime;
+        }
+
+        this.chorus.stop(s);
+        this.flanger.stop(s);
+        this.phaser.stop(s);
+        this.autopanner.stop(s);
+        this.tremolo.stop(s);
+        this.ringmodulator.stop(s);
+        this.wah.stop(s);
+        //this.filter.stop(s);
+
+        if (isPlugin) {
+            for (var i = 0, len = this.plugins.length; i < len; i++) {
+                this.plugins[i].plugin.stop(s);
+            }
+        }
+
+        return this;
     };
 
     /** 
@@ -7083,7 +7194,7 @@
 
                             if ((v === 'linear') || (v === 'exponential')) {
                                 this.type = v;  //Setter
-                            } 
+                            }
                         }
 
                         break;
@@ -7486,8 +7597,8 @@
         var st = parseFloat(startTime);
         var sp = parseFloat(stopTime);
 
-        if (st >  0) {this.times.start = st;}
-        if (sp > st) {this.times.stop  = sp;}
+        if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
+        if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
         return this;
     };
@@ -7543,24 +7654,24 @@
         this.eg.start(startTime);
 
         //Start Effectors
-        this.chorus.start(startTime);
-        this.flanger.start(startTime);
-        this.phaser.start(startTime);
-        this.autopanner.start(startTime);
-        this.tremolo.start(startTime);
-        this.ringmodulator.start(startTime);
-        this.wah.start(startTime);
-        this.filter.start(startTime);
-
-        for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.start(startTime);
-        }
+        this.on(startTime);
 
         //Draw sound wave
         if (!this.isAnalyser) {
             this.analyser.start('time');
             this.analyser.start('fft');
             this.isAnalyser = true;
+        }
+
+        //In the case of scheduling stop time
+        var duration = this.times.stop - this.times.start;
+
+        if (duration > 0) {
+            var self = this;
+
+            global.setTimeout(function() {
+                self.stop(processCallback);
+            }, (duration * 1000));
         }
 
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
@@ -7611,13 +7722,7 @@
                 }
 
                 //Stop Effectors
-                self.chorus.stop(stopTime);
-                self.flanger.stop(stopTime);
-                self.phaser.stop(stopTime);
-                self.autopanner.stop(stopTime);
-                self.tremolo.stop(stopTime);
-                self.ringmodulator.stop(stopTime);
-                self.wah.stop(stopTime);
+                self.off(stopTime);
 
                 //Stop drawing sound wave
                 self.analyser.stop('time');
@@ -7652,13 +7757,7 @@
                     }
 
                     //Stop Effectors
-                    self.chorus.stop(stopTime);
-                    self.flanger.stop(stopTime);
-                    self.phaser.stop(stopTime);
-                    self.autopanner.stop(stopTime);
-                    self.tremolo.stop(stopTime);
-                    self.ringmodulator.stop(stopTime);
-                    self.wah.stop(stopTime);
+                    self.off(stopTime);
 
                     //Stop drawing sound wave
                     self.analyser.stop('time');
@@ -7736,6 +7835,8 @@
             start : 0,
             stop  : 0
         };
+
+        this.transpose = 1.0;
 
         this.isStop = true;
 
@@ -7981,9 +8082,31 @@
 
             //Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
+
+            if (r !== undefined) {
+                return r;  //Getter
+            } else {
+                switch (k) {
+                    case 'transpose' :
+                        if (value === undefined) {
+                            return this.transpose;  //Getter
+                        } else {
+                            var v   = parseFloat(value);
+                            var min = 0;
+
+                            if (v > min) {
+                                this.transpose = v;  //Setter
+                            }
+                        }
+
+                        break;
+                    default :
+                        break;
+                }
+            }
         }
 
-        return (r === undefined) ? this : r;
+        return this;
     };
 
     /** 
@@ -7997,8 +8120,8 @@
         var st = parseFloat(startTime);
         var sp = parseFloat(stopTime);
 
-        if (st >  0) {this.times.start = st;}
-        if (sp > st) {this.times.stop  = sp;}
+        if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
+        if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
         return this;
     };
@@ -8047,7 +8170,7 @@
         source.buffer = this.buffers[bufferIndex];
 
         //Set properties
-        source.playbackRate.value = playbackRate;
+        source.playbackRate.value = playbackRate * this.transpose;
         source.loop               = loop;
         source.loopStart          = loopStart;
         source.loopEnd            = loopEnd;
@@ -8069,18 +8192,7 @@
         this.eg.start(startTime);
 
         //Start Effectors
-        this.chorus.start(startTime);
-        this.flanger.start(startTime);
-        this.phaser.start(startTime);
-        this.autopanner.start(startTime);
-        this.tremolo.start(startTime);
-        this.ringmodulator.start(startTime);
-        this.wah.start(startTime);
-        this.filter.start(startTime);
-
-        for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.start(startTime);
-        }
+        this.on(startTime);
 
         //Draw sound wave
         if (!this.isAnalyser) {
@@ -8093,6 +8205,16 @@
 
         var self = this;
 
+        //In the case of scheduling stop time
+        var duration = this.times.stop - this.times.start;
+
+        if (duration > 0) {
+            global.setTimeout(function() {
+                self.stop(index);
+            }, (duration * 1000));
+        }
+
+        //Call on stopping audio
         source.onended = function() {
             self.isStops[activeIndex] = true;
         };
@@ -8107,16 +8229,9 @@
 
                 if (self.isStop) {
                     //Stop
-                    var stopTime = self.context.currentTime;
 
                     //Stop Effectors
-                    self.chorus.stop(stopTime);
-                    self.flanger.stop(stopTime);
-                    self.phaser.stop(stopTime);
-                    self.autopanner.stop(stopTime);
-                    self.tremolo.stop(stopTime);
-                    self.ringmodulator.stop(stopTime);
-                    self.wah.stop(stopTime);
+                    self.stop(self.context.currentTime);
 
                     self.eg.clear();
 
@@ -8482,17 +8597,7 @@
             this.paused = false;
 
             //Start Effectors
-            this.chorus.start(startTime);
-            this.flanger.start(startTime);
-            this.phaser.start(startTime);
-            this.autopanner.start(startTime);
-            this.tremolo.start(startTime);
-            this.ringmodulator.start(startTime);
-            this.wah.start(startTime);
-
-            for (var i = 0, len = this.plugins.length; i < len; i++) {
-                this.plugins[i].plugin.start(startTime);
-            }
+            this.on(startTime);
 
             this.callbacks.start(this.source, this.currentTime);
 
@@ -8515,10 +8620,10 @@
                             self.currentTime += ((1 * self.source.playbackRate.value) / self.source.buffer.sampleRate);
 
                             var index = Math.floor(self.currentTime * self.source.buffer.sampleRate);
-                            var n1sec = 1 * self.source.buffer.sampleRate;
+                            var n100msec = 0.100 * self.source.buffer.sampleRate;
 
-                            //Execute callback every 1 sec
-                            if ((index % n1sec) === 0) {
+                            //Execute callback every 100 msec
+                            if ((index % n100msec) === 0) {
                                 self.callbacks.update(self.source, self.currentTime);
                             }
                         }
@@ -8551,17 +8656,7 @@
             this.source.stop(stopTime);
 
             //Stop Effectors
-            this.chorus.stop(stopTime);
-            this.flanger.stop(stopTime);
-            this.phaser.stop(stopTime);
-            this.autopanner.stop(stopTime);
-            this.tremolo.stop(stopTime);
-            this.ringmodulator.stop(stopTime);
-            this.wah.stop(stopTime);
-
-            for (var i = 0, len = this.plugins.length; i < len; i++) {
-                this.plugins[i].plugin.stop(stopTime);
-            }
+            this.off(stopTime, true);
 
             //Stop drawing sound wave
             this.analyser.stop('time');
@@ -8759,24 +8854,10 @@
                     break;
                 case 'ended' :
                     this.media.addEventListener('ended', function(event) {
-                        var stopTime = self.context.currentTime;
-
                         this.pause();
 
                         //Stop Effectors
-                        self.chorus.stop(stopTime);
-                        self.flanger.stop(stopTime);
-                        self.phaser.stop(stopTime);
-                        self.autopanner.stop(stopTime);
-                        self.tremolo.stop(stopTime);
-                        self.ringmodulator.stop(stopTime);
-                        self.wah.stop(stopTime);
-
-                        for (var i = 0, len = self.plugins.length; i < len; i++) {
-                            if (self.plugins[i].plugin.isActive) {
-                                self.plugins[i].plugin.stop(stopTime);
-                            }
-                        }
+                        self.off(self.context.currentTime);
 
                         //Stop drawing sound wave
                         self.analyser.stop('time');
@@ -8942,8 +9023,6 @@
      */
     MediaModule.prototype.start = function(position, connects, processCallback) {
         if ((this.source instanceof MediaElementAudioSourceNode) && this.media.paused) {
-            var startTime = this.context.currentTime;
-
             //MediaElementAudioSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
             this.source.connect(this.processor);
             this.connect(this.processor, connects);
@@ -8959,17 +9038,7 @@
             this.media.muted        = this.muted;
 
             //Start Effectors
-            this.chorus.start(startTime);
-            this.flanger.start(startTime);
-            this.phaser.start(startTime);
-            this.autopanner.start(startTime);
-            this.tremolo.start(startTime);
-            this.ringmodulator.start(startTime);
-            this.wah.start(startTime);
-
-            for (var i = 0, len = this.plugins.length; i < len; i++) {
-                this.plugins[i].plugin.start(startTime);
-            }
+            this.on(this.context.currentTime);
 
             //Draw sound wave
             this.analyser.start('time');
@@ -9004,22 +9073,10 @@
      */
     MediaModule.prototype.stop = function() {
         if ((this.source instanceof MediaElementAudioSourceNode) && !this.media.paused) {
-            var stopTime = this.context.currentTime;
-
             this.media.pause();
 
             //Stop Effectors
-            this.chorus.stop(stopTime);
-            this.flanger.stop(stopTime);
-            this.phaser.stop(stopTime);
-            this.autopanner.stop(stopTime);
-            this.tremolo.stop(stopTime);
-            this.ringmodulator.stop(stopTime);
-            this.wah.stop(stopTime);
-
-            for (var i = 0, len = this.plugins.length; i < len; i++) {
-                this.plugins[i].plugin.stop(stopTime);
-            }
+            this.off(this.context.currentTime, true);
 
             //Stop drawing sound wave
             this.analyser.stop('time');
@@ -9180,18 +9237,7 @@
             var stopTime = this.context.currentTime;
 
             //Stop Effectors of each source
-            this.chorus.stop(stopTime);
-            this.flanger.stop(stopTime);
-            this.phaser.stop(stopTime);
-            this.autopanner.stop(stopTime);
-            this.tremolo.stop(stopTime);
-            this.ringmodulator.stop(stopTime);
-            this.wah.stop(stopTime);
-            this.filter.stop(stopTime);
-
-            for (var j = 0, num = this.plugins.length; j < num; j++) {
-                this.plugins[i].plugin.stop(stopTime);
-            }
+            this.off(stopTime, false);
 
             //Stop Analyser, Recorder, Session
             source.analyser.stop('time');
@@ -9212,18 +9258,7 @@
         var startTime = this.context.currentTime;
 
         //Start Effectors
-        this.chorus.start(startTime);
-        this.flanger.start(startTime);
-        this.phaser.start(startTime);
-        this.autopanner.start(startTime);
-        this.tremolo.start(startTime);
-        this.ringmodulator.start(startTime);
-        this.wah.start(startTime);
-        this.filter.start(startTime);
-
-        for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.start(startTime);
-        }
+        this.on(startTime);
 
         //Draw sound wave
         if (!this.isAnalyser) {
@@ -9261,25 +9296,14 @@
                 var stopTime = self.context.currentTime;
 
                 //Stop Effectors
-                self.chorus.stop(stopTime);
-                self.flanger.stop(stopTime);
-                self.phaser.stop(stopTime);
-                self.autopanner.stop(stopTime);
-                self.tremolo.stop(stopTime);
-                self.ringmodulator.stop(stopTime);
-                self.wah.stop(stopTime);
-                self.filter.stop(stopTime);
-
-                for (var i = 0, len = self.plugins.length; i < len; i++) {
-                    self.plugins[i].plugin.stop(stopTime);
-                }
+                self.stop(stopTime, true);
 
                 //Stop drawing sound wave
                 self.analyser.stop('time');
                 self.analyser.stop('fft');
                 self.isAnalyser = false;
 
-                 //Stop onaudioprocess event
+                //Stop onaudioprocess event
                 this.disconnect(0);
                 this.onaudioprocess = null;  //for Firefox
             } else {

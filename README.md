@@ -211,10 +211,7 @@ In the case of multi sounds (for example, chord),
 ### Sound Scheduling
   
     //for example, Starting after 5 seconds, to stop after 10 seconds,
-    X('oscillator').ready(5, 10).start(440).stop();
-  
-    //Method chain
-    X('oscillator').ready(5, 10).start(440).stop().ready(15, 20).start(880).stop() /* ... */ ;
+    X('oscillator').ready(5, 10).start(440);
   
 ### Master Volume
   
@@ -421,21 +418,30 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
     var index = 48;
   
     //for example, Starting after 5 seconds, to stop after 10 seconds,
-    X('oneshot').ready(5, 10).start(index).stop(index);
+    X('oneshot').ready(5, 10).start(index);
   
     //Method chain
-    X('oneshot').ready(5, 10).start(index).stop(index).ready(15, 20).start((index + 12)).stop((index + 12)) /* ... */ ;
+    X('oneshot').ready(5, 10).start(index).ready(15, 20).start((index + 12)) /* ... */ ;
   
-### Master Volume
+### Master Volume / Transpose
   
     //Getter
-    var volume = X('oneshot').param('masterVolume');  //The default value is 1
+    var volume    = X('oneshot').param('masterVolume');  //The default value is 1
+    var transpose = X('oneshot').param('transpose');     //The default value is 1
 
     //Setter
     X('oneshot').param('masterVolume', 0.5);  //The range of value is between 0 and 1
+    X('oneshot').param('transpose', 1.5);     //The range of value is greater than 0
+
+    //Method chain
+    X('oneshot').param('masterVolume', 0.5)
+                .param('transpose', 1.5);
 
     //Associative array
-    X('oneshot').param({masterVolume : 0.5});
+    X('oneshot').param({
+        masterVolume : 0.5,
+        transpose    : 1.5
+    });
   
 ### Envelope Generator
   
@@ -1961,7 +1967,7 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media',
 ### Create WAVE file
   
     //The 1st argument is track number or 'all'. If this argument is 'all', the all of tracks are mixed
-    //The 2nd argument is the number of channel. This argument is either 1 or 2. The default value is 2 channels
+    //The 2nd argument is the number of channels. This argument is either 1 or 2. The default value is 2 channels
     //The 3rd argument is quantization bit. This argument is either 8 or 16. The default value is 16 bit
     var wave = X(source).module('recorder').create('all', 2, 16);
   
