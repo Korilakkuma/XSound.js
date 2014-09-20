@@ -58,13 +58,26 @@ In the case of displaying error message for development,
   
 In the case of using WebSocket,
   
-    $ node xsound-server-websocket.js  //Use "websocket" module
+    $ node xsound-server-session-websocket.js  //Use "websocket" module
+  
+or,
+  
+    $ node xsound-server-session-ws.js  //Use "ws" module
   
 Default port number is 8000.  
 This port number can be changed by designating argument.  
 For example,
   
-    $ node xsound-server-websocket.js 8080  //Listen by 8080 ...
+    $ node xsound-server-session-websocket.js 8080  //Listen by 8080 ...
+  
+If path to module does not exist, module path must be designated by the 2nd argument.  
+For exmaple,
+  
+    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket/lib/websocket.js
+  
+In the case of recording log, the path of log file must be designated by the 3rd argument.
+  
+    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket/lib/websocket.js websocket.log
   
 ## Global Objects
   
@@ -291,7 +304,7 @@ For example, if 3 oscillators are used, this argument is either 0, 1 or 2.
   
 ### Custom Wave
   
-  In the case of using [custom type in "OscillatorNode"](http://www.w3.org/TR/webaudio/#attributes-OscillatorNode),
+  In the case of using [custom type in OscillatorNode](http://www.w3.org/TR/webaudio/#attributes-OscillatorNode),
   
     var reals = new Float32Array([0, 1, 0.5, 0.25, 0.125]);  //Array size must be less than or equal to 4096
     var imags = new Float32Array([0, 1, 0.5, 0.25, 0.125]);  //Array size must be less than or equal to 4096
