@@ -13,6 +13,7 @@ In concrete, this library may be useful to implement the following features.
 * Play the Audio
 * Play the Media (Fallback by HTML5 MediaElement)
 * Play the MML (Music Macro Language)
+* Streaming (by WebRTC)
 * Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb, and Original Effector ... etc)
 * Visualization (Overview in Time Domain / Time Domain / Spectrum)
 * Recording (Create WAVE file)
@@ -155,6 +156,7 @@ In addition, it is necessary that this process is executed before the all of pro
     X('oneshot').resize(1024);
     X('audio').resize(16384);
     X('media').resize(16384);
+    X('stream').resize(8192);
   
 ## Create Sound
   
@@ -760,6 +762,57 @@ Therefore, it is requires to check flag.
         //Cannot use Vocal Canceler
     }
   
+## Streaming
+  
+### Initialization
+  
+    var isVideo = true;  //In the case of streaming video. The default value is false
+
+    var streamCallback = function(stream) {
+         //"stream" is the instance of MediaStream
+    };
+
+    var errorCallback = function(error) {
+         //"error" is the instance of NavigatorUserMediaError
+    };
+
+    X('stream').setup(isVideo, streamCallback, errorCallback);
+  
+### Start Streaming
+  
+    try {
+        X('stream').start();
+    } catch (error) {
+        //Cannot use WebRTC
+        window.alert(error);
+    }
+  
+### Stop Streaming
+  
+    X('stream').stop();
+  
+### Start / Stop
+  
+    try {
+        X('stream').toggle();
+    } catch (error) {
+        //Cannot use WebRTC
+        window.alert(error);
+    }
+  
+### Parameters
+  
+    //Getter
+    var volume = X('stream').param('masterVolume');  //The default value is 1
+
+    //Setter
+    X('stream').param('masterVolume', 0.5);  //The range of value is between 0 and 1
+
+    //Associative array
+    X('stream').param({
+        masterVolume : 0.5
+    });
+  
 ## Mix Sound Source
   
 In the case of mixing the cloned sound source with the original sound source,
@@ -814,7 +867,7 @@ The default connection is the follwing.
 If application does not use some effectors, the effector should be disconnected by "state" method.  
 For example,
   
-    var source   = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
+    var source   = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'stream' or 'mixer' */;
     var effector = /* 'panner' or 'compressor' or 'distortion' or 'wah' or 'equalizer' or 'filter' or 'autopanner' or 'tremolo' or 'ringmodulator' or 'phaser' or 'flanger' or 'chorus' or 'delay' or 'reverb' */;
 
     //Getter
@@ -824,6 +877,9 @@ For example,
     X(source).module(effector).state(false);     //Disconnect the designated effector
     X(source).module(effector).state('toggle');  //Change state according to current state
   
+Default state is inactive  (false) except 'compressor' and 'equalizer'.  
+Therefore, application must change to active state (true) by "state" method.  
+  
 In the case of selecting module,
   
     //For exmaple, source (input) -> ScriptProcessorNode -> masterVolume -> analyser -> AudioDestinationNode (output)
@@ -831,12 +887,14 @@ In the case of selecting module,
     X('oneshot').start(0, []);
     X('audio').start(0, []);
     X('media').start(0, []);
+    X('stream').start([]);
 
     //For exmaple, source (input) -> ScriptProcessorNode -> [ chorus -> delay ] -> masterVolume -> analyser -> AudioDestinationNode (output)
     X('oscillator').start(440, [X('oscillator').module('chorus), X('oscillator').module('delay')]);
     X('oneshot').start(0, [X('audio').module('chorus), X('audio').module('delay')]);
     X('audio').start(0, [X('audio').module('chorus), X('audio').module('delay')]);
     X('media').start(0, [X('media').module('chorus), X('media').module('delay')]);
+    X('stream').start([X('stream').module('chorus), X('stream').module('delay')]);
   
 ## Custom Sound Processor
   
@@ -868,9 +926,9 @@ In ths case of customizing "onaudioprocess" event handler in the instance of Scr
   
 ## Effectors
     
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'stream', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'stream' or 'mixer' */;
   
 If effectors are used to X('media'), it is necessary to determine global flag (X.IS_XSOUND).  
 However, this is omitted the following.
@@ -1749,6 +1807,10 @@ In the case of using HTML5 Canvas,
     //for drawing media
     X('media').module('analyser').domain('time').setup('canvas', 'canvas-time');     //Time domain
     X('media').module('analyser').domain('fft').setup('canvas', 'canvas-spectrum');  //Frequency domain
+
+    //for drawing stream
+    X('stream').module('analyser').domain('time').setup('canvas', 'canvas-time');     //Time domain
+    X('stream').module('analyser').domain('fft').setup('canvas', 'canvas-spectrum');  //Frequency domain
   
 In the case of using HTML5 SVG,
   
@@ -1769,16 +1831,20 @@ In the case of using HTML5 SVG,
     //for drawing media
     X('media').module('analyser').domain('time').setup('svg', 'svg-time', 'svg-parent-time');         //Time domain
     X('media').module('analyser').domain('fft').setup('svg', 'svg-spectrum', 'svg-parent-spectrum');  //Frequency domain
+
+    //for drawing stream
+    X('media').module('analyser').domain('time').setup('svg', 'svg-time', 'svg-parent-time');         //Time domain
+    X('media').module('analyser').domain('fft').setup('svg', 'svg-spectrum', 'svg-parent-spectrum');  //Frequency domain
   
 ### Access Parameters
   
-The following, the variable ("source") is one of 'oscillator', 'oneshot', 'audio', 'media'.
+The following, the variable ("source") is one of 'oscillator', 'oneshot', 'audio', 'media', 'stream', 'mixer'.
   
-    var source = /* one of 'oscillator', 'oneshot', 'audio', 'media' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'stream' or 'mixer' */;
   
 And, the variable ("domain") is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
   
-    var domain = /* one of 'timeAllL', 'timeAllR', 'time', 'fft' */;
+    var domain = /* 'timeAllL' or 'timeAllR' or 'time' or 'fft' */;
   
 #### Manage State
   
@@ -1933,9 +1999,9 @@ In the case of displaying current time according to playing the audio,
   
 ## Recording
   
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'stream', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'stream' or 'mixer' */;
   
 ### Initialization
   
@@ -1993,9 +2059,9 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media',
   
 ## Session
   
-The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'mixer'.
+The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media', 'stream', 'mixer'.
   
-    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'mixer' */;
+    var source = /* 'oscillator' or 'oneshot' or 'audio' or 'media' or 'stream' or 'mixer' */;
   
 ### Initialization
   
@@ -2168,6 +2234,7 @@ In the case of cloning sound source,
     console.assert(X('audio')      === cloned('audio'));       //Assertion failed
     console.assert(X('media')      === cloned('media'));       //Assertion failed
     console.assert(X('fallback')   === cloned('fallback'));    //Assertion failed
+    console.assert(X('stream')     === cloned('stream'));      //Assertion failed
     console.assert(X('mixer')      === cloned('mixer'));       //Assertion failed
     console.assert(X('mml')        === cloned('mml'));         //Assertion failed
   
