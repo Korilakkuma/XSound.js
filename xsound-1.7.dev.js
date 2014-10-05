@@ -14,7 +14,7 @@
     //Global object
     var XSound;
 
-    //Global constant value for the determination that Web Audio API is either valid or invalid.
+    //Global constant value for the determination that Web Audio API is either enabled or disabled.
     var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
     var FULL_MODE = global.webkitAudioContext ? true : false;  //for Firefox
 
@@ -36,7 +36,7 @@
         switch (ERROR_MODE) {
             case ERROR_MODES.ALERT :
                 console.trace();
-                alert(message);
+                global.alert(message);
                 break;
             case ERROR_MODES.CONSOLE :
                 console.trace();
@@ -457,7 +457,11 @@
             var s  = Math.floor(t % 60);
             var ms = t - parseInt(t);
 
-            return {minutes : m, seconds : s, milliseconds : ms};
+            return {
+                minutes      : m,
+                seconds      : s,
+                milliseconds : ms
+            };
         } else {
             _debug(this + ' convertTime() : The range of the 1st argument is between 0 and audio duration !!');
         }
@@ -863,21 +867,7 @@
 
     ////////////////////////////////////////////////////////////////////////////////
 
-    //{@type AudioContext}
-    var audiocontext = null;
-
-    if (IS_XSOUND) {
-        //Chrome, Opera, Firefox (Mac / Windows), Safari (Mac)
-        global.AudioContext = global.AudioContext || global.webkitAudioContext;
-
-        audiocontext = new AudioContext();
-
-        //for legacy browsers
-        audiocontext.createScriptProcessor = audiocontext.createScriptProcessor || audiocontext.createJavaScriptNode;
-        audiocontext.createGain            = audiocontext.createGain            || audiocontext.createGainNode;
-        audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
-        audiocontext.createPeriodicWave    = audiocontext.createPeriodicWave    || audiocontext.createWaveTable;
-    } else {
+    if (!IS_XSOUND) {
         //Internet Explorer
 
         //Create instance
@@ -937,6 +927,17 @@
     }
 
     //If the browser can use Web Audio API, the following code is executed.
+
+    //Chrome, Opera, Firefox (Mac / Windows), Safari (Mac)
+    global.AudioContext = global.AudioContext || global.webkitAudioContext;
+
+    var audiocontext = new AudioContext();
+
+    //for legacy browsers
+    audiocontext.createScriptProcessor = audiocontext.createScriptProcessor || audiocontext.createJavaScriptNode;
+    audiocontext.createGain            = audiocontext.createGain            || audiocontext.createGainNode;
+    audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
+    audiocontext.createPeriodicWave    = audiocontext.createPeriodicWave    || audiocontext.createWaveTable;
 
     /** 
      * This class is superclass that is the top in "xsound.js".
@@ -4221,7 +4222,7 @@
             return this;
         };
 
-        /** @ovreride */
+        /** @override */
         Effector.prototype.state = function(value) {
             if (value === undefined) {
                 return this.isActive;  //Getter
@@ -4361,9 +4362,6 @@
             this.color      = context.createBiquadFilter();
             this.tone       = context.createBiquadFilter();
 
-            this.color.BANDPASS = this.color.BANDPASS || 2;
-            this.tone.LOWPASS   = this.tone.LOWPASS   || 0;
-
             //Distortion type
             this.type = 'clean';
 
@@ -4372,11 +4370,11 @@
 
             //Initialize parameters
             this.drive.gain.value      = 1;
-            this.color.type            = (Object.prototype.toString.call(this.color.type) === '[object String]') ? 'bandpass' : this.color.BANDPASS;
+            this.color.type            = (Object.prototype.toString.call(this.color.type) === '[object String]') ? 'bandpass' : (this.color.BANDPASS || 2);
             this.color.frequency.value = 350;
             this.color.Q.value         = Math.SQRT1_2;
             this.color.gain.value      = 0;  //Not used
-            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : this.tone.LOWPASS;
+            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
@@ -4573,10 +4571,8 @@
 
             this.lowpass = context.createBiquadFilter();
 
-            this.lowpass.LOWPASS = this.lowpass.LOWPASS || 0;
-
             //Initialize parameters
-            this.lowpass.type            = (Object.prototype.toString.call(this.lowpass.type) === '[object String]') ? 'lowpass' : this.lowpass.LOWPASS;
+            this.lowpass.type            = (Object.prototype.toString.call(this.lowpass.type) === '[object String]') ? 'lowpass' : (this.lowpass.LOWPASS || 0);
             this.lowpass.frequency.value = 350;
             this.lowpass.gain.value      = 0;    //Not used
 
@@ -4739,16 +4735,11 @@
             this.treble   = context.createBiquadFilter();
             this.presence = context.createBiquadFilter();
 
-            this.bass.LOWSHELF      = this.bass.LOWSHELF      || 3;
-            this.middle.PEAKING     = this.middle.PEAKING     || 5;
-            this.treble.HIGHSHELF   = this.treble.HIGHSHELF   || 4;
-            this.presence.HIGHSHELF = this.presence.HIGHSHELF || 4;
-
             //Set filter type
-            this.bass.type     = (Object.prototype.toString.call(this.bass.type)     === '[object String]') ? 'lowshelf'  : this.bass.LOWSHELF;
-            this.middle.type   = (Object.prototype.toString.call(this.middle.type)   === '[object String]') ? 'peaking'   : this.middle.PEAKING;
-            this.treble.type   = (Object.prototype.toString.call(this.treble.type)   === '[object String]') ? 'highshelf' : this.treble.HIGHSHELF;
-            this.presence.type = (Object.prototype.toString.call(this.presence.type) === '[object String]') ? 'highshelf' : this.presence.HIGHSHELF;
+            this.bass.type     = (Object.prototype.toString.call(this.bass.type)     === '[object String]') ? 'lowshelf'  : (this.bass.LOWSHELF      || 3);
+            this.middle.type   = (Object.prototype.toString.call(this.middle.type)   === '[object String]') ? 'peaking'   : (this.middle.PEAKING     || 5);
+            this.treble.type   = (Object.prototype.toString.call(this.treble.type)   === '[object String]') ? 'peaking'   : (this.treble.PEAKING     || 5);
+            this.presence.type = (Object.prototype.toString.call(this.presence.type) === '[object String]') ? 'highshelf' : (this.presence.HIGHSHELF || 4);
 
             //Set cutoff frequency
             this.bass.frequency.value     =  500;  //500 Hz
@@ -4759,7 +4750,7 @@
             //Set Q
             //this.bass.Q.value     = Math.SQRT1_2;  //Not used
             this.middle.Q.value   = Math.SQRT1_2;
-            //this.treble.Q.value   = Math.SQRT1_2;  //Not used
+            this.treble.Q.value   = Math.SQRT1_2;
             //this.presence.Q.value = Math.SQRT1_2;  //Not used
 
             //Set Gain
@@ -4855,20 +4846,11 @@
 
             this.filter = context.createBiquadFilter();
 
-            this.filter.LOWPASS   = this.filter.LOWPASS   || 0;
-            this.filter.HIGHPASS  = this.filter.HIGHPASS  || 1;
-            this.filter.BANDPASS  = this.filter.BANDPASS  || 2;
-            this.filter.LOWSHELF  = this.filter.LOWSHELF  || 3;
-            this.filter.HIGHSHELF = this.filter.HIGHSHELF || 4;
-            this.filter.PEAKING   = this.filter.PEAKING   || 5;
-            this.filter.NOTCH     = this.filter.NOTCH     || 6;
-            this.filter.ALLPASS   = this.filter.ALLPASS   || 7;
-
             //for legacy browsers
             this.filter.frequency.setTargetAtTime = this.filter.frequency.setTargetAtTime || this.filter.frequency.setTargetValueAtTime;
 
             //Initialize parameters
-            this.filter.type            = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? 'lowpass' : this.filter.LOWPASS;
+            this.filter.type            = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? 'lowpass' : (this.filter.LOWPASS || 0);
             this.filter.frequency.value = 350;
             this.filter.Q.value         = 1;
             this.filter.gain.value      = 0;
@@ -4901,19 +4883,19 @@
                             var v = String(value).toLowerCase();
 
                             //for legacy browsers
-                            var FILTER_TYPE = {
-                                lowpass   : this.filter.LOWPASS,
-                                highpass  : this.filter.HIGHPASS,
-                                bandpass  : this.filter.BANDPASS,
-                                lowshelf  : this.filter.LOWSHELF,
-                                highshelf : this.filter.HIGHSHELF,
-                                peaking   : this.filter.PEAKING,
-                                notch     : this.filter.NOTCH,
-                                allpass   : this.filter.ALLPASS
+                            var FILTER_TYPES = {
+                                lowpass   : this.filter.LOWPASS   || 0,
+                                highpass  : this.filter.HIGHPASS  || 1,
+                                bandpass  : this.filter.BANDPASS  || 2,
+                                lowshelf  : this.filter.LOWSHELF  || 3,
+                                highshelf : this.filter.HIGHSHELF || 4,
+                                peaking   : this.filter.PEAKING   || 5,
+                                notch     : this.filter.NOTCH     || 6,
+                                allpass   : this.filter.ALLPASS   || 7
                             };
 
-                            if (v in FILTER_TYPE) {
-                                this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPE[v];  //Setter
+                            if (v in FILTER_TYPES) {
+                                this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPES[v];  //Setter
                             } else {
                                 _debug(this + ' param() : The value of "' + key + '" is one of "lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass" !!');
                             }
@@ -5066,7 +5048,7 @@
             return this;
         };
 
-        /** @ovreride */
+        /** @override */
         Filter.prototype.state = function(value) {
             if (value === undefined) {
                 return this.isActive;  //Getter
@@ -5547,8 +5529,7 @@
 
             for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
                 this.filters[i]                 = context.createBiquadFilter();
-                this.filters[i].ALLPASS         = this.filters[i].ALLPASS || 7;
-                this.filters[i].type            = (Object.prototype.toString.call(this.filters[i].type) === '[object String]') ? 'allpass' : this.filters[i].ALLPASS;
+                this.filters[i].type            = (Object.prototype.toString.call(this.filters[i].type) === '[object String]') ? 'allpass' : (this.filters[i].ALLPASS || 7);
                 this.filters[i].frequency.value = 350;
                 this.filters[i].Q.value         = 1;
                 this.filters[i].gain.value      = 0;  //Not used
@@ -5704,7 +5685,7 @@
             return this;
         };
 
-        /** @ovreride */
+        /** @override */
         Phaser.prototype.connect = function() {
             //Clear connection
             this.input.disconnect(0);
@@ -5779,14 +5760,12 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            this.tone.LOWPASS = this.tone.LOWPASS || 0;
-
             //Initialize parameters
             this.delay.delayTime.value = 0;
             this.depth.gain.value      = 0;
             this.rate.value            = 0;
             this.mix.gain.value        = 0;
-            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : this.tone.LOWPASS;
+            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
@@ -5972,14 +5951,12 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            this.tone.LOWPASS = this.tone.LOWPASS || 0;
-
             //Initialize parameters
             this.delay.delayTime.value = 0;
             this.depth.gain.value      = 0;
             this.rate.value            = 0;
             this.mix.gain.value        = 0;
-            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : this.tone.LOWPASS;
+            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
@@ -6169,13 +6146,11 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            this.tone.LOWPASS = this.tone.LOWPASS || 0;
-
             //Initialize parameters
             this.delay.delayTime.value = 0;
             this.dry.gain.value        = 1;
             this.wet.gain.value        = 0;
-            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : this.tone.LOWPASS;
+            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
@@ -6313,8 +6288,6 @@
             this.wet       = context.createGain();
             this.tone     = context.createBiquadFilter();
 
-            this.tone.LOWPASS = this.tone.LOWPASS || 0;
-
             //Callback for create the instance of AudioBuffer
             this.decodeAudioData = function(impulse, successCallback, errorCallback) {
                 context.decodeAudioData(impulse, successCallback, errorCallback);
@@ -6323,7 +6296,7 @@
             //Initialize parameters
             this.dry.gain.value        = 1;
             this.wet.gain.value        = 0;
-            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : this.tone.LOWPASS;
+            this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
             this.tone.gain.value       = 0;  //Not used
@@ -6649,7 +6622,7 @@
             return this;
         };
 
-        /** @ovreride */
+        /** @override */
         Reverb.prototype.state = function(value) {
             if (value === undefined) {
                 return this.isActive;  //Getter
@@ -6685,13 +6658,6 @@
 
             this.panner = context.createPanner();
 
-            this.panner.EQUALPOWER = this.panner.EQUALPOWER || 0;
-            this.panner.HRTF       = this.panner.HRTF       || 1;
-
-            this.panner.LINEAR_DISTANCE      = this.panner.LINEAR_DISTANCE      || 0;
-            this.panner.INVERSE_DISTANCE     = this.panner.INVERSE_DISTANCE     || 1;
-            this.panner.EXPONENTIAL_DISTANCE = this.panner.EXPONENTIAL_DISTANCE || 2;
-
             this.positions    = {x : 0, y : 0, z : 0};
             this.orientations = {x : 1, y : 0, z : 0};
             this.velocities   = {x : 0, y : 0, z : 0};
@@ -6704,8 +6670,8 @@
             this.panner.coneOuterAngle = 360;
             this.panner.coneOuterGain  = 0;
 
-            this.panner.panningModel  = (Object.prototype.toString.call(this.panner.panningModel)  === '[object String]') ? 'HRTF'    : 1;
-            this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? 'inverse' : 1;
+            this.panner.panningModel  = (Object.prototype.toString.call(this.panner.panningModel)  === '[object String]') ? 'HRTF'    : (this.panner.HRTF || 1);
+            this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? 'inverse' : (this.panner.INVERSE_DISTANCE || 1);
 
             this.panner.setPosition(this.positions.x, this.positions.y, this.positions.z);
             this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
@@ -6871,8 +6837,8 @@
                             var v = /HRTF/i.test(value) ? String(value).toUpperCase() : String(value).toLowerCase();
 
                             var MODELS = {
-                                equalpower : this.panner.EQUALPOWER,
-                                HRTF       : this.panner.HRTF
+                                equalpower : this.panner.EQUALPOWER || 0,
+                                HRTF       : this.panner.HRTF       || 1
                             };
 
                             if (v in MODELS) {
@@ -6890,9 +6856,9 @@
                             var v = String(value).replace(/-/g, '').toLowerCase();
 
                             var MODELS = {
-                                linear      : this.panner.LINEAR_DISTANCE,
-                                inverse     : this.panner.INVERSE_DISTANCE,
-                                exponential : this.panner.EXPONENTIAL_DISTANCE
+                                linear      : this.panner.LINEAR_DISTANCE      || 0,
+                                inverse     : this.panner.INVERSE_DISTANCE     || 1,
+                                exponential : this.panner.EXPONENTIAL_DISTANCE || 2
                             };
 
                             if (v in MODELS) {
@@ -7866,7 +7832,7 @@
             return this;
         };
 
-        /** @ovreride */
+        /** @override */
         Oscillator.prototype.state = function(value) {
             if (value === undefined) {
                 return this.isActive;  //Getter
@@ -10546,7 +10512,7 @@
      * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML.
      * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml'.
      * @param {number} index This argument is in order to select one of some oscillators.
-     * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule|StreamModuel|MixerModule|MML}
+     * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule|StreamModule|MixerModule|MML}
      */
     XSound = function(source, index) {
         var s = String(source).replace(/-/g, '').toLowerCase();
@@ -10664,7 +10630,6 @@
     /** 
      * This static method releases memory of unnecessary instances.
      * @param {Array.<SoundModule|MML|MediaFallbackModule>} sources This argument is array that has the instances of SoundModule or MML or MediaFallbackModule.
-     * @return {function} This is returned as closure for getter of cloned module.
      */
     XSound.free = function(sources) {
         if (!Array.isArray(sources)) {
