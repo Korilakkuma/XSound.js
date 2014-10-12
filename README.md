@@ -2022,6 +2022,21 @@ The following, the variable is one of 'oscillator', 'oneshot', 'audio', 'media',
         X(source).module('recorder').stop();
     }
   
+In the case of using WebRTC (MediaStreamAudioSourceNode),
+  
+    if (X('stream').module('recorder').getActiveTrack() === -1) {
+        //Start (Track 1)
+        //It is important that recorder starts before streaming
+        X('stream').module('recorder').ready(0).start();  //for example, if the number of tracks is 4, the range of this argument is between 0 and 3
+
+        //....
+
+        X('stream').start();
+    } else {
+        //Stop
+        X('stream').module('recorder').stop();
+    }
+  
 ### Clear
   
      //Delete recorded data in track 1
