@@ -157,11 +157,11 @@
         }
 
         if (!(file instanceof File)) {
-            throw new Error('Please upload file !!');
+            throw new Error('Please upload file.');
         } else if ((/text/i.test(type)) && (file.type.indexOf('text') === -1)) {
-            throw new Error('Please upload text file !!');
+            throw new Error('Please upload text file.');
         } else if ((/arraybuffer|dataurl/i.test(type)) && (file.type.indexOf('audio') === -1)) {
-            throw new Error('Please upload audio file !!');
+            throw new Error('Please upload audio file.');
         } else {
             //Asynchronously
             this.read({
@@ -458,7 +458,7 @@
         }
 
         if (this.ext === '') {
-            throw new Error('Media format that can be played does not exist !!');
+            throw new Error('Media format that can be played does not exist.');
         }
 
         if (Object.prototype.toString.call(callbacks) === '[object Object]') {
@@ -624,7 +624,7 @@
                 this.media.src = src + '.' + this.ext;  //Path
             }
         } catch (error) {
-            throw new Error('The designated resource cannot be loaded !!');
+            throw new Error('The designated resource cannot be loaded.');
         }
 
         return this;
@@ -728,7 +728,7 @@
                 //Opera
                 this.media.requestFullscreen();
             } else {
-                throw new Error('Cannot change to full screen !!');
+                throw new Error('Cannot change to full screen.');
             }
         }
 
@@ -750,7 +750,7 @@
             //Opera
             document.exitFullscreen();
         } else {
-            throw new Error('Cannot exit from full screen !!');
+            throw new Error('Cannot exit from full screen.');
         }
 
         return this;
@@ -853,6 +853,8 @@
         this.NUM_INPUT   = 2;
         this.NUM_OUTPUT  = 2;
 
+        var userAgent = navigator.userAgent;
+
         if (bufferSize !== undefined) {
             switch (parseInt(bufferSize)) {
                 case   256 :
@@ -867,19 +869,19 @@
                 default :
                     return;
             }
-        } else if (/(Win(dows )?NT 6\.2)/.test(navigator.userAgent)) {
+        } else if (/(Win(dows )?NT 6\.2)/.test(userAgent)) {
             this.BUFFER_SIZE = 1024;  //Windows 8
-        } else if (/(Win(dows )?NT 6\.1)/.test(navigator.userAgent)) {
+        } else if (/(Win(dows )?NT 6\.1)/.test(userAgent)) {
             this.BUFFER_SIZE = 1024;  //Windows 7
-        } else if (/(Win(dows )?NT 6\.0)/.test(navigator.userAgent)) {
+        } else if (/(Win(dows )?NT 6\.0)/.test(userAgent)) {
             this.BUFFER_SIZE = 2048;  //Windows Vista
-        } else if (/Win(dows )?(NT 5\.1|XP)/.test(navigator.userAgent)) {
+        } else if (/Win(dows )?(NT 5\.1|XP)/.test(userAgent)) {
             this.BUFFER_SIZE = 4096;  //Windows XP
-        } else if (/Mac|PPC/.test(navigator.userAgent)) {
+        } else if (/Mac|PPC/.test(userAgent)) {
             this.BUFFER_SIZE = 1024;  //Mac OS X
-        } else if (/Linux/.test(navigator.userAgent)) {
+        } else if (/Linux/.test(userAgent)) {
             this.BUFFER_SIZE = 8192;  //Linux
-        } else if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        } else if (/iPhone|iPad|iPod/.test(userAgent)) {
             this.BUFFER_SIZE = 2048;  //iOS
         } else {
             this.BUFFER_SIZE = 16384;  //Otherwise
@@ -3691,7 +3693,7 @@
                 this.connect();
                 this.websocket = null;
 
-                throw new Error('Now Offline !!');
+                throw new Error('Now Offline.');
             }
 
             //The argument is associative array ?
@@ -4942,6 +4944,7 @@
             this.amplitudeL.disconnect(0);
             this.amplitudeR.disconnect(0);
             this.splitter.disconnect(0);
+            this.splitter.disconnect(1);
             this.merger.disconnect(0);
 
             if (this.isActive) {
@@ -8788,7 +8791,7 @@
         }
 
         if (this.ext === '') {
-            throw new Error('Media format that can be played does not exist !!');
+            throw new Error('Media format that can be played does not exist.');
         }
 
         if (Object.prototype.toString.call(callbacks) === '[object Object]') {
@@ -8974,7 +8977,7 @@
                 this.media.src = src + '.' + this.ext;  //Path
             }
         } catch (error) {
-            throw new Error('The designated resource cannot be loaded !!');
+            throw new Error('The designated resource cannot be loaded.');
         }
 
         return this;
@@ -9128,7 +9131,7 @@
                 //Opera
                 this.media.requestFullscreen();
             } else {
-                throw new Error('Cannot change to full screen !!');
+                throw new Error('Cannot change to full screen.');
             }
         }
 
@@ -9150,7 +9153,7 @@
             //Opera
             document.exitFullscreen();
         } else {
-            throw new Error('Cannot exit from full screen !!');
+            throw new Error('Cannot exit from full screen.');
         }
 
         return this;
@@ -9252,7 +9255,7 @@
      */
     StreamModule.prototype.start = function(connects, processCallback) {
         if (navigator.getUserMedia === undefined) {
-            throw new Error('Cannot use WebRTC !!');
+            throw new Error('Cannot use WebRTC.');
         }
 
         var isAnalyser = false;
@@ -9537,6 +9540,23 @@
         };
     }
 
+    /**
+     * static properties
+     */
+    MML.ONE_MINUTES       = 60;  //sec
+    MML.EQUAL_TEMPERAMENT = 12;
+    MML.QUARTER_NOTE      = 4;
+    MML.REGEXP_MML        = /\s*(?:T\d+)\s*|\s*(?:O\d+)\s*|\s*(?:(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)(?:&(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)*\s*/gi;
+    MML.REGEXP_TEMPO      = /T\d+/i;
+    MML.REGEXP_OCTAVE     = /O\d+/i;
+    MML.REGEXP_NOTE       = /(?:(?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)(?:&(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)*/i;
+    MML.REGEXP_CHORD      = /((?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*/i;
+    MML.REGEXP_DURATION   = /(?:[CDEFGABR][#+-]?)+((?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*)/i;
+    MML.ERROR_MML_STRING  = 'MML';
+    MML.ERROR_MML_TEMPO   = 'TEMPO';
+    MML.ERROR_MML_OCTAVE  = 'OCTAVE';
+    MML.ERROR_MML_NOTE    = 'NOTE';
+
     /** 
      * This method sets callback functions.
      * @param {string|object} key This argument is property name.
@@ -9601,22 +9621,13 @@
         while (mmls.length > 0) {
             var mml = String(mmls.shift());
 
-            var ONE_MINUTES       = 60;  //sec
-            var EQUAL_TEMPERAMENT = 12;
-            var QUARTER_NOTE      = 4;
-            var MML_REGEXP        = /\s*(?:T\d+)\s*|\s*(?:O\d+)\s*|\s*(?:(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)(?:&(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)*\s*/gi;
-            var ERROR_MML_STRING  = 'MML';
-            var ERROR_MML_TEMPO   = 'TEMPO';
-            var ERROR_MML_OCTAVE  = 'OCTAVE';
-            var ERROR_MML_NOTE    = 'NOTE';
-
             //{@type Array.<object>}
             var sequences = [];
 
-            var notes = mml.match(MML_REGEXP);
+            var notes = mml.match(MML.REGEXP_MML);
 
             if (notes === null) {
-                this.callbacks.error(ERROR_MML_STRING, '');
+                this.callbacks.error(MML.ERROR_MML_STRING, '');
                 return;
             }
 
@@ -9637,7 +9648,7 @@
                     default  : break;
                 }
 
-                var computedIndex = (EQUAL_TEMPERAMENT * (octave - 1)) + index;
+                var computedIndex = (MML.EQUAL_TEMPERAMENT * (octave - 1)) + index;
 
                 if (computedIndex >= 0) {
                     return computedIndex;
@@ -9666,34 +9677,34 @@
             while (notes.length > 0) {
                 var note = notes.shift().trim();
 
-                if (/T\d+/i.test(note)) {
+                if (MML.REGEXP_TEMPO.test(note)) {
                     var bpm = parseInt(note.slice(1));
 
                     if (bpm > 0) {
-                        var timeOf4note = ONE_MINUTES / bpm;
+                        var timeOf4note = MML.ONE_MINUTES / bpm;
                     } else {
-                        this.callbacks.error(ERROR_MML_TEMPO, note);
+                        this.callbacks.error(MML.ERROR_MML_TEMPO, note);
                         return;
                     }
-                } else if (/O\d+/i.test(note)) {
+                } else if (MML.REGEXP_OCTAVE.test(note)) {
                     var octave = parseInt(note.slice(1));
 
                     if (octave < 0) {
-                        this.callbacks.error(ERROR_MML_OCTAVE, note);
+                        this.callbacks.error(MML.ERROR_MML_OCTAVE, note);
                         return;
                     }
-                } else if (/(?:(?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)(?:&(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)*/i.test(note)) {
+                } else if (MML.REGEXP_NOTE.test(note)) {
                     if (timeOf4note === undefined) {
-                        this.callbacks.error(ERROR_MML_TEMPO, note);
+                        this.callbacks.error(MML.ERROR_MML_TEMPO, note);
                         return;
                     }
 
                     if (octave === undefined) {
-                        this.callbacks.error(ERROR_MML_OCTAVE, note);
+                        this.callbacks.error(MML.ERROR_MML_OCTAVE, note);
                         return;
                     }
 
-                    var chord = note.match(/((?:[CDEFGABR][#+-]?)+)(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*/i)[1];
+                    var chord = note.match(MML.REGEXP_CHORD)[1];
 
                     var indexes = [];
 
@@ -9721,12 +9732,12 @@
 
                         //in the case of chord
                         if (index >= indexes[0]) {
-                            index -= EQUAL_TEMPERAMENT;
+                            index -= MML.EQUAL_TEMPERAMENT;
                         }
 
                         //Validation
                         if (index < 0) {
-                            this.callbacks.error(ERROR_MML_NOTE, note);
+                            this.callbacks.error(MML.ERROR_MML_NOTE, note);
                             return;
                         }
 
@@ -9740,7 +9751,7 @@
 
                         //Validation
                         if (frequency === -1) {
-                            this.callbacks.error(ERROR_MML_NOTE, note);
+                            this.callbacks.error(MML.ERROR_MML_NOTE, note);
                             return;
                         }
 
@@ -9751,7 +9762,7 @@
                     var duration  = 0;
 
                     while (durations.length > 0) {
-                        var d = durations.shift().match(/(?:[CDEFGABR][#+-]?)+((?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?.*)/i)[1];
+                        var d = durations.shift().match(MML.REGEXP_DURATION)[1];
 
                         switch (parseInt(d)) {
                             case   1 :
@@ -9763,7 +9774,7 @@
                             case  64 :
                             case 128 :
                             case 256 :
-                                var numOf4note = QUARTER_NOTE / parseInt(d);
+                                var numOf4note = MML.QUARTER_NOTE / parseInt(d);
 
                                 //a dotted note ?
                                 duration += (d.indexOf('.') !== -1) ? ((1.5 * numOf4note) * timeOf4note) : (numOf4note * timeOf4note);
@@ -9809,7 +9820,7 @@
                                 duration += (0.0625 * timeOf4note) / 3;
                                 break;
                             default :
-                                this.callbacks.error(ERROR_MML_NOTE, note);
+                                this.callbacks.error(MML.ERROR_MML_NOTE, note);
                                 break;
                         }
                     }
