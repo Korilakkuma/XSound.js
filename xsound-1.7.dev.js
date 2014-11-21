@@ -3310,6 +3310,14 @@
             }
         };
 
+        /**
+         * This method gets the instance of AnalyserNode.
+         * @return {AnalyserNode} This value is the instance of AnalyserNode.
+         */
+        Analyser.prototype.get = function() {
+            return this.analyser;
+        };
+
         /** @override */
         Analyser.prototype.toString = function() {
             return '[SoundModule Analyser]';
@@ -4097,6 +4105,14 @@
 
             //In the case of setter
             return this;
+        };
+
+        /**
+         * This method gets the instance of WebSocket.
+         * @return {WebSocket} This value is the instance of WebSocket.
+         */
+        Session.prototype.get = function() {
+            return this.websocket;
         };
 
         /** @override */
@@ -5200,7 +5216,7 @@
                 var self = this;
 
                 this.processor.onaudioprocess = function(event) {
-                    var inputs = event.inputBuffer.getChannelData(0);
+                    var inputs   = event.inputBuffer.getChannelData(0);
                     var outputLs = event.outputBuffer.getChannelData(0);
                     var outputRs = event.outputBuffer.getChannelData(1);
 
