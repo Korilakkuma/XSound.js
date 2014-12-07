@@ -517,8 +517,8 @@ Register callback functions.
             //When audio ended, this callback function is executed
             //for example, this callback clears UI for playing the audio
 
-            //'source' is the instance of AudioBufferSourceNode
-            //'currentTime' is current time in audio
+            //"source" is the instance of AudioBufferSourceNode
+            //"currentTime" is current time in audio
         },
         error : function() {
             //When "decodeAudioData" failed, this callback function is executed
@@ -812,6 +812,17 @@ Therefore, it is requires to check flag.
     X('stream').param({
         masterVolume : 0.5
     });
+  
+### Noise Gate
+  
+    //Getter
+    var noisegate = X('stream').module('noisegate').param('level');  //The default value is 0
+
+    //Setter
+    X('stream').module('noisegate').param('level', 0.3);  //The range of value is between 0 and 1
+
+    //Associative array
+    X('stream').module('noisegate').param({level : 0.3});
   
 ## Mix Sound Source
   
