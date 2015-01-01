@@ -67,7 +67,7 @@ if (!fs.existsSync(path)) {
     process.exit(1);
 }
 
-//Create the instance of WebSocketServer
+// Create the instance of WebSocketServer
 var WebSocketServer = require(path).Server;
 var http            = require('http');
 var httpd           = http.createServer();
@@ -105,18 +105,18 @@ ws.on('connection', function(socket) {
     });
 });
 
-//Start HTTP server and WebSocket server
+// Start HTTP server and WebSocket server
 httpd.listen(port, function() {
     process.stdout.write('Waiting ... (' + port + ')\n');
 });
 
-//Signal Handler
+// Signal Handler
 process.on('SIGINT', function() {
     process.stdout.write('This process caught signal number 2 (SIGINT). Therefore, (' + process.pid + ') was terminated.\n');
     process.exit(0);
 });
 
-//Catch Exception
+// Catch Exception
 process.on('uncaughtException', function(error) {
     appendLog(error.message, '121');
     process.stderr.write('LINE 122 :' + error.message + '\n');

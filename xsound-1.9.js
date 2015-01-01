@@ -11,12 +11,12 @@
 (function(global) {
     'use strict';
 
-    //Global object
+    // Global object
     var XSound;
 
-    //Global constant value for the determination that Web Audio API is either enabled or disabled.
+    // Global constant value for the determination that Web Audio API is either enabled or disabled.
     var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
-    var FULL_MODE = global.webkitAudioContext ? true : false;  //for Firefox
+    var FULL_MODE = global.webkitAudioContext ? true : false;  // for Firefox
 
     /** 
      * This interface is in order to manage state of module that implements this interface.
@@ -35,7 +35,7 @@
     Statable.prototype.state = function(value) {
     };
 
-    //These functions are static methods for "XSound".
+    // These functions are static methods for "XSound".
 
     /** 
      * TThis static method reads file of audio or text.
@@ -46,7 +46,7 @@
      * @param {function} progressCallback This argument is executed as "onprogress" event handler in the instance of FileReader.
      */
     var read = function(file, type, successCallback, errorCallback, progressCallback) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -67,7 +67,7 @@
             return;
         }
 
-        //Create the instance of FileReader
+        // Create the instance of FileReader
         var reader = new FileReader();
 
         reader.onprogress = function(event) {
@@ -97,7 +97,7 @@
             if (Object.prototype.toString.call(successCallback) === '[object Function]') {
                 var result = reader.result;
 
-                //Escape <script> in the case of text
+                // Escape <script> in the case of text
                 if ((Object.prototype.toString.call(result) === '[object String]') && (result.indexOf('data:') === -1) && (result.indexOf('blob:') === -1)) {
                     result = result.replace(/<(\/?script.*?)>/gi, '<$1>');
                 }
@@ -125,7 +125,7 @@
      * @return {File} This is returned as the instance of File (extends Blob).
      */
     var file = function(event, type, successCallback, errorCallback, progressCallback) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -140,17 +140,17 @@
             return;
         }
 
-        //for the instance of File (extends Blob)
+        // for the instance of File (extends Blob)
         var file = null;
 
         if (event.type === 'drop') {
-            //Drag & Drop
+            // Drag & Drop
             event.stopImmediatePropagation();
             event.preventDefault();
 
             file = /*('items' in event.dataTransfer) ? event.dataTransfer.items[0].getAsFile() : */event.dataTransfer.files[0];
         } else if ((event.type === 'change') && ('files' in event.target)) {
-            //<input type="file">
+            // <input type="file">
             file = event.target.files[0];
         } else {
             return;
@@ -163,7 +163,7 @@
         } else if ((/arraybuffer|dataurl/i.test(type)) && (file.type.indexOf('audio') === -1)) {
             throw new Error('Please upload audio file.');
         } else {
-            //Asynchronously
+            // Asynchronously
             this.read({
                 file     : file,
                 type     : type,
@@ -185,7 +185,7 @@
      * @param {function} progressCallback This argument is executed during receiving audio data.
      */
     var ajax = function(url, timeout, successCallback, errorCallback, progressCallback) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -196,15 +196,15 @@
             if ('progress' in properties) {progressCallback = properties.progress;}
         }
 
-        //for errorCallback
+        // for errorCallback
         var ERROR_AJAX         = 'error';
         var ERROR_AJAX_TIMEOUT = 'timeout';
 
-        //Create the instance of XMLHttpRequest
+        // Create the instance of XMLHttpRequest
         var xhr = new XMLHttpRequest();
 
         if ((FULL_MODE === undefined) || FULL_MODE) {
-            //XMLHttpRequest Level 2
+            // XMLHttpRequest Level 2
             xhr.responseType = 'arraybuffer';
         } else {
             xhr.overrideMimeType('text/plain; charset=x-user-defined');
@@ -212,7 +212,7 @@
 
         var t = parseInt(timeout);
 
-        //Timeout
+        // Timeout
         xhr.timeout = (t > 0) ? t : 60000;
 
         xhr.ontimeout = function(event) {
@@ -221,21 +221,21 @@
             }
         };
 
-        //Progress
+        // Progress
         xhr.onprogress = function(event) {
             if (Object.prototype.toString.call(progressCallback) === '[object Function]') {
                 progressCallback(event);
             }
         };
 
-        //Error
+        // Error
         xhr.onerror = function(event) {
             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
                 errorCallback(event, ERROR_AJAX);
             }
         };
 
-        //Success
+        // Success
         xhr.onload = function(event) {
             if (xhr.status === 200) {
                 var arrayBuffer = null;
@@ -328,13 +328,13 @@
      * @return {Array.<number>} This is returned as array of frequencies.
      */
     var toFrequencies = function(indexes) {
-        //The 12 equal temperament
+        // The 12 equal temperament
         //
-        //Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
+        // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
         //
-        //A * 1.059463 -> A# (half up)
+        // A * 1.059463 -> A# (half up)
 
-        var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  //about 1.059463
+        var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
         var MIN_A           = 27.5;
 
         if (!Array.isArray(indexes)) {
@@ -384,7 +384,7 @@
             global.X = undefined;
         }
 
-        //both of global objects are removed ?
+        // both of global objects are removed ?
         if (deep && (global.XSound === XSound)) {
             global.XSound = undefined;
         }
@@ -399,8 +399,8 @@
      * @constructor
      */
     function MediaFallbackModule() {
-        this.media = null;  //for HTMLMediaElement
-        this.ext   = ''  ;  //'wav', 'ogg', 'mp3, 'webm', 'ogv', 'mp4' ...etc
+        this.media = null;  // for HTMLMediaElement
+        this.ext   = ''  ;  // 'wav', 'ogg', 'mp3, 'webm', 'ogv', 'mp4' ...etc
 
         this.duration     = 0;
         this.volume       = 1;
@@ -409,8 +409,8 @@
         this.loop         = false;
         this.muted        = false;
 
-        //The keys are the event interfaces that are defined by HTMLMediaElement.
-        //For example, "loadstart", "loadedmetadata", "loadeddata", "canplay", "canplaythrough", "timeupdate", "ended" ...etc
+        // The keys are the event interfaces that are defined by HTMLMediaElement.
+        // For example, "loadstart", "loadedmetadata", "loadeddata", "canplay", "canplaythrough", "timeupdate", "ended" ...etc
         this.callbacks = {};
     };
 
@@ -424,7 +424,7 @@
      * @return {MediaFallbackModule} This is returned for method chain.
      */
     MediaFallbackModule.prototype.setup = function(id, type, formats, callbacks) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -499,7 +499,7 @@
      */
     MediaFallbackModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
@@ -509,14 +509,14 @@
             switch (k) {
                 case 'mastervolume' :
                     if (value === undefined) {
-                        return (this.media instanceof HTMLMediaElement) ? this.media.volume : this.volume;  //Getter
+                        return (this.media instanceof HTMLMediaElement) ? this.media.volume : this.volume;  // Getter
                     } else {
                         var v   = parseFloat(value);
                         var min = 0;
                         var max = 1;
 
                         if ((v >= min) && (v <= max)) {
-                            //Setter
+                            // Setter
                             if (this.media instanceof HTMLMediaElement) {
                                 this.media.volume = v;
                             }
@@ -528,13 +528,13 @@
                     break;
                 case 'playbackrate' :
                     if (value === undefined) {
-                        return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;  //Getter
+                        return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;  // Getter
                     } else {
                         var v   = parseFloat(value);
-                        var min = 0.5;  //for Chrome
+                        var min = 0.5;  // for Chrome
 
                         if (v >= min) {
-                            //Setter
+                            // Setter
                             if (this.media instanceof HTMLMediaElement) {
                                 this.media.playbackRate = v;
                             }
@@ -546,7 +546,7 @@
                     break;
                 case 'currenttime' :
                     if (value === undefined) {
-                        return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;  //Getter
+                        return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;  // Getter
                     } else {
                         var v = parseFloat(value);
 
@@ -558,7 +558,7 @@
                         }
 
                         if ((v >= min) && (v <= max)) {
-                            //Setter
+                            // Setter
                             this.media.currentTime = v;
                         }
                     }
@@ -568,9 +568,9 @@
                 case 'muted'    :
                 case 'controls' :
                     if (value === undefined) {
-                        return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];  //Getter
+                        return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];  // Getter
                     } else {
-                        //Setter
+                        // Setter
                         if (this.media instanceof HTMLMediaElement) {
                             this.media[k] = Boolean(value);
                         }
@@ -582,13 +582,13 @@
                 case 'width'  :
                 case 'height' :
                     if (value === undefined) {
-                        return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;  //Getter
+                        return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;  // Getter
                     } else {
                         var v   = parseInt(value);
                         var min = 0;
 
                         if (v >= min) {
-                            //Setter
+                            // Setter
                             if (this.media instanceof HTMLVideoElement) {
                                 this.media[k] = v;
                             }
@@ -597,9 +597,9 @@
 
                     break;
                 case 'duration' :
-                    return this.duration;  //Getter only
+                    return this.duration;  // Getter only
                 case 'channels' :
-                    return;  //for MediaModule
+                    return;  // for MediaModule
                 default :
                     break;
             }
@@ -617,11 +617,11 @@
         var src = String(source);
 
         try {
-            //Data URL or Object URL ?
+            // Data URL or Object URL ?
             if ((src.indexOf('data:') !== -1) || (src.indexOf('blob:') !== -1)) {
-                this.media.src = src;  //Data URL or Object URL
+                this.media.src = src;  // Data URL or Object URL
             } else {
-                this.media.src = src + '.' + this.ext;  //Path
+                this.media.src = src + '.' + this.ext;  // Path
             }
         } catch (error) {
             throw new Error('The designated resource cannot be loaded.');
@@ -719,13 +719,13 @@
     MediaFallbackModule.prototype.fullscreen = function() {
         if (this.media instanceof HTMLVideoElement) {
             if (this.media.webkitRequestFullscreen) {
-                //Chrome Safari
+                // Chrome Safari
                 this.media.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
             } else if (this.media.mozRequestFullScreen) {
-                //Firefox
+                // Firefox
                 this.media.mozRequestFullScreen();
             } else if (this.media.requestFullscreen) {
-                //Opera
+                // Opera
                 this.media.requestFullscreen();
             } else {
                 throw new Error('Cannot change to full screen.');
@@ -741,13 +741,13 @@
      */
     MediaFallbackModule.prototype.exitFullscreeen = function() {
         if (document.webkitExitFullscreen) {
-            //Chrome Safari
+            // Chrome Safari
             document.webkitExitFullscreen();
         } else if (document.mozCancelFullscreen) {
-            //Firefox
+            // Firefox
             document.mozCancelFullscreen();
         } else if (document.exitFullscreen) {
-            //Opera
+            // Opera
             document.exitFullscreen();
         } else {
             throw new Error('Cannot exit from full screen.');
@@ -764,9 +764,9 @@
     ////////////////////////////////////////////////////////////////////////////////
 
     if (!IS_XSOUND) {
-        //Internet Explorer
+        // Internet Explorer
 
-        //Create instance
+        // Create instance
         var media = new MediaFallbackModule();
 
         /** 
@@ -777,14 +777,14 @@
             return media;
         };
 
-        //Static properties
+        // Static properties
         XSound.IS_XSOUND   = IS_XSOUND;
         XSound.SAMPLE_RATE = null;
         XSound.BUFFER_SIZE = null;
         XSound.NUM_INPUT   = null;
         XSound.NUM_OUTPUT  = null;
 
-        //Static methods
+        // Static methods
         XSound.read           = read;
         XSound.file           = file;
         XSound.ajax           = ajax;
@@ -792,8 +792,8 @@
         XSound.toFrequencies  = toFrequencies;
         XSound.convertTime    = convertTime;
         XSound.noConflict     = noConflict;
-        XSound.get            = function() {return null;};  //for defining the same interface
-        XSound.getCurrentTime = function() {return 0;};     //for defining the same interface
+        XSound.get            = function() {return null;};  // for defining the same interface
+        XSound.getCurrentTime = function() {return 0;};     // for defining the same interface
 
         /** 
          * This static method returns function as closure for getter of cloned module.
@@ -802,7 +802,7 @@
         XSound.clone = function() {
             var cloned = new MediaFallbackModule();
 
-            //Closure
+            // Closure
             return function() {
                 return cloned;
             };
@@ -813,21 +813,21 @@
             return '[XSound]';
         };
 
-        //Set 2 objects as property of window object
+        // Set 2 objects as property of window object
         global.XSound = XSound;
-        global.X      = XSound;  //Alias of XSound
+        global.X      = XSound;  // Alias of XSound
 
         return;
     }
 
-    //If the browser can use Web Audio API, the following code is executed.
+    // If the browser can use Web Audio API, the following code is executed.
 
-    //Chrome, Opera, Firefox (Mac / Windows), Safari (Mac)
+    // Chrome, Opera, Firefox (Mac / Windows), Safari (Mac)
     global.AudioContext = global.AudioContext || global.webkitAudioContext;
 
     var audiocontext = new AudioContext();
 
-    //for legacy browsers
+    // for legacy browsers
     audiocontext.createScriptProcessor = audiocontext.createScriptProcessor || audiocontext.createJavaScriptNode;
     audiocontext.createGain            = audiocontext.createGain            || audiocontext.createGainNode;
     audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
@@ -870,21 +870,21 @@
                     return;
             }
         } else if (/(Win(dows )?NT 6\.2)/.test(userAgent)) {
-            this.BUFFER_SIZE = 1024;  //Windows 8
+            this.BUFFER_SIZE = 1024;  // Windows 8
         } else if (/(Win(dows )?NT 6\.1)/.test(userAgent)) {
-            this.BUFFER_SIZE = 1024;  //Windows 7
+            this.BUFFER_SIZE = 1024;  // Windows 7
         } else if (/(Win(dows )?NT 6\.0)/.test(userAgent)) {
-            this.BUFFER_SIZE = 2048;  //Windows Vista
+            this.BUFFER_SIZE = 2048;  // Windows Vista
         } else if (/Win(dows )?(NT 5\.1|XP)/.test(userAgent)) {
-            this.BUFFER_SIZE = 4096;  //Windows XP
+            this.BUFFER_SIZE = 4096;  // Windows XP
         } else if (/Mac|PPC/.test(userAgent)) {
-            this.BUFFER_SIZE = 1024;  //Mac OS X
+            this.BUFFER_SIZE = 1024;  // Mac OS X
         } else if (/Linux/.test(userAgent)) {
-            this.BUFFER_SIZE = 8192;  //Linux
+            this.BUFFER_SIZE = 8192;  // Linux
         } else if (/iPhone|iPad|iPod/.test(userAgent)) {
-            this.BUFFER_SIZE = 2048;  //iOS
+            this.BUFFER_SIZE = 2048;  // iOS
         } else {
-            this.BUFFER_SIZE = 16384;  //Otherwise
+            this.BUFFER_SIZE = 16384;  // Otherwise
         }
 
         this.masterVolume = context.createGain();
@@ -928,7 +928,7 @@
         Reverb.prototype.constructor        = Reverb;
         Panner.prototype.constructor        = Panner;
 
-        //for modules that user creates
+        // for modules that user creates
         this.Effector = Effector;
         this.plugins  = [];
 
@@ -939,10 +939,10 @@
          * @constructor
          */
         function Listener(context) {
-            //the instance of AudioListener
+            // the instance of AudioListener
             this.listener = context.listener;
 
-            //Set default value
+            // Set default value
             this.dopplerFactor = 1;
             this.speedOfSound  = 343.3;
 
@@ -965,7 +965,7 @@
          */
         Listener.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -975,24 +975,24 @@
                 switch (k) {
                     case 'dopplerfactor' :
                         if (value === undefined) {
-                            return this.listener.dopplerFactor;  //Getter
+                            return this.listener.dopplerFactor;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
-                                this.listener.dopplerFactor = v;  //Setter
+                                this.listener.dopplerFactor = v;  // Setter
                             }
                         }
 
                         break;
                     case 'speedofsound' :
                         if (value === undefined) {
-                            return this.listener.speedOfSound;  //Getter
+                            return this.listener.speedOfSound;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
-                                this.listener.speedOfSound = v;  //Setter
+                                this.listener.speedOfSound = v;  // Setter
                             }
                         }
 
@@ -1001,12 +1001,12 @@
                     case 'y' :
                     case 'z' :
                         if (value === undefined) {
-                            return this.positions[k];  //Getter
+                            return this.positions[k];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.positions[k] = v;
                                 this.listener.setPosition(this.positions.x, this.positions.y, this.positions.z);
                             }
@@ -1017,12 +1017,12 @@
                     case 'fy' :
                     case 'fz' :
                         if (value === undefined) {
-                            return this.fronts[k.charAt(1)];  //Getter
+                            return this.fronts[k.charAt(1)];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.fronts[k.charAt(1)] = v;
                                 this.listener.setOrientation(this.fronts.x, this.fronts.y, this.fronts.z, this.ups.x, this.ups.y, this.ups.z);
                             }
@@ -1033,12 +1033,12 @@
                     case 'uy' :
                     case 'uz' :
                         if (value === undefined) {
-                            return this.ups[k.charAt(1)];  //Getter
+                            return this.ups[k.charAt(1)];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.ups[k.charAt(1)] = v;
                                 this.listener.setOrientation(this.fronts.x, this.fronts.y, this.fronts.z, this.ups.x, this.ups.y, this.ups.z);
                             }
@@ -1049,12 +1049,12 @@
                     case 'vy' :
                     case 'vz' :
                         if (value === undefined) {
-                            return this.velocities[k.charAt(1)];  //Getter
+                            return this.velocities[k.charAt(1)];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.velocities[k.charAt(1)] = v;
                                 this.listener.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
                             }
@@ -1096,7 +1096,7 @@
             this.input    = context.createGain();
             this.output   = context.createGain();
 
-            //GainNode (input) -> AnalyserNode -> GainNode (output)
+            // GainNode (input) -> AnalyserNode -> GainNode (output)
             this.input.connect(this.analyser);
             this.analyser.connect(this.output);
 
@@ -1105,7 +1105,7 @@
             Visualizer.prototype.constructor = Visualizer;
 
             /** @extends {Visualizer} */
-            TimeAll.prototype = Object.create(Visualizer.prototype);  //The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
+            TimeAll.prototype = Object.create(Visualizer.prototype);  // The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
             Time.prototype    = Object.create(Visualizer.prototype);
             FFT.prototype     = Object.create(Visualizer.prototype);
 
@@ -1113,13 +1113,13 @@
             Time.prototype.constructor    = Time;
             FFT.prototype.constructor     = FFT;
 
-            //Create the instances of Visualizer's subclass
+            // Create the instances of Visualizer's subclass
             this.timeAllL = new TimeAll(context.sampleRate);
             this.timeAllR = new TimeAll(context.sampleRate);
             this.time     = new Time(context.sampleRate);
             this.fft      = new FFT(context.sampleRate);
 
-            //Set default value
+            // Set default value
             this.analyser.fftSize               = 2048;
             this.analyser.minDecibels           = -100;
             this.analyser.maxDecibels           = -30;
@@ -1132,25 +1132,25 @@
              * @implements {Statable}
              */
             function Visualizer(sampleRate) {
-                //Call interface constructor
+                // Call interface constructor
                 Statable.call(this);
 
                 this.isActive = false;
 
                 this.SAMPLE_RATE = sampleRate;
 
-                //either 'canvas' or 'svg'
+                // either 'canvas' or 'svg'
                 this.drawType = '';
 
-                //In the case of using HTML5 Canvas
+                // In the case of using HTML5 Canvas
                 this.canvas  = null;
                 this.context = null;
 
-                //In the case of using HTML5 SVG
+                // In the case of using HTML5 SVG
                 this.svg       = null;
                 this.svgParent = null;
 
-                //for timer
+                // for timer
                 this.interval = 1000;
                 this.timerid  = null;
 
@@ -1220,7 +1220,7 @@
                 switch (k) {
                     case 'interval' :
                         if (value === undefined) {
-                            return this.interval;  //Getter
+                            return this.interval;  // Getter
                         } else {
                             if (String(value).toLowerCase() === 'auto') {
                                 this.interval = 'auto';
@@ -1228,7 +1228,7 @@
                                 var v = parseFloat(value);
 
                                 if (v >= 0) {
-                                    this.interval = v;  //Setter
+                                    this.interval = v;  // Setter
                                 }
                             }
                         }
@@ -1236,19 +1236,19 @@
                         break;
                     case 'shape' :
                         if (value === undefined) {
-                            return this.styles.shape;  //Getter
+                            return this.styles.shape;  // Getter
                         } else {
                             var v = String(value).toLowerCase();
 
                             if ((v === 'line') || (v === 'rect')) {
-                                this.styles.shape = (this.styles.wave !== 'gradient') ? v : 'rect';  //Setter
+                                this.styles.shape = (this.styles.wave !== 'gradient') ? v : 'rect';  // Setter
                             }
                         }
 
                         break;
                     case 'grad' :
                         if (value === undefined) {
-                            return this.styles.grad;  //Getter
+                            return this.styles.grad;  // Getter
                         } else {
                             if (!Array.isArray(value)) {
                                 value = [value];
@@ -1273,7 +1273,7 @@
                             }
 
                             if (!isError) {
-                                this.styles.grad = value;  //Setter
+                                this.styles.grad = value;  // Setter
                             }
                         }
 
@@ -1285,14 +1285,14 @@
                     case 'cap'  :
                     case 'join' :
                         if (value === undefined) {
-                            return this.styles[k];  //Getter
+                            return this.styles[k];  // Getter
                         } else {
                             if (Object.prototype.toString.call(value) === '[object String]') {
                                 if ((k === 'wave') && (value === 'gradient')) {
                                     this.styles.shape = 'rect';
                                 }
 
-                                this.styles[k] = (k === 'font') ? value : value.toLowerCase();  //Setter
+                                this.styles[k] = (k === 'font') ? value : value.toLowerCase();  // Setter
                             }
                         }
 
@@ -1303,12 +1303,12 @@
                     case 'bottom' :
                     case 'left'   :
                         if (value === undefined) {
-                            return this.styles[k];  //Getter
+                            return this.styles[k];  // Getter
                         } else {
                             var v = (k === 'width') ? parseFloat(value) : parseInt(value);
 
                             if (v >= 0) {
-                                this.styles[k] = v;  //Setter
+                                this.styles[k] = v;  // Setter
                             }
                         }
 
@@ -1350,14 +1350,14 @@
             /** @override */
             Visualizer.prototype.state = function(value) {
                 if (value === undefined) {
-                    return this.isActive;  //Getter
+                    return this.isActive;  // Getter
                 } else if (String(value).toLowerCase() === 'toggle') {
-                    this.isActive = !this.isActive;  //Setter
+                    this.isActive = !this.isActive;  // Setter
                 } else {
-                    this.isActive = Boolean(value);  //Setter
+                    this.isActive = Boolean(value);  // Setter
                 }
 
-                //In the case of setter
+                // In the case of setter
                 return this;
             };
 
@@ -1391,16 +1391,16 @@
                 if (isNaN(h)) {h = 0;}
                 if (isNaN(m)) {m = 0;}
 
-                //Begin drawing
+                // Begin drawing
                 switch (this.styles.shape) {
                     case 'line' :
-                        //Set style
+                        // Set style
                         context.strokeStyle = this.styles.wave;
                         context.lineWidth   = this.styles.width;
                         context.lineCap     = this.styles.cap;
                         context.lineJoin    = this.styles.join;
 
-                        //Draw wave
+                        // Draw wave
                         context.beginPath();
 
                         for (var i = 0, len = datas.length; i < len; i++) {
@@ -1420,18 +1420,18 @@
 
                         break;
                     case 'rect' :
-                       //Set style
+                       // Set style
                        if (this.styles.wave !== 'gradient') {
                            context.fillStyle = this.styles.wave;
                        }
 
-                        //Draw wave
+                        // Draw wave
                         for (var i = 0, len = datas.length; i < len; i++) {
                             if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = -1 * Math.floor(datas[i] * (h / 2));
 
-                               //Set style
+                               // Set style
                                if (this.styles.wave === 'gradient') {
                                     var upside   = (innerHeight / 2) + this.styles.top;
                                     var gradient = context.createLinearGradient(0 , upside, 0, (upside + y));
@@ -1483,7 +1483,7 @@
 
                 switch (this.styles.shape) {
                     case 'line' :
-                        //Draw wave
+                        // Draw wave
                         svg += '<path style="' + waveStyle + '" d="';
 
                         for (var i = 0, len = datas.length; i < len; i++) {
@@ -1500,12 +1500,12 @@
                             }
                         }
 
-                        //<path d="..." />
+                        // <path d="..." />
                         svg += '" />';
 
                         break;
                     case 'rect' :
-                        //Draw wave
+                        // Draw wave
                         for (var i = 0, len = datas.length; i < len; i++) {
                             if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
@@ -1545,41 +1545,41 @@
              * @extends {Visualizer}
              */
             function TimeAll(sampleRate) {
-                //Call superclass constructor
+                // Call superclass constructor
                 Visualizer.call(this, sampleRate);
 
-                //for update(), drag()
+                // for update(), drag()
                 this.savedImage = null;
                 this.length     = 0;
 
-                this.currentTime  = 'rgba(255, 255, 255, 1.0)';  //This style is used for the rectangle that displays current time of audio
-                this.plotinterval = 0.0625;                      //Draw wave at intervals of this value [sec]
-                this.textinterval = 60;                          //Draw text at intervals of this value [sec]
+                this.currentTime  = 'rgba(255, 255, 255, 1.0)';  // This style is used for the rectangle that displays current time of audio
+                this.plotinterval = 0.0625;                      // Draw wave at intervals of this value [sec]
+                this.textinterval = 60;                          // Draw text at intervals of this value [sec]
             }
 
             /** @override */
             TimeAll.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                    //Associative array
+                    // Associative array
                     for (var k in arguments[0]) {
                         this.param(k, arguments[0][k]);
                     }
                 } else {
                     var k = String(key).replace(/-/g, '').toLowerCase();
 
-                    //Call superclass method
+                    // Call superclass method
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        return r;  //Getter
+                        return r;  // Getter
                     } else {
                         switch (k) {
                             case 'currenttime' :
                                 if (value === undefined) {
-                                    return this.currentTime;  //Getter
+                                    return this.currentTime;  // Getter
                                 } else {
                                     if (Object.prototype.toString.call(value) === '[object String]') {
-                                        this.currentTime = value.toLowerCase();  //Setter
+                                        this.currentTime = value.toLowerCase();  // Setter
                                     }
                                 }
 
@@ -1587,12 +1587,12 @@
                             case 'plotinterval' :
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this[k]; //Getter
+                                    return this[k]; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this[k] = v;  //Setter
+                                        this[k] = v;  // Setter
                                     }
                                 }
 
@@ -1629,32 +1629,32 @@
                 var y = 0;
                 var t = '';
 
-                //Draw wave at intervals of "this.plotinterval" [sec]
+                // Draw wave at intervals of "this.plotinterval" [sec]
                 var nPlotinterval = Math.floor(this.plotinterval * this.SAMPLE_RATE);
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
 
-                //Erase previous wave
+                // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
-                //Begin drawing
+                // Begin drawing
                 this.drawTimeDomainFloat32ArrayToCanvas(context, datas, innerWidth, innerHeight, middle, nPlotinterval);
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Draw grid and text (X axis)
+                    // Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor(i / this.SAMPLE_RATE) + ' min';
 
-                            //Draw grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 context.fillStyle = this.styles.grid;
                                 context.fillRect(x, this.styles.top, 1, innerHeight);
                             }
 
-                            //Draw text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
                                 context.font      = this.styles.font;
@@ -1663,7 +1663,7 @@
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     var texts = ['-1.00', '-0.50', ' 0.00', ' 0.50', ' 1.00'];
 
                     for (var i = 0, len = texts.length; i < len; i++) {
@@ -1671,7 +1671,7 @@
                         x = Math.floor(width - context.measureText(t).width);
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
-                        //Draw grid
+                        // Draw grid
                         if (this.styles.grid !== 'none') {
                             context.fillStyle = this.styles.grid;
                             context.fillRect(this.styles.left, y, innerWidth, 1);
@@ -1679,7 +1679,7 @@
 
                         y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
 
-                        //Draw text
+                        // Draw text
                         if (this.styles.text !== 'none') {
                             context.fillStyle = this.styles.text;
                             context.font      = this.styles.font;
@@ -1688,11 +1688,11 @@
                     }
                 }
 
-                //for update(), drag()
+                // for update(), drag()
                 this.savedImage = context.getImageData(0, 0, width, height);
                 this.length     = datas.length;
 
-                //This rectangle displays current time of audio
+                // This rectangle displays current time of audio
                 context.fillStyle = this.currentTime;
                 context.fillRect(this.styles.left, this.styles.top, 1, innerHeight);
 
@@ -1722,13 +1722,13 @@
                 var y = 0;
                 var t = '';
 
-                //Draw wave at intervals of "this.plotinterval" [sec]
+                // Draw wave at intervals of "this.plotinterval" [sec]
                 var nPlotinterval = Math.floor(this.plotinterval * this.SAMPLE_RATE);
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
 
-                //Set style
+                // Set style
                 var waveStyle = '';
 
                 switch (this.styles.shape) {
@@ -1788,40 +1788,40 @@
                 offsetStyle += 'fill : ' + this.currentTime + '; ';
                 offsetStyle += 'stroke-width : 0;';
 
-                //Erase previous wave
+                // Erase previous wave
                 this.svgParent.innerHTML = svg;
 
-                //Begin drawing
+                // Begin drawing
                 svg = this.svgParent.innerHTML.replace('</svg>', '');
 
-                //Gradient ?
+                // Gradient ?
                 if (this.styles.wave === 'gradient') {
                     svg += gradient;
                 }
 
-                //Begin drawing
+                // Begin drawing
                 svg += this.drawTimeDomainFloat32ArrayToSVG(waveStyle, datas, innerWidth, innerHeight, middle, nPlotinterval);
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Draw grid and text (X axis)
+                    // Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor(i / this.SAMPLE_RATE) + ' min';
 
-                            //Draw grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
                             }
 
-                            //Draw text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
                             }
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     var texts = ['-1.00', '-0.50', ' 0.00', ' 0.50', ' 1.00'];
 
                     for (var i = 0, len = texts.length; i < len; i++) {
@@ -1829,29 +1829,29 @@
                         x = width; 
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
-                        //Draw grid
+                        // Draw grid
                         if (this.styles.grid !== 'none') {
                             svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
                         }
 
                         y -= Math.floor(parseInt(size) / 4);
 
-                        //Draw text
+                        // Draw text
                         if (this.styles.text !== 'none') {
                             svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                         }
                     }
                 }
 
-                //This rectangle displays current time of audio
+                // This rectangle displays current time of audio
                 svg += '<rect class="svg-current-time" style="' + offsetStyle + '" x="' + this.styles.left + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
 
-                //End tag
+                // End tag
                 svg += '</svg>';
 
                 this.svgParent.innerHTML = svg;
 
-                //for update(), drag()
+                // for update(), drag()
                 this.savedImage = svg;
                 this.length     = datas.length;
 
@@ -1913,7 +1913,7 @@
 
                         break;
                     case 'svg' :
-                        var svg = this.svgParent.getElementsByClassName('svg-current-time')[0];
+                        var svg = this.svgParent.querySelector('.svg-current-time');
 
                         if (svg instanceof SVGElement) {
                             width       = this.svg.getAttribute('width');
@@ -1946,7 +1946,7 @@
                     case 'canvas' :
                         if ((this.canvas instanceof HTMLCanvasElement) && this.isActive) {
                             drawNode  = this.canvas;
-                            isCapture = true;
+                            // isCapture = true;
                             break;
                         } else {
                             return;
@@ -1954,7 +1954,7 @@
                     case 'svg' :
                         if ((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive) {
                             drawNode  = this.svgParent;
-                            isCapture = false;
+                            // isCapture = false;
                             break;
                         } else {
                             return;
@@ -1967,7 +1967,7 @@
                 var move  = '';
                 var end   = '';
 
-                //Touch Panel ?
+                // Touch Panel ?
                 if (/iPhone|iPad|iPod|Android/.test(navigator.userAgent)) {
                     start = 'touchstart';
                     move  = 'touchmove';
@@ -1998,7 +1998,7 @@
                     var x     = eventX - (offset + this.styles.left);
                     var width = width  - (this.styles.left + this.styles.right);
 
-                    //Exceed ?
+                    // Exceed ?
                     if (x < 0)     {x = 0;}
                     if (x > width) {x = width;}
 
@@ -2020,26 +2020,28 @@
                     }
                 };
 
-                var isMouse = false;
-                var self = this;
+                var isDown = false;
+                var self   = this;
 
                 drawNode.addEventListener(start, function(event) {
                     if (self.savedImage !== null) {
                         draw.call(self, getX(event));
-                        isMouse = true;
+                        isDown = true;
                     }
                 }, isCapture);
 
                 drawNode.addEventListener(move, function(event) {
-                    event.preventDefault();  //for Touch Panel
+                    event.preventDefault();  // for Touch Panel
 
-                    if (isMouse && (self.savedImage !== null)) {
+                    if (isDown && (self.savedImage !== null)) {
                         draw.call(self, getX(event));
                     }
                 }, isCapture);
 
                 global.addEventListener(end, function(event) {
-                    isMouse = false;
+                    if (isDown) {
+                        isDown = false;
+                    }
                 }, true);
 
                 return this;
@@ -2057,50 +2059,50 @@
              * @extends {Visualizer}
              */
             function Time(sampleRate) {
-                //Call superclass constructor
+                // Call superclass constructor
                 Visualizer.call(this, sampleRate);
 
-                this.type         = 'uint';  //unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
-                this.textinterval = 0.005;  //Draw text at intervals this value [sec]
+                this.type         = 'uint';  // unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
+                this.textinterval = 0.005;  // Draw text at intervals this value [sec]
             }
 
             /** @override */
             Time.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                    //Associative array
+                    // Associative array
                     for (var k in arguments[0]) {
                         this.param(k, arguments[0][k]);
                     }
                 } else {
                     var k = String(key).replace(/-/g, '').toLowerCase();
 
-                    //Call superclass method
+                    // Call superclass method
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        return r;  //Getter
+                        return r;  // Getter
                     } else {
                         switch (k) {
                             case 'type' :
                                 if (value === undefined) {
-                                    return this.type;  //Getter
+                                    return this.type;  // Getter
                                 } else {
                                     var v = String(value).toLowerCase();
 
                                     if ((v === 'uint') || (v === 'float')) {
-                                        this.type = v;  //Setter
+                                        this.type = v;  // Setter
                                     }
                                 }
 
                                 break;
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this.textinterval; //Getter
+                                    return this.textinterval; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this.textinterval = v;  //Setter
+                                        this.textinterval = v;  // Setter
                                     }
                                 }
 
@@ -2142,13 +2144,13 @@
                 var y = 0;
                 var t = '';
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
 
-                //Erase previous wave
+                // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
-                //Begin drawing
+                // Begin drawing
                 switch (this.type) {
                     case 'float' :
                         this.drawTimeDomainFloat32ArrayToCanvas(context, datas, innerWidth, innerHeight, middle);
@@ -2157,13 +2159,13 @@
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
-                                //Set style
+                                // Set style
                                 context.strokeStyle = this.styles.wave;
                                 context.lineWidth   = this.styles.width;
                                 context.lineCap     = this.styles.cap;
                                 context.lineJoin    = this.styles.join;
 
-                                //Draw wave
+                                // Draw wave
                                 context.beginPath();
 
                                 for (var i = 0, len = datas.length; i < len; i++) {
@@ -2181,17 +2183,17 @@
 
                                 break;
                             case 'rect' :
-                               //Set style
+                               // Set style
                                if (this.styles.wave !== 'gradient') {
                                    context.fillStyle = this.styles.wave;
                                }
 
-                                //Draw wave
+                                // Draw wave
                                 for (var i = 0, len = datas.length; i < len; i++) {
                                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                                     y = Math.floor((0.5 - (datas[i] / 255)) * innerHeight);
 
-                                   //Set style
+                                   // Set style
                                    if (this.styles.wave === 'gradient') {
                                         var upside   = (innerHeight / 2) + this.styles.top;
                                         var gradient = context.createLinearGradient(0 , upside, 0, (upside + y));
@@ -2217,19 +2219,19 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Draw grid and text (X axis)
+                    // Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.SAMPLE_RATE) * 1000) + ' ms';
 
-                            //Draw grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 context.fillStyle = this.styles.grid;
                                 context.fillRect(x, this.styles.top, 1, innerHeight);
                             }
 
-                            //Draw text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
                                 context.font      = this.styles.font;
@@ -2238,7 +2240,7 @@
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     var texts = ['-1.00', '-0.50', ' 0.00', ' 0.50', ' 1.00'];
 
                     for (var i = 0, len = texts.length; i < len; i++) {
@@ -2246,7 +2248,7 @@
                         x = Math.floor(width - context.measureText(t).width); 
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
-                        //Draw grid
+                        // Draw grid
                         if (this.styles.grid !== 'none') {
                             context.fillStyle = this.styles.grid;
                             context.fillRect(this.styles.left, y, innerWidth, 1);
@@ -2254,7 +2256,7 @@
 
                         y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
 
-                        //Draw text
+                        // Draw text
                         if (this.styles.text !== 'none') {
                             context.fillStyle = this.styles.text;
                             context.font      = this.styles.font;
@@ -2289,10 +2291,10 @@
                 var y = 0;
                 var t = '';
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
 
-                //Set style
+                // Set style
                 var waveStyle = '';
 
                 switch (this.styles.shape) {
@@ -2349,18 +2351,18 @@
                 textStyle += 'font-family : ' + family + '; ';
                 textStyle += 'font-size : ' + size + ';';
 
-                //Erase previous wave
+                // Erase previous wave
                 this.svgParent.innerHTML = svg;
 
-                //Begin drawing
+                // Begin drawing
                 svg = this.svgParent.innerHTML.replace('</svg>', '');
 
-                //Gradient ?
+                // Gradient ?
                 if (this.styles.wave === 'gradient') {
                     svg += gradient;
                 }
 
-                //Begin drawing
+                // Begin drawing
                 switch (this.type) {
                     case 'float' :
                         svg += this.drawTimeDomainFloat32ArrayToSVG(waveStyle, datas, innerWidth, innerHeight, middle);
@@ -2369,7 +2371,7 @@
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
-                                //Draw wave
+                                // Draw wave
                                 svg += '<path style="' + waveStyle + '" d="';
 
                                 for (var i = 0, len = datas.length; i < len; i++) {
@@ -2384,12 +2386,12 @@
                                     }
                                 }
 
-                                //<path d="..." />
+                                // <path d="..." />
                                 svg += '" />';
 
                                 break;
                             case 'rect' :
-                                //Draw wave
+                                // Draw wave
                                 for (var i = 0, len = datas.length; i < len; i++) {
                                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                                     y = Math.floor(((datas[i] / 255) - 0.5) * innerHeight);
@@ -2408,25 +2410,25 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Draw grid and text (X axis)
+                    // Draw grid and text (X axis)
                     for (var i = 0, len = datas.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.SAMPLE_RATE) * 1000) + ' ms';
 
-                            //Draw grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
                             }
 
-                            //Draw text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
                             }
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     var texts = ['-1.00', '-0.50', ' 0.00', ' 0.50', ' 1.00'];
 
                     for (var i = 0, len = texts.length; i < len; i++) {
@@ -2434,21 +2436,21 @@
                         x = width; 
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
-                        //Draw grid
+                        // Draw grid
                         if (this.styles.grid !== 'none') {
                             svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
                         }
 
                         y -= Math.floor(parseInt(size) / 4);
 
-                        //Draw text
+                        // Draw text
                         if (this.styles.text !== 'none') {
                             svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                         }
                     }
                 }
 
-                //End tag
+                // End tag
                 svg += '</svg>';
 
                 this.svgParent.innerHTML = svg;
@@ -2468,65 +2470,65 @@
              * @extends {Visualizer}
              */
             function FFT(sampleRate) {
-                //Call superclass constructor
+                // Call superclass constructor
                 Visualizer.call(this, sampleRate);
 
-                this.type         = 'uint';  //unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
-                this.size         = 256;     //Range for drawing
-                this.textinterval = 1000;    //Draw text at intervals of this value [Hz]
+                this.type         = 'uint';  // unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
+                this.size         = 256;     // Range for drawing
+                this.textinterval = 1000;    // Draw text at intervals of this value [Hz]
             }
 
             /** @override */
             FFT.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                    //Associative array
+                    // Associative array
                     for (var k in arguments[0]) {
                         this.param(k, arguments[0][k]);
                     }
                 } else {
                     var k = String(key).replace(/-/g, '').toLowerCase();
 
-                    //Call superclass method
+                    // Call superclass method
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        return r;  //Getter
+                        return r;  // Getter
                     } else {
                         switch (k) {
                             case 'type' :
                                 if (value === undefined) {
-                                    return this.type;  //Getter
+                                    return this.type;  // Getter
                                 } else {
                                     var v = String(value).toLowerCase();
 
                                     if ((v === 'uint') || (v === 'float')) {
-                                        this.type = v;  //Setter
+                                        this.type = v;  // Setter
                                     }
                                 }
 
                                 break;
                             case 'size' :
                                 if (value === undefined) {
-                                    return this.size; //Getter
+                                    return this.size; // Getter
                                 } else {
                                     var v   = parseFloat(value);
                                     var min = 0;
-                                    var max = 1024;  //AnalyserNode fftSize max 2048 -> half 1024
+                                    var max = 1024;  // AnalyserNode fftSize max 2048 -> half 1024
 
                                     if ((v >= 0) && (v <= max)) {
-                                        this.size = v;  //Setter
+                                        this.size = v;  // Setter
                                     }
                                 }
 
                                 break;
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this.textinterval; //Getter
+                                    return this.textinterval; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this.textinterval = v;  //Setter
+                                        this.textinterval = v;  // Setter
                                     }
                                 }
 
@@ -2571,30 +2573,30 @@
 
                 var drawnSize = (this.size > datas.length) ? datas.length : this.size;
 
-                //Frequency resolution (Sampling rate / FFT size)
+                // Frequency resolution (Sampling rate / FFT size)
                 var fsDivN = this.SAMPLE_RATE / (2 * datas.length);
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval / fsDivN);
 
-                //Erase previous wave
+                // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
-                //Begin drawing
+                // Begin drawing
                 switch (this.type) {
                     case 'float' :
-                        //Set style
-                        context.strokeStyle = (this.styles.wave !== 'gradient') ? this.styles.wave : 'rgba(0, 0, 255, 1.0)';  //line only
+                        // Set style
+                        context.strokeStyle = (this.styles.wave !== 'gradient') ? this.styles.wave : 'rgba(0, 0, 255, 1.0)';  // line only
                         context.lineWidth   = this.styles.width;
                         context.lineCap     = this.styles.cap;
                         context.lineJoin    = this.styles.join;
 
-                        //Visualizer wave
+                        // Visualizer wave
                         context.beginPath();
 
                         for (var i = 0; i < drawnSize; i++) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                            y = (Math.abs(datas[i] - maxdB) * (innerHeight / range)) + this.styles.top;  //[dB] * [px / dB] = [px]
+                            y = (Math.abs(datas[i] - maxdB) * (innerHeight / range)) + this.styles.top;  // [dB] * [px / dB] = [px]
 
                             if (i === 0) {
                                 context.moveTo(x, y);
@@ -2610,7 +2612,7 @@
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
-                                //Set style
+                                // Set style
                                 context.strokeStyle = this.styles.wave;
                                 context.lineWidth   = this.styles.width;
                                 context.lineCap     = this.styles.cap;
@@ -2618,7 +2620,7 @@
 
                                 context.beginPath();
 
-                                //Visualizer wave
+                                // Visualizer wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
                                     y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
@@ -2634,17 +2636,17 @@
 
                                 break;
                             case 'rect' :
-                               //Set style
+                               // Set style
                                if (this.styles.wave !== 'gradient') {
                                    context.fillStyle = this.styles.wave;
                                }
 
-                                //Visualizer wave
+                                // Visualizer wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
                                     y = -1 * Math.floor((datas[i] / 255) * innerHeight);
 
-                                   //Set style
+                                   // Set style
                                    if (this.styles.wave === 'gradient') {
                                         var upside   = innerHeight + this.styles.top;
                                         var gradient = context.createLinearGradient(0 , upside, 0, (upside + y));
@@ -2670,7 +2672,7 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Visualizer grid and text (X axis)
+                    // Visualizer grid and text (X axis)
                     var f = 0;
 
                     for (var i = 0; i < drawnSize; i++) {
@@ -2680,13 +2682,13 @@
                             f = Math.floor(this.textinterval * (i / nTextinterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
-                            //Visualizer grid
+                            // Visualizer grid
                             if (this.styles.grid !== 'none') {
                                 context.fillStyle = this.styles.grid;
                                 context.fillRect(x, this.styles.top, 1, innerHeight);
                             }
 
-                            //Visualizer text
+                            // Visualizer text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
                                 context.font      = this.styles.font;
@@ -2695,7 +2697,7 @@
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     switch (this.type) {
                         case 'float' :
                             for (var i = mindB; i <= maxdB; i += 10) {
@@ -2703,7 +2705,7 @@
                                 x = width - Math.floor(context.measureText(t).width);
                                 y = Math.floor(((-1 * (i - maxdB)) / range) * innerHeight) + this.styles.top;
 
-                                //Draw grid
+                                // Draw grid
                                 if (this.styles.grid !== 'none') {
                                     context.fillStyle = this.styles.grid;
                                     context.fillRect(this.styles.left, y, innerWidth, 1);
@@ -2711,7 +2713,7 @@
 
                                 y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
 
-                                //Draw text
+                                // Draw text
                                 if (this.styles.text !== 'none') {
                                     context.fillStyle = this.styles.text;
                                     context.font      = this.styles.font;
@@ -2729,7 +2731,7 @@
                                 x = width - Math.floor(context.measureText(t).width);
                                 y = ((1 - parseFloat(t)) * innerHeight) + this.styles.top;
 
-                                //Draw grid
+                                // Draw grid
                                 if (this.styles.grid !== 'none') {
                                     context.fillStyle = this.styles.grid;
                                     context.fillRect(this.styles.left, y, innerWidth, 1);
@@ -2737,7 +2739,7 @@
 
                                 y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
 
-                                //Draw text
+                                // Draw text
                                 if (this.styles.text !== 'none') {
                                     context.fillStyle = this.styles.text;
                                     context.font      = this.styles.font;
@@ -2783,13 +2785,13 @@
 
                 var drawnSize = (this.size > datas.length) ? datas.length : this.size;
 
-                //Frequency resolution (Sampling rate / FFT size)
+                // Frequency resolution (Sampling rate / FFT size)
                 var fsDivN = this.SAMPLE_RATE / (2 * datas.length);
 
-                //Draw text at intervals of "this.textinterval" [sec]
+                // Draw text at intervals of "this.textinterval" [sec]
                 var nTextinterval = Math.floor(this.textinterval / fsDivN);
 
-                //Set style
+                // Set style
                 var waveStyle = '';
 
                 switch (this.styles.shape) {
@@ -2825,7 +2827,7 @@
                             waveStyle += 'fill : ' + this.styles.wave + '; ';
                             waveStyle += 'stroke-width : 0;';
                         } else if (this.type !== 'uint') {
-                            //this.type === 'float' -> line only
+                            // this.type === 'float' -> line only
                             waveStyle += 'stroke : rgba(0, 0, 255, 1.0); ';
                             waveStyle += 'fill : none; ';
                             waveStyle += 'stroke-width : ' + this.styles.width + '; ';
@@ -2853,20 +2855,20 @@
                 textStyle += 'font-family : ' + family + '; ';
                 textStyle += 'font-size : ' + size + ';';
 
-                //Erase previous wave
+                // Erase previous wave
                 this.svgParent.innerHTML = svg;
 
-                //Begin drawing
+                // Begin drawing
                 svg = this.svgParent.innerHTML.replace('</svg>', '');
 
-                //Uint8Array && Gradient ?
+                // Uint8Array && Gradient ?
                 if ((this.type === 'uint') && (this.styles.wave === 'gradient')) {
                     svg += gradient;
                 }
 
                 switch (this.type) {
                     case 'float' :
-                        //Draw wave
+                        // Draw wave
                         svg += '<path style="' + waveStyle + '" d="';
 
                         for (var i = 0; i < drawnSize; i++) {
@@ -2881,7 +2883,7 @@
                             }
                         }
 
-                        //<path d="..." />
+                        // <path d="..." />
                         svg += '" />';
 
                         break;
@@ -2889,10 +2891,10 @@
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
-                                //Draw wave
+                                // Draw wave
                                 svg += '<path style="' + waveStyle + '" d="';
 
-                                //Draw wave
+                                // Draw wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
                                     y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
@@ -2905,12 +2907,12 @@
                                     }
                                 }
 
-                                //<path d="..." />
+                                // <path d="..." />
                                 svg += '" />';
 
                                 break;
                             case 'rect' :
-                                //Draw wave
+                                // Draw wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
                                     y = Math.floor((datas[i] / 255) * innerHeight);
@@ -2927,7 +2929,7 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    //Draw grid and text (X axis)
+                    // Draw grid and text (X axis)
                     var f = 0;
 
                     for (var i = 0; i < drawnSize; i++) {
@@ -2937,19 +2939,19 @@
                             f = Math.floor(this.textinterval * (i / nTextinterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
-                            //Draw grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
                             }
 
-                            //Draw text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
                             }
                         }
                     }
 
-                    //Draw grid and text (Y axis)
+                    // Draw grid and text (Y axis)
                     switch (this.type) {
                         case 'float' :
                             for (var i = mindB; i <= maxdB; i += 10) {
@@ -2957,14 +2959,14 @@
                                 x = width;
                                 y = Math.floor(((-1 * (i - maxdB)) / range) * innerHeight) + this.styles.top;
 
-                                //Draw grid
+                                // Draw grid
                                 if (this.styles.grid !== 'none') {
                                     svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
                                 }
 
                                 y -= Math.floor(parseInt(size) / 4);
 
-                                //Draw text
+                                // Draw text
                                 if (this.styles.text !== 'none') {
                                     svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                                 }
@@ -2980,14 +2982,14 @@
                                 x = width;
                                 y = ((1 - parseFloat(t)) * innerHeight) + this.styles.top;
 
-                                //Draw grid
+                                // Draw grid
                                 if (this.styles.grid !== 'none') {
                                     svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
                                 }
 
                                 y -= Math.floor(parseInt(size) / 4);
 
-                                //Draw text
+                                // Draw text
                                 if (this.styles.text !== 'none') {
                                     svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
                                 }
@@ -2997,7 +2999,7 @@
                     }
                 }
 
-                //End tag
+                // End tag
                 svg += '</svg>';
 
                 this.svgParent.innerHTML = svg;
@@ -3020,7 +3022,7 @@
          */
         Analyser.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -3030,7 +3032,7 @@
                 switch (k) {
                     case 'fftsize' :
                         if (value === undefined) {
-                            return this.analyser.fftSize;  //Getter
+                            return this.analyser.fftSize;  // Getter
                         } else {
                             var v = parseInt(value);
 
@@ -3042,7 +3044,7 @@
                                 case  512 :
                                 case 1024 :
                                 case 2048 :
-                                    this.analyser.fftSize = v;   //Setter
+                                    this.analyser.fftSize = v;   // Setter
                                     break;
                                 default :
                                     break;
@@ -3051,22 +3053,22 @@
 
                         break;
                     case 'frequencybincount' :
-                        return this.analyser.frequencyBinCount;  //Getter only
+                        return this.analyser.frequencyBinCount;  // Getter only
                     case 'mindecibels' :
                     case 'maxdecibels' :
                         if (value === undefined) {
-                            return this.analyser[k.replace('decibels', 'Decibels')];  //Getter
+                            return this.analyser[k.replace('decibels', 'Decibels')];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.analyser[k.replace('decibels', 'Decibels')] = v;  //Setter
+                                this.analyser[k.replace('decibels', 'Decibels')] = v;  // Setter
 
                                 if (this.analyser.minDecibels >= this.analyser.maxDecibels) {
                                     var min = this.analyser.minDecibels;
                                     var max = this.analyser.maxDecibels;
 
-                                    //Set default value
+                                    // Set default value
                                     this.analyser.minDecibels = -100;
                                     this.analyser.maxDecibels =  -30;
                                 }
@@ -3076,14 +3078,14 @@
                         break;
                     case 'smoothingtimeconstant' :
                         if (value === undefined) {
-                            return this.analyser.smoothingTimeConstant;  //Getter
+                            return this.analyser.smoothingTimeConstant;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.analyser.smoothingTimeConstant = v;  //Setter
+                                this.analyser.smoothingTimeConstant = v;  // Setter
                             }
                         }
 
@@ -3269,18 +3271,18 @@
             this.context   = context;
             this.processor = context.createScriptProcessor(bufferSize, numInput, numOutput);
 
-            this.mixLs = null;  //{@type Float32Array}
-            this.mixRs = null;  //{@type Float32Array}
+            this.mixLs = null;  /** @type {Float32Array} */
+            this.mixRs = null;  /** @type {Float32Array} */
 
-            this.trackLs     = [];  //{@type Array.<Array.<Float32Array>>} 2 dimensions array
-            this.trackRs     = [];  //{@type Array.<Array.<Float32Array>>} 2 dimensions array
+            this.trackLs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
+            this.trackRs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
             this.numtrack    = 0;
 
-            this.activeTrack = -1;      //There is not any active track in the case of -1
-            this.paused      = true;    //for preventing from the duplicate onaudioprocess event ("start" method)
+            this.activeTrack = -1;      // There is not any active track in the case of -1
+            this.paused      = true;    // for preventing from the duplicate onaudioprocess event ("start" method)
 
-            this.gainL = 1;  //Gain of L channel
-            this.gainR = 1;  //Gain of R channel
+            this.gainL = 1;  // Gain of L channel
+            this.gainR = 1;  // Gain of R channel
         };
 
         /** 
@@ -3297,16 +3299,16 @@
                 this.trackLs = new Array(this.numTrack);
                 this.trackRs = new Array(this.numTrack);
 
-                for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  //n * array
-                for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  //n * array
+                for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  // n * array
+                for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  // n * array
             } else {
                 this.numTrack = 1;
 
                 this.trackLs = new Array(this.numTrack);
                 this.trackRs = new Array(this.numTrack);
 
-                this.trackLs[0] = [];  //1 * array
-                this.trackRs[0] = [];  //1 * array
+                this.trackLs[0] = [];  // 1 * array
+                this.trackRs[0] = [];  // 1 * array
             }
 
             return this;
@@ -3321,7 +3323,7 @@
          */
         Recorder.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -3332,14 +3334,14 @@
                     case 'gainl' :
                     case 'gainr' :
                         if (value === undefined) {
-                            return this['gain' + k.slice(-1).toUpperCase()];  //Getter
+                            return this['gain' + k.slice(-1).toUpperCase()];  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this['gain' + k.slice(-1).toUpperCase()] = v;  //Setter
+                                this['gain' + k.slice(-1).toUpperCase()] = v;  // Setter
                             }
                         }
 
@@ -3392,7 +3394,7 @@
                         self.trackRs[self.activeTrack].push(recordRs);
                     } else {
                         this.disconnect(0);
-                        this.onaudioprocess = null;  //for Firefox
+                        this.onaudioprocess = null;  // for Firefox
                     }
                 };
             }
@@ -3405,10 +3407,10 @@
          * @return {Recorder} This is returned for method chain.
          */
         Recorder.prototype.stop = function() {
-            this.activeTrack = -1;  //Flag becomes inactive
+            this.activeTrack = -1;  // Flag becomes inactive
             this.paused      = true;
-            this.processor.disconnect(0);  //Stop onaudioprocess event
-            this.processor.onaudioprocess = null;  //for Firefox
+            this.processor.disconnect(0);  // Stop onaudioprocess event
+            this.processor.onaudioprocess = null;  // for Firefox
             return this;
         };
 
@@ -3436,7 +3438,7 @@
          * @return {Recorder} This is returned for method chain.
          */
         Recorder.prototype.mix = function() {
-            //on the way of recording ?
+            // on the way of recording ?
             if (this.activeTrack !== -1) {
                 this.stop();
             }
@@ -3447,10 +3449,10 @@
                 var currentBuffer = 0;
                 var index         = 0;
 
-                //Calculate sound data size
+                // Calculate sound data size
                 var maxNumBuffers = 0;
 
-                //Search max number of Float32Arrays each track
+                // Search max number of Float32Arrays each track
                 for (var i = 0, num = tracks.length; i < num; i++) {
                     if (maxNumBuffers < tracks[i].length) {
                         maxNumBuffers = tracks[i].length;
@@ -3469,25 +3471,25 @@
 
                     if (mixs.num > 0) {
                         var offset = currentBuffer * this.processor.bufferSize;
-                        mixs.values[offset + index] = mixs.sum / mixs.num;  //Average
+                        mixs.values[offset + index] = mixs.sum / mixs.num;  // Average
 
-                        //Clear
+                        // Clear
                         mixs.sum = 0;
                         mixs.num = 0;
 
-                        //Next data
+                        // Next data
                         if (index < (this.processor.bufferSize - 1)) {
-                            //Next Element in Float32Array
+                            // Next Element in Float32Array
                             index++;
                         } else {
-                            //Next Float32Array
+                            // Next Float32Array
                             currentBuffer++;
                             index = 0;
                         }
                     } else {
                         this['mix' + channel + 's'] = mixs.values;
 
-                        //End
+                        // End
                         break;
                     }
                 }
@@ -3505,7 +3507,7 @@
          * @return {Recorder} This is returned for method chain.
          */
         Recorder.prototype.clear = function(track) {
-            //on the way of recording ?
+            // on the way of recording ?
             if (this.activeTrack !== -1) {
                 this.stop();
             }
@@ -3532,13 +3534,16 @@
          * @return {string} This is returned as Object URL or Data URL for WAVE file.
          */
         Recorder.prototype.create = function(track, channelType, qbit, dataType) {
-            //on the way of recording ?
+            // on the way of recording ?
             if (this.activeTrack !== -1) {
                 this.stop();
             }
 
-            var Ls = null;  //{@type Float32Array}
-            var Rs = null;  //{@type Float32Array}
+            /** @type {Float32Array} */
+            var Ls = null;
+
+            /** @type {Float32Array} */
+            var Rs = null;
 
             if (String(track).toLowerCase() === 'all') {
                 this.mix();
@@ -3552,17 +3557,17 @@
                 }
             }
 
-            //Sound data exists ?
+            // Sound data exists ?
             if ((Ls.length === 0) && (Rs.length === 0)) {
                 return;
             }
 
-            //PCM parameters
+            // PCM parameters
             var CHANNEL = (channelType === 1) ? 1 : 2;
             var QBIT    = (qbit        === 8) ? 8 : 16;
             var SIZE    = (CHANNEL === 1) ? Math.min(Ls.length, Rs.length) : (2 * Math.min(Ls.length, Rs.length));
 
-            //{@type Uint8Array|Int16Array}
+            /** @type {Uint8Array|Int16Array} */
             var sounds = null;
 
             switch (QBIT) {
@@ -3570,16 +3575,16 @@
                     sounds = new Uint8Array(SIZE);
 
                     for (var i = 0; i < SIZE; i++) {
-                        //Convert 8bit unsigned integer (-1 -> 0, 0 -> 128, 1 -> 255)
+                        // Convert 8bit unsigned integer (-1 -> 0, 0 -> 128, 1 -> 255)
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = ((Ls[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  //Left channel
+                            binary = ((Ls[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Left channel
                         } else {
-                            binary = ((Rs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  //Right channel
+                            binary = ((Rs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Right channel
                         }
 
-                        //for preventing from clipping
+                        // for preventing from clipping
                         if (binary > (Math.pow(2, 8) - 1)) {binary = (Math.pow(2, 8) - 1);}
                         if (binary < (Math.pow(2, 0) - 1)) {binary = (Math.pow(2, 0) - 1);}
 
@@ -3591,16 +3596,16 @@
                     sounds = new Int16Array(SIZE);
 
                     for (var i = 0; i < SIZE; i++) {
-                        //Convert 16bit integer (-1 -> -32768, 0 -> 0, 1 -> 32767)
+                        // Convert 16bit integer (-1 -> -32768, 0 -> 0, 1 -> 32767)
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = Ls[parseInt(i / CHANNEL)] * Math.pow(2, 15);  //Left channel
+                            binary = Ls[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Left channel
                         } else {
-                            binary = Rs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  //Right channel
+                            binary = Rs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Right channel
                         }
 
-                        //for preventing from clipping
+                        // for preventing from clipping
                         if (binary > (+Math.pow(2, 15) - 1)) {binary =  Math.pow(2, 15) - 1;}
                         if (binary < (-Math.pow(2, 15) - 1)) {binary = -Math.pow(2, 15) - 1;}
 
@@ -3612,7 +3617,7 @@
                     break;
             }
 
-            //Create WAVE file (Object URL or Data URL)
+            // Create WAVE file (Object URL or Data URL)
             var FMT_CHUNK  = 28;
             var DATA_CHUNK =  8 + (SIZE * (QBIT / 8));
             var CHUNK_SIZE = 36 + (SIZE * (QBIT / 8));
@@ -3629,26 +3634,26 @@
                     wave += String.fromCharCode(((CHUNK_SIZE >> 0) & 0xFF), ((CHUNK_SIZE >> 8) & 0xFF), ((CHUNK_SIZE >> 16) & 0xFF), ((CHUNK_SIZE >> 24) & 0xFF));
                     wave += 'WAVE';
 
-                    //fmt chunk
+                    // fmt chunk
                     wave += 'fmt' + ' ' + String.fromCharCode(16, 0, 0, 0);
                     wave += String.fromCharCode(1, 0);
 
-                    //fmt chunk -> Channels (Monaural or Stereo)
+                    // fmt chunk -> Channels (Monaural or Stereo)
                     wave += String.fromCharCode(CHANNEL, 0);
 
-                    //fmt chunk -> Sample rate
+                    // fmt chunk -> Sample rate
                     wave += String.fromCharCode(((RATE >> 0) & 0xFF), ((RATE >> 8) & 0xFF), ((RATE >> 16) & 0xFF), ((RATE >> 24) & 0xFF));
 
-                    //fmt chunk -> Byte per second
+                    // fmt chunk -> Byte per second
                     wave += String.fromCharCode(((BPS >> 0) & 0xFF), ((BPS >> 8) & 0xFF), ((BPS >> 16) & 0xFF), ((BPS >> 24) & 0xFF));
 
-                    //fmt chunk -> Block size
+                    // fmt chunk -> Block size
                     wave += String.fromCharCode((CHANNEL * (QBIT / 8)), 0);
 
-                    //fmt chunk -> Byte per Sample
+                    // fmt chunk -> Byte per Sample
                     wave += String.fromCharCode(QBIT, 0);
 
-                    //data chunk
+                    // data chunk
                     wave += 'data';
                     wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
 
@@ -3658,7 +3663,7 @@
                                 wave += String.fromCharCode(sounds[i]);
                                 break;
                             case 16 :
-                                //The byte order in WAVE file is little endian
+                                // The byte order in WAVE file is little endian
                                 wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
                                 break;
                             default :
@@ -3674,26 +3679,26 @@
                 default     :
                     var waves = [];
 
-                    waves[0] = 0x52;  //'R'
-                    waves[1] = 0x49;  //'I'
-                    waves[2] = 0x46;  //'F'
-                    waves[3] = 0x46;  //'F'
+                    waves[0] = 0x52;  // 'R'
+                    waves[1] = 0x49;  // 'I'
+                    waves[2] = 0x46;  // 'F'
+                    waves[3] = 0x46;  // 'F'
 
                     waves[4] = (CHUNK_SIZE >>  0) & 0xFF;
                     waves[5] = (CHUNK_SIZE >>  8) & 0xFF;
                     waves[6] = (CHUNK_SIZE >> 16) & 0xFF;
                     waves[7] = (CHUNK_SIZE >> 24) & 0xFF;
 
-                    waves[8]  = 0x57;  //'W'
-                    waves[9]  = 0x41;  //'A'
-                    waves[10] = 0x56;  //'V'
-                    waves[11] = 0x45;  //'E'
+                    waves[8]  = 0x57;  // 'W'
+                    waves[9]  = 0x41;  // 'A'
+                    waves[10] = 0x56;  // 'V'
+                    waves[11] = 0x45;  // 'E'
 
-                    //fmt chunk
-                    waves[12] = 0x66;  //'f'
-                    waves[13] = 0x6D;  //'m'
-                    waves[14] = 0x74;  //'t'
-                    waves[15] = 0x20;  //' '
+                    // fmt chunk
+                    waves[12] = 0x66;  // 'f'
+                    waves[13] = 0x6D;  // 'm'
+                    waves[14] = 0x74;  // 't'
+                    waves[15] = 0x20;  // ' '
 
                     waves[16] = 16;
                     waves[17] =  0;
@@ -3703,35 +3708,35 @@
                     waves[20] = 1;
                     waves[21] = 0;
 
-                    //fmt chunk -> Channels (Monaural or Stereo)
+                    // fmt chunk -> Channels (Monaural or Stereo)
                     waves[22] = CHANNEL;
                     waves[23] = 0;
 
-                    //fmt chunk -> Sample rate
+                    // fmt chunk -> Sample rate
                     waves[24] = (RATE >>  0) & 0xFF;
                     waves[25] = (RATE >>  8) & 0xFF;
                     waves[26] = (RATE >> 16) & 0xFF;
                     waves[27] = (RATE >> 24) & 0xFF;
 
-                    //fmt chunk -> Byte per second
+                    // fmt chunk -> Byte per second
                     waves[28] = (BPS >>  0) & 0xFF;
                     waves[29] = (BPS >>  8) & 0xFF;
                     waves[30] = (BPS >> 16) & 0xFF;
                     waves[31] = (BPS >> 24) & 0xFF;
 
-                    //fmt chunk -> Block size
+                    // fmt chunk -> Block size
                     waves[32] = CHANNEL * (QBIT / 8);
                     waves[33] = 0;
 
-                    //fmt chunk -> Byte per Sample
+                    // fmt chunk -> Byte per Sample
                     waves[34] = QBIT;
                     waves[35] = 0;
 
-                    //data chunk
-                    waves[36] = 0x64;  //'d'
-                    waves[37] = 0x61;  //'a'
-                    waves[38] = 0x74;  //'t
-                    waves[39] = 0x61;  //'a'
+                    // data chunk
+                    waves[36] = 0x64;  // 'd'
+                    waves[37] = 0x61;  // 'a'
+                    waves[38] = 0x74;  // 't
+                    waves[39] = 0x61;  // 'a'
 
                     waves[40] = (DATA_SIZE >>  0) & 0xFF;
                     waves[41] = (DATA_SIZE >>  8) & 0xFF;
@@ -3744,7 +3749,7 @@
                                 waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
                                 break;
                             case 16 :
-                                //The byte order in WAVE file is little endian
+                                // The byte order in WAVE file is little endian
                                 waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
                                 waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
                                 break;
@@ -3778,19 +3783,19 @@
          * @implements {Statable}
          */
         function Session(context, bufferSize, numInput, numOutput, analyser) {
-            //Call interface constructor
+            // Call interface constructor
             Statable.call(this);
 
             this.isActive = false;
 
             this.context  = context;
-            this.analyser = analyser;  //the instance of Analyser
+            this.analyser = analyser;  // the instance of Analyser
 
             this.sender   = context.createScriptProcessor(bufferSize, numInput, numOutput);
             this.receiver = context.createScriptProcessor(bufferSize, numInput, numOutput);
 
-            this.websocket = null;  //for the instance of WebSocket
-            this.paused    = true;  //for preventing from  the duplicate onaudioprocess event ("start" method)
+            this.websocket = null;  // for the instance of WebSocket
+            this.paused    = true;  // for preventing from  the duplicate onaudioprocess event ("start" method)
         }
 
         /** 
@@ -3806,7 +3811,7 @@
          */
         Session.prototype.setup = function(tls, host, port, path, openCallback, closeCallback, errorCallback) {
             if (!navigator.onLine) {
-                //Clear
+                // Clear
                 this.isActive = false;
                 this.paused   = true;
                 this.connect();
@@ -3815,7 +3820,7 @@
                 throw new Error('Now Offline.');
             }
 
-            //The argument is associative array ?
+            // The argument is associative array ?
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
                 var properties = arguments[0];
 
@@ -3875,7 +3880,7 @@
 
             this.websocket.onmessage = function(event) {
                 if (!self.isActive) {
-                    //Stop drawing sound wave
+                    // Stop drawing sound wave
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
 
@@ -3887,10 +3892,10 @@
                     var length = Math.floor(total / 2);
                     var offset = length * Float32Array.BYTES_PER_ELEMENT;
 
-                    var bufferLs = new Float32Array(event.data,      0, length);  //Get Left  channel data
-                    var bufferRs = new Float32Array(event.data, offset, length);  //Get Right channel data
+                    var bufferLs = new Float32Array(event.data,      0, length);  // Get Left  channel data
+                    var bufferRs = new Float32Array(event.data, offset, length);  // Get Right channel data
 
-                    //Start drawing sound wave
+                    // Start drawing sound wave
                     self.analyser.start('time');
                     self.analyser.start('fft');
 
@@ -3905,7 +3910,7 @@
                         bufferRs = null;
 
                         if (!self.isActive || (self.websocket === null)) {
-                            //Stop drawing sound wave
+                            // Stop drawing sound wave
                             self.analyser.stop('time');
                             self.analyser.stop('fft');
                         }
@@ -3921,16 +3926,16 @@
          * @return {Session} This is returned for method chain.
          */
         Session.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.receiver.disconnect(0);
             this.sender.disconnect(0);
 
-            //for Firefox
+            // for Firefox
             this.receiver.onaudioprocess = null;
             this.sender.onaudioprocess   = null;
 
             if (this.isActive) {
-                //ScriptProcessorNode (input) -> Analyser -> AudioDestinationNode (output)
+                // ScriptProcessorNode (input) -> Analyser -> AudioDestinationNode (output)
                 this.receiver.connect(this.analyser.input);
                 this.analyser.output.connect(this.context.destination);
             } else {
@@ -4002,7 +4007,7 @@
         /** @override */
         Session.prototype.state = function(value, stateCallback, waitCallback) {
             if (value === undefined) {
-                return this.isActive;  //Getter
+                return this.isActive;  // Getter
             }
 
             if (Object.prototype.toString.call(waitCallback) === '[object Function]') {
@@ -4017,9 +4022,9 @@
                 }
 
                 if (String(value).toLowerCase() === 'toggle') {
-                    self.isActive = !self.isActive;  //Setter
+                    self.isActive = !self.isActive;  // Setter
                 } else {
-                    self.isActive = Boolean(value);  //Setter
+                    self.isActive = Boolean(value);  // Setter
                 }
 
                 self.connect();
@@ -4031,7 +4036,7 @@
                 global.clearInterval(intervalid);
             }, 10);
 
-            //In the case of setter
+            // In the case of setter
             return this;
         };
 
@@ -4056,26 +4061,26 @@
          * @implements {Statable}
          */
         function Effector(context, bufferSize) {
-            //Call interface constructor
+            // Call interface constructor
             Statable.call(this);
 
             this.isActive = true;
 
-            //for creating instance of OscillatorNode again
+            // for creating instance of OscillatorNode again
             this.context = context;
 
-            //for connecting external node
+            // for connecting external node
             this.input  = context.createGain();
             this.output = context.createGain();
 
-            //for LFO (Low Frequency Oscillator)
-            //LFO changes parameter cyclically
+            // for LFO (Low Frequency Oscillator)
+            // LFO changes parameter cyclically
             this.lfo       = context.createOscillator();
             this.depth     = context.createGain();
             this.rate      = this.lfo.frequency;
             this.processor = context.createScriptProcessor(bufferSize, 1, 2);
 
-            //for legacy browsers
+            // for legacy browsers
             this.lfo.start = this.lfo.start || this.lfo.noteOn;
             this.lfo.stop  = this.lfo.stop  || this.lfo.noteOff;
 
@@ -4142,21 +4147,21 @@
                     r = 0;
                 }
 
-                //for keeping value
+                // for keeping value
                 var type = this.lfo.type;
                 var rate = this.lfo.frequency.value;
 
-                //Destroy the instance of OscillatorNode
+                // Destroy the instance of OscillatorNode
                 this.lfo.stop(s + r);
 
-                //Create the instance of OscillatorNode again
+                // Create the instance of OscillatorNode again
                 this.lfo = this.context.createOscillator();
 
-               //for legacy browsers
+               // for legacy browsers
                 this.lfo.start = this.lfo.start || this.lfo.noteOn;
                 this.lfo.stop  = this.lfo.stop  || this.lfo.noteOff;
 
-                //Set the saved value
+                // Set the saved value
                 this.lfo.type            = type;
                 this.lfo.frequency.value = rate;
 
@@ -4171,19 +4176,19 @@
         /** @override */
         Effector.prototype.state = function(value) {
             if (value === undefined) {
-                return this.isActive;  //Getter
+                return this.isActive;  // Getter
             } else if (String(value).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  //Setter
+                this.isActive = !this.isActive;  // Setter
             } else {
-                this.isActive = Boolean(value);  //Setter
+                this.isActive = Boolean(value);  // Setter
             }
 
-            //In the case of setter
+            // In the case of setter
 
-            //Change connection
+            // Change connection
             this.connect();
 
-            //Start LFO
+            // Start LFO
             this.start(this.context.currentTime);
 
             return this;
@@ -4202,26 +4207,26 @@
          * @extends {Effector}
          */
         function Compressor(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.compressor = context.createDynamicsCompressor();
 
-            //Set default value
+            // Set default value
             this.compressor.threshold.value = -24;
             this.compressor.knee.value      = 30;
             this.compressor.ratio.value     = 12;
             this.compressor.attack.value    = 0.003;
             this.compressor.release.value   = 0.25;
 
-            //Connect nodes
+            // Connect nodes
             this.connect();
         }
 
         /** @override */
         Compressor.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -4230,7 +4235,7 @@
 
                 if (k in this.compressor) {
                     if (value === undefined) {
-                        return this.compressor[k].value;  //Getter
+                        return this.compressor[k].value;  // Getter
                     } else {
                         var v   = parseFloat(value);
 
@@ -4254,7 +4259,7 @@
                         var max = this.compressor[k].maxValue || maxs[k];
 
                         if ((v >= min) && (v <= max)) {
-                            this.compressor[k].value = v;  //Setter
+                            this.compressor[k].value = v;  // Setter
                         }
                     }
                 }
@@ -4265,18 +4270,18 @@
 
         /** @override */
         Compressor.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.compressor.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
-                //GainNode (input) -> DynamicsCompressorNode -> GainNode (output)
+                // Effect ON
+                // GainNode (input) -> DynamicsCompressorNode -> GainNode (output)
                 this.input.connect(this.compressor);
                 this.compressor.connect(this.output);
             } else {
-                //Effect OFF
-                //GainNode (input) -> GainNode (output)
+                // Effect OFF
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
 
@@ -4296,7 +4301,7 @@
          * @extends {Effector}
          */
         function Distortion(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.distortion = context.createWaveShaper();
@@ -4304,24 +4309,24 @@
             this.color      = context.createBiquadFilter();
             this.tone       = context.createBiquadFilter();
 
-            //Distortion type
+            // Distortion type
             this.type = 'clean';
 
-            //for creating curve
+            // for creating curve
             this.numberOfSamples = 4096;
 
-            //Initialize parameters
+            // Initialize parameters
             this.drive.gain.value      = 1;
             this.color.type            = (Object.prototype.toString.call(this.color.type) === '[object String]') ? 'bandpass' : (this.color.BANDPASS || 2);
             this.color.frequency.value = 350;
             this.color.Q.value         = Math.SQRT1_2;
-            this.color.gain.value      = 0;  //Not used
+            this.color.gain.value      = 0;  // Not used
             this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
-            this.tone.gain.value       = 0;  //Not used
+            this.tone.gain.value       = 0;  // Not used
 
-            //Distortion is not connected by default
+            // Distortion is not connected by default
             this.state(false);
         }
 
@@ -4338,22 +4343,22 @@
                 var k = (2 * amount) / (1 - amount);
 
                 for (var i = 0; i < numberOfSamples; i++) {
-                    //LINEAR INTERPOLATION: x := (c - a) * (z - y) / (b - a) + y
-                    //a = 0, b = 2048, z = 1, y = -1, c = i
+                    // LINEAR INTERPOLATION: x := (c - a) * (z - y) / (b - a) + y
+                    // a = 0, b = 2048, z = 1, y = -1, c = i
                     var x = (((i - 0) * (1 - (-1))) / (numberOfSamples - 0)) + (-1);
                     curves[i] = ((1 + k) * x) / (1 + k * Math.abs(x));
                 }
 
                 return curves;
             } else {
-                return null;  //Clean sound (default value)
+                return null;  // Clean sound (default value)
             }
         };
 
         /** @override */
         Distortion.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -4363,7 +4368,7 @@
                 switch (k) {
                     case 'curve' :
                         if (value === undefined) {
-                            return this.distortion.curve;  //Getter
+                            return this.distortion.curve;  // Getter
                         } else {
                             var AMOUNTS = {
                                 CLEAN      : 0.0,
@@ -4373,7 +4378,7 @@
                                 FUZZ       : 0.9
                             };
 
-                            //Setter
+                            // Setter
                             var curve = null;
 
                             switch (String(value).toLowerCase()) {
@@ -4411,12 +4416,12 @@
                         break;
                     case 'samples' :
                         if (value === undefined) {
-                            return this.numberOfSamples;  //Getter
+                            return this.numberOfSamples;  // Getter
                         } else {
                             var v = parseInt(value);
 
                             if (v >= 0) {
-                                //Setter
+                                // Setter
                                 this.numberOfSamples = v;
                                 this.param('curve', this.type);
                             }
@@ -4425,14 +4430,14 @@
                         break;
                     case 'drive' :
                         if (value === undefined) {
-                            return this.drive.gain.value;  //Getter
+                            return this.drive.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.drive.gain.minValue || 0;
                             var max = this.drive.gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.drive.gain.value = v;  //Setter
+                                this.drive.gain.value = v;  // Setter
                             }
                         }
 
@@ -4440,14 +4445,14 @@
                     case 'color' :
                     case 'tone'  :
                         if (value === undefined) {
-                            return this[k].frequency.value; //Getter
+                            return this[k].frequency.value; // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].frequency.minValue || 10;
                             var max = this[k].frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].frequency.value = v;  //Setter
+                                this[k].frequency.value = v;  // Setter
                             }
                         }
 
@@ -4462,7 +4467,7 @@
 
         /** @override */
         Distortion.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.distortion.disconnect(0);
             this.drive.disconnect(0);
@@ -4470,18 +4475,18 @@
             this.tone.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> BiquadFilterNode (color) -> WaveShaperNode (distorion) -> GainNode (drive) -> BiquadFilterNode (tone) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (color) -> WaveShaperNode (distorion) -> GainNode (drive) -> BiquadFilterNode (tone) -> GainNode (output)
                 this.input.connect(this.color);
                 this.color.connect(this.distortion);
                 this.distortion.connect(this.drive);
                 this.drive.connect(this.tone);
                 this.tone.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -4499,26 +4504,26 @@
          * @extends {Effector}
          */
         function Wah(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.lowpass = context.createBiquadFilter();
 
-            //Initialize parameters
+            // Initialize parameters
             this.lowpass.type            = (Object.prototype.toString.call(this.lowpass.type) === '[object String]') ? 'lowpass' : (this.lowpass.LOWPASS || 0);
             this.lowpass.frequency.value = 350;
-            this.lowpass.gain.value      = 0;    //Not used
+            this.lowpass.gain.value      = 0;    // Not used
 
             this.lowpass.Q.value   = 1;
             this.depth.gain.value  = 0;
             this.rate.value        = 0;
             this.depthRate         = 0;
 
-            //Wah is not connected by default
+            // Wah is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
             this.lfo.connect(this.depth);
             this.depth.connect(this.lowpass.frequency);
         };
@@ -4526,7 +4531,7 @@
         /** @override */
         Wah.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -4537,14 +4542,14 @@
                     case 'frequency' :
                     case 'cutoff'    :
                         if (value === undefined) {
-                            return this.lowpass.frequency.value;  //Getter
+                            return this.lowpass.frequency.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.lowpass.frequency.minValue || 10;
                             var max = this.lowpass.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.lowpass.frequency.value = v;
                                 this.depth.gain.value        = this.lowpass.frequency.value * this.depthRate;
                             }
@@ -4553,14 +4558,14 @@
                         break;
                     case 'depth' :
                         if (value === undefined) {
-                            return this.depthRate;  //Getter
+                            return this.depthRate;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.depth.gain.value = this.lowpass.frequency.value * v;
                                 this.depthRate        = v;
                             }
@@ -4569,28 +4574,28 @@
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                            return this.rate.value;  //Getter
+                            return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'resonance' :
                         if (value === undefined) {
-                            return this.lowpass.Q.value;  //Getter
+                            return this.lowpass.Q.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.lowpass.Q.minValue || 0.0001;
                             var max = this.lowpass.Q.maxValue || 1000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.lowpass.Q.value = v;  //Setter
+                                this.lowpass.Q.value = v;  // Setter
                             }
                         }
 
@@ -4605,12 +4610,12 @@
 
         /** @override */
         Wah.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.lowpass.frequency);
             }
@@ -4620,20 +4625,20 @@
 
         /** @override */
         Wah.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.lowpass.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> BiquadFilterNode (lowpass) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (lowpass) -> GainNode (output)
                 this.input.connect(this.lowpass);
                 this.lowpass.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -4651,7 +4656,7 @@
          * @extends {Effector}
          */
         function Equalizer(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.bass     = context.createBiquadFilter();
@@ -4659,38 +4664,38 @@
             this.treble   = context.createBiquadFilter();
             this.presence = context.createBiquadFilter();
 
-            //Set filter type
+            // Set filter type
             this.bass.type     = (Object.prototype.toString.call(this.bass.type)     === '[object String]') ? 'lowshelf'  : (this.bass.LOWSHELF      || 3);
             this.middle.type   = (Object.prototype.toString.call(this.middle.type)   === '[object String]') ? 'peaking'   : (this.middle.PEAKING     || 5);
             this.treble.type   = (Object.prototype.toString.call(this.treble.type)   === '[object String]') ? 'peaking'   : (this.treble.PEAKING     || 5);
             this.presence.type = (Object.prototype.toString.call(this.presence.type) === '[object String]') ? 'highshelf' : (this.presence.HIGHSHELF || 4);
 
-            //Set cutoff frequency
-            this.bass.frequency.value     =  500;  //500 Hz
-            this.middle.frequency.value   = 1000;  //1 kHz
-            this.treble.frequency.value   = 2000;  //2 kHz
-            this.presence.frequency.value = 4000;  //4 kHz
+            // Set cutoff frequency
+            this.bass.frequency.value     =  500;  // 500 Hz
+            this.middle.frequency.value   = 1000;  // 1 kHz
+            this.treble.frequency.value   = 2000;  // 2 kHz
+            this.presence.frequency.value = 4000;  // 4 kHz
 
-            //Set Q
-            //this.bass.Q.value     = Math.SQRT1_2;  //Not used
+            // Set Q
+            // this.bass.Q.value     = Math.SQRT1_2;  // Not used
             this.middle.Q.value   = Math.SQRT1_2;
             this.treble.Q.value   = Math.SQRT1_2;
-            //this.presence.Q.value = Math.SQRT1_2;  //Not used
+            // this.presence.Q.value = Math.SQRT1_2;  // Not used
 
-            //Set Gain
+            // Set Gain
             this.bass.gain.value     = 0;
             this.middle.gain.value   = 0;
             this.treble.gain.value   = 0;
             this.presence.gain.value = 0;
 
-            //Connect nodes
+            // Connect nodes
             this.connect();
         }
 
         /** @override */
         Equalizer.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -4703,14 +4708,14 @@
                     case 'treble'   :
                     case 'presence' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || -40;
                             var max = this[k].gain.maxValue ||  40;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
@@ -4725,7 +4730,7 @@
 
         /** @override */
         Equalizer.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.bass.disconnect(0);
             this.middle.disconnect(0);
@@ -4733,18 +4738,18 @@
             this.presence.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> BiquadFilterNode (bass) -> BiquadFilterNode (middle) -> BiquadFilterNode (treble) -> BiquadFilterNode (presence) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (bass) -> BiquadFilterNode (middle) -> BiquadFilterNode (treble) -> BiquadFilterNode (presence) -> GainNode (output)
                 this.input.connect(this.bass);
                 this.bass.connect(this.middle);
                 this.middle.connect(this.treble);
                 this.treble.connect(this.presence);
                 this.presence.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -4762,15 +4767,15 @@
          * @extends {Effector}
          */
         function Filter(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.filter = context.createBiquadFilter();
 
-            //for legacy browsers
+            // for legacy browsers
             this.filter.frequency.setTargetAtTime = this.filter.frequency.setTargetAtTime || this.filter.frequency.setTargetValueAtTime;
 
-            //Initialize parameters
+            // Initialize parameters
             this.filter.type            = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? 'lowpass' : (this.filter.LOWPASS || 0);
             this.filter.frequency.value = 350;
             this.filter.Q.value         = 1;
@@ -4782,14 +4787,14 @@
             this.sustain = 1.0;
             this.release = 1.0;
 
-            //Filter is not connected by default
+            // Filter is not connected by default
             this.state(false);
         }
 
         /** @override */
         Filter.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -4799,11 +4804,11 @@
                 switch (k) {
                     case 'type' :
                         if (value === undefined) {
-                            return this.filter.type;  //Getter
+                            return this.filter.type;  // Getter
                         } else {
                             var v = String(value).toLowerCase();
 
-                            //for legacy browsers
+                            // for legacy browsers
                             var FILTER_TYPES = {
                                 lowpass   : this.filter.LOWPASS   || 0,
                                 highpass  : this.filter.HIGHPASS  || 1,
@@ -4816,7 +4821,7 @@
                             };
 
                             if (v in FILTER_TYPES) {
-                                this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPES[v];  //Setter
+                                this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPES[v];  // Setter
                             }
                         }
 
@@ -4824,14 +4829,14 @@
                     case 'frequency' :
                     case 'cutoff'    :
                         if (value === undefined) {
-                            return this.filter.frequency.value;  //Getter
+                            return this.filter.frequency.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.filter.frequency.minValue || 10;
                             var max = this.filter.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.maxFrequency           = v;
                                 this.filter.frequency.value = v;
                             }
@@ -4840,28 +4845,28 @@
                         break;
                     case 'gain' :
                         if (value === undefined) {
-                            return this.filter.gain.value;  //Getter
+                            return this.filter.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.filter.gain.minValue || -40;
                             var max = this.filter.gain.maxValue ||  40;
 
                             if ((v >= min) && (v <= max)) {
-                                this.filter.gain.value = v;  //Setter
+                                this.filter.gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'q' :
                         if (value === undefined) {
-                            return this.filter.Q.value;  //Getter
+                            return this.filter.Q.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.filter.Q.minValue || 0.0001;
                             var max = this.filter.Q.maxValue || 1000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.filter.Q.value = v;  //Setter
+                                this.filter.Q.value = v;  // Setter
                             }
                         }
 
@@ -4871,12 +4876,12 @@
                     case 'sustain' :
                     case 'release' :
                         if (value === undefined) {
-                            return this[k];  //Getter
+                            return this[k];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
-                                this[k] = v;  //Setter
+                                this[k] = v;  // Setter
                             }
                         }
 
@@ -4891,27 +4896,27 @@
 
         /** @override */
         Filter.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.filter.disconnect(0);
 
             if (this.isActive) {
-                //Effector ON
+                // Effector ON
 
-                //GainNode (input) -> BiquadFilterNode -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode -> GainNode (output)
                 this.input.connect(this.filter);
                 this.filter.connect(this.output);
             } else {
-                //Effector OFF
+                // Effector OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
 
         /** @override */
         Filter.prototype.start = function(startTime) {
-            //for the case of end on the way of scheduling
+            // for the case of end on the way of scheduling
             this.filter.frequency.value = this.maxFrequency;
 
             if (this.isActive) {
@@ -4926,11 +4931,11 @@
                 var t2      = this.decay;
                 var t2Value = this.sustain * this.filter.frequency.value;
 
-                //Envelope Generator for filter
+                // Envelope Generator for filter
                 this.filter.frequency.cancelScheduledValues(t0);
                 this.filter.frequency.setValueAtTime(this.filter.frequency.defaultValue, t0);
-                this.filter.frequency.linearRampToValueAtTime(this.maxFrequency, t1);  //Attack
-                this.filter.frequency.setTargetAtTime(t2Value, t1, t2);  //Decay -> Sustain
+                this.filter.frequency.linearRampToValueAtTime(this.maxFrequency, t1);  // Attack
+                this.filter.frequency.setTargetAtTime(t2Value, t1, t2);  // Decay -> Sustain
             }
 
             return this;
@@ -4948,10 +4953,10 @@
                 var t3 = s;
                 var t4 = this.release;
 
-                //Envelope Generator for filter
+                // Envelope Generator for filter
                 this.filter.frequency.cancelScheduledValues(t3);
                 this.filter.frequency.setValueAtTime(this.filter.frequency.value, t3);
-                this.filter.frequency.setTargetAtTime(this.filter.frequency.defaultValue, t3, t4);  //Sustain -> Release
+                this.filter.frequency.setTargetAtTime(this.filter.frequency.defaultValue, t3, t4);  // Sustain -> Release
                 this.filter.frequency.setValueAtTime(this.maxFrequency, (t3 + t4));
             }
 
@@ -4961,16 +4966,16 @@
         /** @override */
         Filter.prototype.state = function(value) {
             if (value === undefined) {
-                return this.isActive;  //Getter
+                return this.isActive;  // Getter
             } else if (String(value).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  //Setter
+                this.isActive = !this.isActive;  // Setter
             } else {
-                this.isActive = Boolean(value);  //Setter
+                this.isActive = Boolean(value);  // Setter
             }
 
-            //In the case of setter
+            // In the case of setter
 
-            //Change connection
+            // Change connection
             this.connect();
 
             return this;
@@ -4989,7 +4994,7 @@
          * @extends {Effector}
          */
         function Autopanner(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.amplitudeL = context.createGain();
@@ -4997,18 +5002,18 @@
             this.splitter   = context.createChannelSplitter(2);
             this.merger     = context.createChannelMerger(2);
 
-            this.amplitudeL.gain.value = 1;  //1 +- depth
-            this.amplitudeR.gain.value = 1;  //1 +- depth
+            this.amplitudeL.gain.value = 1;  // 1 +- depth
+            this.amplitudeR.gain.value = 1;  // 1 +- depth
 
-            //Initialize parameters
+            // Initialize parameters
             this.depth.gain.value = 0;
             this.rate.value       = 0;
 
-            //Autopanner is not connected by default
+            // Autopanner is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> ScriptProcessorNode -> ChannelSplitterNode -> AudioParam (GainNode.gain) (L) / (R)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> ScriptProcessorNode -> ChannelSplitterNode -> AudioParam (GainNode.gain) (L) / (R)
             this.lfoSplitter = context.createChannelSplitter(2);
             this.lfo.connect(this.depth);
             this.depth.connect(this.processor);
@@ -5020,7 +5025,7 @@
         /** @override */
         Autopanner.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5030,28 +5035,28 @@
                 switch (k) {
                     case 'depth' :
                         if (value === undefined) {
-                           return this.depth.gain.value;  //Getter
+                           return this.depth.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.depth.gain.value = v;  //Setter
+                                this.depth.gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                           return this.rate.value;  //Getter
+                           return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
@@ -5066,7 +5071,7 @@
 
         /** @override */
         Autopanner.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.amplitudeL.disconnect(0);
             this.amplitudeR.disconnect(0);
@@ -5075,7 +5080,7 @@
             this.merger.disconnect(0);
 
             if (this.isActive) {
-                //GainNode (input) -> ChannelSplitterNode -> GainNode (L) / (R) -> ChannelMergerNode -> GainNode (output)
+                // GainNode (input) -> ChannelSplitterNode -> GainNode (L) / (R) -> ChannelMergerNode -> GainNode (output)
                 this.input.connect(this.splitter);
                 this.splitter.connect(this.amplitudeL, 0, 0);
                 this.splitter.connect(this.amplitudeR, 1, 0);
@@ -5083,7 +5088,7 @@
                 this.amplitudeR.connect(this.merger, 0, 1);
                 this.merger.connect(this.output);
             } else {
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -5126,16 +5131,16 @@
 
         /** @override */
         Autopanner.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Stop onaudioprocess event
+                // Stop onaudioprocess event
                 this.processor.disconnect(0);
-                this.processor.onaudioprocess = null;  //for Firefox
+                this.processor.onaudioprocess = null;  // for Firefox
 
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.processor);
                 this.processor.connect(this.lfoSplitter);
@@ -5159,22 +5164,22 @@
          * @extends {Effector}
          */
         function Tremolo(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.amplitude = context.createGain();
 
-            this.amplitude.gain.value = 1;  //1 +- depth
+            this.amplitude.gain.value = 1;  // 1 +- depth
 
-            //Initialize parameter
+            // Initialize parameter
             this.depth.gain.value = 0;
             this.rate.value       = 0;
 
-            //Tremolo is not connected by default
+            // Tremolo is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
             this.lfo.connect(this.depth);
             this.depth.connect(this.amplitude.gain);
         }
@@ -5182,7 +5187,7 @@
         /** @override */
         Tremolo.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5192,35 +5197,35 @@
                 switch (k) {
                     case 'depth' :
                         if (value === undefined) {
-                           return this.depth.gain.value;  //Getter
+                           return this.depth.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.depth.gain.value = v;  //Setter
+                                this.depth.gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                           return this.rate.value;  //Getter
+                           return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'wave' :
                         if (value === undefined) {
-                            return this.lfo.type;  //Getter
+                            return this.lfo.type;  // Getter
                         } else {
                             var v = String(value).toLowerCase();
 
@@ -5229,7 +5234,7 @@
                             this.lfo.SAWTOOTH = this.lfo.SAWTOOTH || 2;
                             this.lfo.TRIANGLE = this.lfo.TRIANGLE || 3;
 
-                            //for legacy browsers
+                            // for legacy browsers
                             var WAVE_TYPE = {
                                 sine     : this.lfo.SINE,
                                 square   : this.lfo.SQUARE,
@@ -5238,7 +5243,7 @@
                             };
 
                             if (v in WAVE_TYPE) {
-                                this.lfo.type = (Object.prototype.toString.call(this.lfo.type) === '[object String]') ? v : WAVE_TYPE[v];  //Setter
+                                this.lfo.type = (Object.prototype.toString.call(this.lfo.type) === '[object String]') ? v : WAVE_TYPE[v];  // Setter
                             }
                         }
 
@@ -5253,32 +5258,32 @@
 
         /** @override */
         Tremolo.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.amplitude.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> GainNode -> GainNode (output)
+                // GainNode (input) -> GainNode -> GainNode (output)
                 this.input.connect(this.amplitude);
                 this.amplitude.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
 
         /** @override */
         Tremolo.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.amplitude.gain);
             }
@@ -5299,22 +5304,22 @@
          * @extends {Effector}
          */
         function Ringmodulator(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.amplitude = context.createGain();
 
-            this.amplitude.gain.value = 0;  //0 +- depth
+            this.amplitude.gain.value = 0;  // 0 +- depth
 
-            //Initialize parameter
+            // Initialize parameter
             this.depth.gain.value = 1;
             this.rate.value       = 0;
 
-            //Ring Modulator is not connected by default
+            // Ring Modulator is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (GainNode.gain)
             this.lfo.connect(this.depth);
             this.depth.connect(this.amplitude.gain);
         }
@@ -5322,7 +5327,7 @@
         /** @override */
         Ringmodulator.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5332,28 +5337,28 @@
                 switch (k) {
                     case 'depth' :
                         if (value === undefined) {
-                           return this.depth.gain.value;  //Getter
+                           return this.depth.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.depth.gain.value = v;  //Setter
+                                this.depth.gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                           return this.rate.value;  //Getter
+                           return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
@@ -5368,32 +5373,32 @@
 
         /** @override */
         Ringmodulator.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.amplitude.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> GainNode -> GainNode (output)
+                // GainNode (input) -> GainNode -> GainNode (output)
                 this.input.connect(this.amplitude);
                 this.amplitude.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
 
         /** @override */
         Ringmodulator.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.amplitude.gain);
             }
@@ -5414,11 +5419,11 @@
          * @extends {Effector}
          */
         function Phaser(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
-            this.MAXIMUM_STAGES = 24;  //The maximum number of All-Pass Filters
-            this.numberOfStages = 12;  //The default number of All-Pass Filters
+            this.MAXIMUM_STAGES = 24;  // The maximum number of All-Pass Filters
+            this.numberOfStages = 12;  // The default number of All-Pass Filters
             this.filters        = new Array(this.MAXIMUM_STAGES);
 
             for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
@@ -5426,24 +5431,24 @@
                 this.filters[i].type            = (Object.prototype.toString.call(this.filters[i].type) === '[object String]') ? 'allpass' : (this.filters[i].ALLPASS || 7);
                 this.filters[i].frequency.value = 350;
                 this.filters[i].Q.value         = 1;
-                this.filters[i].gain.value      = 0;  //Not used
+                this.filters[i].gain.value      = 0;  // Not used
             }
 
             this.mix      = context.createGain();
             this.feedback = context.createGain();
 
-            //Initialize parameters
+            // Initialize parameters
             this.depth.gain.value    = 0;
             this.rate.value          = 0;
             this.mix.gain.value      = 0;
             this.feedback.gain.value = 0;
             this.depthRate           = 0;
 
-            //Phaser is not connected by default
+            // Phaser is not connected by default
             this.state(false);
 
-            //LFO
-            //GainNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
+            // LFO
+            // GainNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
             this.lfo.connect(this.depth);
 
             for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
@@ -5454,7 +5459,7 @@
         /** @override */
         Phaser.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5464,7 +5469,7 @@
                 switch (k) {
                     case 'stage' :
                         if (value === undefined) {
-                            return this.numberOfStages;  //Getter
+                            return this.numberOfStages;  // Getter
                         } else {
                             var v   = parseInt(value);
                             var min = 0;
@@ -5480,14 +5485,14 @@
                     case 'frequency' :
                     case 'cutoff'    :
                         if (value === undefined) {
-                            return this.filters[0].frequency.value;  //Getter
+                            return this.filters[0].frequency.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.filters[0].frequency.minValue || 10;
                             var max = this.filters[0].frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
                                     this.filters[i].frequency.value = v;
                                 }
@@ -5499,7 +5504,7 @@
                         break;
                     case 'resonance' :
                         if (value === undefined) {
-                            return this.filters[0].Q.value;  //Getter
+                            return this.filters[0].Q.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.filters[0].Q.minValue || 0.0001;
@@ -5507,7 +5512,7 @@
 
                             if ((v >= min) && (v <= max)) {
                                 for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
-                                    this.filters[0].Q.value = v;  //Setter
+                                    this.filters[0].Q.value = v;  // Setter
                                 }
                             }
                         }
@@ -5515,14 +5520,14 @@
                         break;
                     case 'depth' :
                         if (value === undefined) {
-                            return this.depthRate;  //Getter
+                            return this.depthRate;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = this.filters[0].frequency.value;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.depth.gain.value = this.filters[0].frequency.value * v;
                                 this.depthRate        = v;
                             }
@@ -5531,14 +5536,14 @@
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                            return this.rate.value;  //Getter
+                            return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
@@ -5546,14 +5551,14 @@
                     case 'mix'      :
                     case 'feedback' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
@@ -5568,7 +5573,7 @@
 
         /** @override */
         Phaser.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
 
             for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
@@ -5578,12 +5583,12 @@
             this.mix.disconnect(0);
             this.feedback.disconnect(0);
 
-            //GainNode (input) -> GainNode (output)
+            // GainNode (input) -> GainNode (output)
             this.input.connect(this.output);
 
-            //Effect ON
+            // Effect ON
             if (this.isActive && (this.numberOfStages > 0)) {
-                //GainNode (input) -> BiquadFilterNode (allpass) (* 12) -> GainNode (mix) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (allpass) (* 12) -> GainNode (mix) -> GainNode (output)
                 this.input.connect(this.filters[0]);
 
                 for (var i = 0; i < this.numberOfStages; i++) {
@@ -5593,8 +5598,8 @@
                         this.filters[i].connect(this.mix);
                         this.mix.connect(this.output);
 
-                        //Feedback
-                        //GainNode (input) -> BiquadFilterNode (allpass) (* 12) -> GainNode (feedback) -> BiquadFilterNode (allpass) (* 12) ...
+                        // Feedback
+                        // GainNode (input) -> BiquadFilterNode (allpass) (* 12) -> GainNode (feedback) -> BiquadFilterNode (allpass) (* 12) ...
                         this.filters[i].connect(this.feedback);
                         this.feedback.connect(this.filters[0]);
                     }
@@ -5604,12 +5609,12 @@
 
         /** @override */
         Phaser.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-               //Connect nodes again
+               // Connect nodes again
                this.lfo.connect(this.depth);
 
                for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
@@ -5633,7 +5638,7 @@
          * @extends {Effector}
          */
         function Flanger(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.delay    = context.createDelay();
@@ -5641,7 +5646,7 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            //Initialize parameters
+            // Initialize parameters
             this.delay.delayTime.value = 0;
             this.depth.gain.value      = 0;
             this.rate.value            = 0;
@@ -5649,15 +5654,15 @@
             this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
-            this.tone.gain.value       = 0;  //Not used
+            this.tone.gain.value       = 0;  // Not used
             this.feedback.gain.value   = 0;
             this.depthRate             = 0;
 
-            //Flanger is not connected by default
+            // Flanger is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
             this.lfo.connect(this.depth);
             this.depth.connect(this.delay.delayTime);
         }
@@ -5665,7 +5670,7 @@
         /** @override */
         Flanger.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5676,14 +5681,14 @@
                     case 'delaytime' :
                     case 'time'      :
                         if (value === undefined) {
-                            return this.delay.delayTime.value;  //Getter
+                            return this.delay.delayTime.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.delay.delayTime.value = v;
                                 this.depth.gain.value      = this.delay.delayTime.value * this.depthRate;
                             }
@@ -5692,7 +5697,7 @@
                         break;
                     case 'depth' :
                         if (value === undefined) {
-                            //Getter
+                            // Getter
                             return this.depthRate;
                         } else {
                             var v   = parseFloat(value);
@@ -5700,7 +5705,7 @@
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.depth.gain.value = this.delay.delayTime.value * v;
                                 this.depthRate        = v;
                             }
@@ -5709,14 +5714,14 @@
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                            return this.rate.value;  //Getter
+                            return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
@@ -5724,28 +5729,28 @@
                     case 'mix'      :
                     case 'feedback' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'tone' :
                         if (value === undefined) {
-                            return this.tone.frequency.value; //Getter
+                            return this.tone.frequency.value; // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                this.tone.frequency.value = v;  //Setter
+                                this.tone.frequency.value = v;  // Setter
                             }
                         }
 
@@ -5760,26 +5765,26 @@
 
         /** @override */
         Flanger.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.delay.disconnect(0);
             this.mix.disconnect(0);
             this.tone.disconnect(0);
             this.feedback.disconnect(0);
 
-            //GainNode (input) -> GainNode (output)
+            // GainNode (input) -> GainNode (output)
             this.input.connect(this.output);
 
-            //Effect ON
+            // Effect ON
             if (this.isActive) {
-                //GainNode (input) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (mix) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (mix) -> GainNode (output)
                 this.input.connect(this.tone);
                 this.tone.connect(this.delay);
                 this.delay.connect(this.mix);
                 this.mix.connect(this.output);
 
-                //Feedback
-                //GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
+                // Feedback
+                // GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
                 this.delay.connect(this.feedback);
                 this.feedback.connect(this.delay);
             }
@@ -5787,12 +5792,12 @@
 
         /** @override */
         Flanger.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.delay.delayTime);
             }
@@ -5813,7 +5818,7 @@
          * @extends {Effector}
          */
         function Chorus(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.delay    = context.createDelay();
@@ -5821,7 +5826,7 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            //Initialize parameters
+            // Initialize parameters
             this.delay.delayTime.value = 0;
             this.depth.gain.value      = 0;
             this.rate.value            = 0;
@@ -5829,15 +5834,15 @@
             this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
-            this.tone.gain.value       = 0;  //Not used
+            this.tone.gain.value       = 0;  // Not used
             this.feedback.gain.value   = 0;
             this.depthRate             = 0;
 
-            //Chorus is not connected by default
+            // Chorus is not connected by default
             this.state(false);
 
-            //LFO
-            //OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (DelayNode.delayTime)
             this.lfo.connect(this.depth);
             this.depth.connect(this.delay.delayTime);
         }
@@ -5845,7 +5850,7 @@
         /** @override */
         Chorus.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -5856,14 +5861,14 @@
                     case 'delaytime' :
                     case 'time'      :
                         if (value === undefined) {
-                            return this.delay.delayTime.value;  //Getter
+                            return this.delay.delayTime.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.delay.delayTime.value = v;
                                 this.depth.gain.value      = this.delay.delayTime.value * this.depthRate;
                             }
@@ -5872,7 +5877,7 @@
                         break;
                     case 'depth' :
                         if (value === undefined) {
-                            //Getter
+                            // Getter
                             return this.depthRate;
                         } else {
                             var v   = parseFloat(value);
@@ -5880,7 +5885,7 @@
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.depth.gain.value = this.delay.delayTime.value * v;
                                 this.depthRate        = v;
                             }
@@ -5889,14 +5894,14 @@
                         break;
                     case 'rate' :
                         if (value === undefined) {
-                            return this.rate.value;  //Getter
+                            return this.rate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
 
                             if ((v >= min) && (v <= max)) {
-                                this.rate.value = v;  //Setter
+                                this.rate.value = v;  // Setter
                             }
                         }
 
@@ -5904,28 +5909,28 @@
                     case 'mix'      :
                     case 'feedback' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'tone' :
                         if (value === undefined) {
-                            return this.tone.frequency.value; //Getter
+                            return this.tone.frequency.value; // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                this.tone.frequency.value = v;  //Setter
+                                this.tone.frequency.value = v;  // Setter
                             }
                         }
 
@@ -5940,26 +5945,26 @@
 
         /** @override */
         Chorus.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.delay.disconnect(0);
             this.mix.disconnect(0);
             this.tone.disconnect(0);
             this.feedback.disconnect(0);
 
-            //GainNode (input) -> GainNode (output)
+            // GainNode (input) -> GainNode (output)
             this.input.connect(this.output);
 
-            //Effect ON
+            // Effect ON
             if (this.isActive) {
-                //GainNode (input) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (mix) -> GainNode (output)
+                // GainNode (input) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (mix) -> GainNode (output)
                 this.input.connect(this.tone);
                 this.tone.connect(this.delay);
                 this.delay.connect(this.mix);
                 this.mix.connect(this.output);
 
-                //Feedback
-                //GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
+                // Feedback
+                // GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
                 this.delay.connect(this.feedback);
                 this.feedback.connect(this.delay);
             }
@@ -5967,12 +5972,12 @@
 
         /** @override */
         Chorus.prototype.stop = function(stopTime, releaseTime) {
-            //Call superclass method
+            // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
-            //Effector's state is active ?
+            // Effector's state is active ?
             if (this.isActive) {
-                //Connect nodes again
+                // Connect nodes again
                 this.lfo.connect(this.depth);
                 this.depth.connect(this.delay.delayTime);
             }
@@ -5993,10 +5998,10 @@
          * @extends {Effector}
          */
         function Delay(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
-            //Max delay time is 5000 [ms]
+            // Max delay time is 5000 [ms]
             this.MAX_DELAY_TIME = 5;
 
             this.delay    = context.createDelay(this.MAX_DELAY_TIME);
@@ -6005,24 +6010,24 @@
             this.tone     = context.createBiquadFilter();
             this.feedback = context.createGain();
 
-            //Initialize parameters
+            // Initialize parameters
             this.delay.delayTime.value = 0;
             this.dry.gain.value        = 1;
             this.wet.gain.value        = 0;
             this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
-            this.tone.gain.value       = 0;  //Not used
+            this.tone.gain.value       = 0;  // Not used
             this.feedback.gain.value   = 0;
 
-            //Delay is not connected by default
+            // Delay is not connected by default
             this.state(false);
         };
 
         /** @override */
         Delay.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -6033,14 +6038,14 @@
                     case 'delaytime' :
                     case 'time'      :
                         if (value === undefined) {
-                            return this.delay.delayTime.value;  //Getter
+                            return this.delay.delayTime.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || this.MAX_DELAY_TIME;
 
                             if ((v >= min) && (v <= max)) {
-                                this.delay.delayTime.value = v;  //Setter
+                                this.delay.delayTime.value = v;  // Setter
                             }
                         }
 
@@ -6049,28 +6054,28 @@
                     case 'wet'      :
                     case 'feedback' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'tone' :
                         if (value === undefined) {
-                            return this.tone.frequency.value; //Getter
+                            return this.tone.frequency.value; // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                this.tone.frequency.value = v;  //Setter
+                                this.tone.frequency.value = v;  // Setter
                             }
                         }
 
@@ -6085,7 +6090,7 @@
 
         /** @override */
         Delay.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.delay.disconnect(0);
             this.dry.disconnect(0);
@@ -6094,26 +6099,26 @@
             this.feedback.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> GainNode (dry) -> GainNode (output)
+                // GainNode (input) -> GainNode (dry) -> GainNode (output)
                 this.input.connect(this.dry);
                 this.dry.connect(this.output);
 
-                //(GainNode (input)) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (wet) -> GainNode (output)
+                // (GainNode (input)) -> BiquadFilterNode (tone) -> DelayNode -> GainNode (wet) -> GainNode (output)
                 this.input.connect(this.tone);
                 this.tone.connect(this.delay);
                 this.delay.connect(this.wet);
                 this.wet.connect(this.output);
 
-                //Feedback
-                //GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
+                // Feedback
+                // GainNode (input) -> DelayNode -> GainNode (feedback) -> DelayNode ...
                 this.delay.connect(this.feedback);
                 this.feedback.connect(this.delay);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -6131,7 +6136,7 @@
          * @extends {Effector}
          */
         function Reverb(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.rirs      = [];
@@ -6140,27 +6145,27 @@
             this.wet       = context.createGain();
             this.tone     = context.createBiquadFilter();
 
-            //Callback for create the instance of AudioBuffer
+            // Callback for create the instance of AudioBuffer
             this.decodeAudioData = function(impulse, successCallback, errorCallback) {
                 context.decodeAudioData(impulse, successCallback, errorCallback);
             };
 
-            //Initialize parameters
+            // Initialize parameters
             this.dry.gain.value        = 1;
             this.wet.gain.value        = 0;
             this.tone.type             = (Object.prototype.toString.call(this.tone.type) === '[object String]') ? 'lowpass' : (this.tone.LOWPASS || 0);
             this.tone.frequency.value  = 350;
             this.tone.Q.value          = Math.SQRT1_2;
-            this.tone.gain.value       = 0;  //Not used
+            this.tone.gain.value       = 0;  // Not used
 
-            //Reverb is not connected by default
+            // Reverb is not connected by default
             this.state(false);
         }
 
         /** @override */
         Reverb.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -6170,21 +6175,21 @@
                 switch (k) {
                     case 'type' :
                         if (value === undefined) {
-                            return this.convolver.buffer;  //Getter
+                            return this.convolver.buffer;  // Getter
                         } else {
                             var v   = parseInt(value);
                             var min = 0;
                             var max = this.rirs.length - 1;
 
                             if (value === null) {
-                                this.convolver.buffer = null;  //Setter
+                                this.convolver.buffer = null;  // Setter
 
-                                //If "buffer" in ConvolverNode is null after set the instance of AudioBuffer, Reverb is not OFF.
-                                //Thefore, Reverb is OFF by disconnecting nodes.
+                                // If "buffer" in ConvolverNode is null after set the instance of AudioBuffer, Reverb is not OFF.
+                                // Thefore, Reverb is OFF by disconnecting nodes.
                                 this.input.disconnect(0);
                                 this.input.connect(this.output);
                             } else if ((v >= min) && (v <= max)) {
-                                this.convolver.buffer = this.rirs[v];  //Setter
+                                this.convolver.buffer = this.rirs[v];  // Setter
                                 this.connect();
                             }
                         }
@@ -6193,34 +6198,34 @@
                     case 'dry' :
                     case 'wet' :
                         if (value === undefined) {
-                            return this[k].gain.value;  //Getter
+                            return this[k].gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this[k].gain.value = v;  //Setter
+                                this[k].gain.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'tone' :
                         if (value === undefined) {
-                            return this.tone.frequency.value; //Getter
+                            return this.tone.frequency.value; // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                this.tone.frequency.value = v;  //Setter
+                                this.tone.frequency.value = v;  // Setter
                             }
                         }
 
                         break;
                     case 'rirs' :
-                        return this.rirs;  //Getter only
+                        return this.rirs;  // Getter only
                     default :
                         break;
                 }
@@ -6231,7 +6236,7 @@
 
         /** @override */
         Reverb.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.convolver.disconnect(0);
             this.dry.disconnect(0);
@@ -6239,21 +6244,21 @@
             this.tone.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> GainNode (dry) -> GainNode (output)
+                // GainNode (input) -> GainNode (dry) -> GainNode (output)
                 this.input.connect(this.dry);
                 this.dry.connect(this.output);
 
-                //GainNode (input) -> ConvolverNode -> GainNode (mix) -> GainNode (output)
+                // GainNode (input) -> ConvolverNode -> GainNode (mix) -> GainNode (output)
                 this.input.connect(this.tone);
                 this.tone.connect(this.convolver);
                 this.convolver.connect(this.wet);
                 this.wet.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -6268,21 +6273,21 @@
          */
         Reverb.prototype.start = function(impulse, errorCallback) {
             if ((impulse instanceof AudioBuffer) || (impulse === null)) {
-                this.convolver.buffer = impulse;  //Set the instance of AudioBuffer
-                this.rirs.push(impulse);          //Add to preset
+                this.convolver.buffer = impulse;  // Set the instance of AudioBuffer
+                this.rirs.push(impulse);          // Add to preset
             } else if (impulse instanceof ArrayBuffer) {
                 var self = this;
 
                 var successCallback = function(buffer) {
-                    self.convolver.buffer = buffer;  //Set the instance of AudioBuffer
-                    self.rirs.push(buffer);          //Add to preset
+                    self.convolver.buffer = buffer;  // Set the instance of AudioBuffer
+                    self.rirs.push(buffer);          // Add to preset
                 };
 
                 if (Object.prototype.toString.call(errorCallback) !== '[object Function]') {
                     errorCallback = function() {};
                 }
 
-                //Asynchronously
+                // Asynchronously
                 this.decodeAudioData(impulse, successCallback, errorCallback);
             }
 
@@ -6300,7 +6305,7 @@
          * @override
          */
         Reverb.prototype.preset = function(rirs, timeout, successCallback, errorCallback, progressCallback) {
-            //The argument is associative array ?
+            // The argument is associative array ?
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
                 var properties = arguments[0];
 
@@ -6317,31 +6322,31 @@
 
             this.rirs = new Array(rirs.length);
 
-            //for errorCallback
+            // for errorCallback
             var ERROR_AJAX         = 'error';
             var ERROR_AJAX_TIMEOUT = 'timeout';
             var ERROR_DECODE       = 'decode';
 
-            //If the error is at least 1, this method aborts the all of connections.
-            //Therefore, this flag are shared with the all instances of XMLHttpRequest.
+            // If the error is at least 1, this method aborts the all of connections.
+            // Therefore, this flag are shared with the all instances of XMLHttpRequest.
             var isError = false;
 
             var t = parseInt(timeout);
 
             var self = this;
 
-            //Get ArrayBuffer by Ajax -> Create the instances of AudioBuffer
+            // Get ArrayBuffer by Ajax -> Create the instances of AudioBuffer
             var load = function(url, index) {
                 var xhr = new XMLHttpRequest();
 
                 if ((FULL_MODE === undefined) || FULL_MODE) {
-                    //XMLHttpRequest Level 2
+                    // XMLHttpRequest Level 2
                     xhr.responseType = 'arraybuffer';
                 } else {
                     xhr.overrideMimeType('text/plain; charset=x-user-defined');
                 }
 
-                //Timeout
+                // Timeout
                 xhr.timeout = (t > 0) ? t : 60000;
 
                 xhr.ontimeout = function(event) {
@@ -6352,7 +6357,7 @@
                     isError = true;
                 };
 
-                //Progress
+                // Progress
                 xhr.onprogresss = function(event) {
                     if (isError) {
                         xhr.abort();
@@ -6361,7 +6366,7 @@
                     }
                 };
 
-                //Error
+                // Error
                 xhr.onerror = function(event) {
                     if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
                         errorCallback(event, ERROR_AJAX);
@@ -6370,7 +6375,7 @@
                     isError = true;
                 };
 
-                //Success
+                // Success
                 xhr.onload = function(event) {
                     if (xhr.status === 200) {
                         var arrayBuffer = null;
@@ -6381,9 +6386,9 @@
                             }
 
                             var decodeSuccessCallback = function(audioBuffer) {
-                                self.rirs[index] = audioBuffer;  //Save instance of AudioBuffer
+                                self.rirs[index] = audioBuffer;  // Save instance of AudioBuffer
 
-                                //The creating the instances of AudioBuffer has completed ?
+                                // The creating the instances of AudioBuffer has completed ?
                                 for (var i = 0, len = self.rirs.length; i < len; i++) {
                                     if (self.rirs[i] === undefined) {
                                         return;
@@ -6401,7 +6406,7 @@
                                 }
                             };
 
-                            //Create instance of AudioBuffer (Asynchronously)
+                            // Create instance of AudioBuffer (Asynchronously)
                             self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
                         };
 
@@ -6454,10 +6459,10 @@
 
             for (var i = 0, len = rirs.length; i < len; i++) {
                 if (Object.prototype.toString.call(rirs[i]) === '[object String]') {
-                    //Get the instances of AudioBuffer from the designated URLs.
+                    // Get the instances of AudioBuffer from the designated URLs.
                     load.call(this, rirs[i], i);
                 } else if (rirs[i] instanceof AudioBuffer) {
-                    //Get the instances of AudioBuffer directly
+                    // Get the instances of AudioBuffer directly
                     this.rirs[i] = rirs[i];
                 }
             }
@@ -6468,16 +6473,16 @@
         /** @override */
         Reverb.prototype.state = function(value) {
             if (value === undefined) {
-                return this.isActive;  //Getter
+                return this.isActive;  // Getter
             } else if (String(value).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  //Setter
+                this.isActive = !this.isActive;  // Setter
             } else {
-                this.isActive = Boolean(value);  //Setter
+                this.isActive = Boolean(value);  // Setter
             }
 
-            //In the case of setter
+            // In the case of setter
 
-            //Change connection
+            // Change connection
             this.connect();
 
             return this;
@@ -6496,7 +6501,7 @@
          * @extends {Effector}
          */
         function Panner(context, bufferSize) {
-            //Call superclass constructor
+            // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
             this.panner = context.createPanner();
@@ -6520,14 +6525,14 @@
             this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
             this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
 
-            //Panner is not connected by default
+            // Panner is not connected by default
             this.state(false);
         }
 
         /** @override */
         Panner.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -6539,12 +6544,12 @@
                     case 'y' :
                     case 'z' :
                         if (value === undefined) {
-                            return this.positions[k];  //Getter
+                            return this.positions[k];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.positions[k] = v;
                                 this.panner.setPosition(this.positions.x, this.positions.y, this.positions.z);
                             }
@@ -6555,12 +6560,12 @@
                     case 'oy' :
                     case 'oz' :
                         if (value === undefined) {
-                            return this.orientations[k.charAt(1)];  //Getter
+                            return this.orientations[k.charAt(1)];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.orientations[k.charAt(1)] = v;
                                 this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
                             }
@@ -6571,12 +6576,12 @@
                     case 'vy' :
                     case 'vz' :
                         if (value === undefined) {
-                            return this.velocities[k.charAt(1)];  //Getter
+                            return this.velocities[k.charAt(1)];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                //Setter
+                                // Setter
                                 this.velocities[k.charAt(1)] = v;
                                 this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
                             }
@@ -6585,79 +6590,79 @@
                         break;
                     case 'refdistance' :
                         if (value === undefined) {
-                            return this.panner.refDistance;  //Getter
+                            return this.panner.refDistance;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.refDistance = v;  //Setter
+                                this.panner.refDistance = v;  // Setter
                             }
                         }
 
                         break;
                     case 'maxdistance' :
                         if (value === undefined) {
-                            return this.panner.maxDistance;  //Getter
+                            return this.panner.maxDistance;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.maxDistance = v;  //Setter
+                                this.panner.maxDistance = v;  // Setter
                             }
                         }
 
                         break;
                     case 'rollofffactor' :
                         if (value === undefined) {
-                            return this.panner.rolloffFactor;  //Getter
+                            return this.panner.rolloffFactor;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.rolloffFactor = v;  //Setter
+                                this.panner.rolloffFactor = v;  // Setter
                             }
                         }
 
                         break;
                     case 'coneinnerangle' :
                         if (value === undefined) {
-                            return this.panner.coneInnerAngle;  //Getter
+                            return this.panner.coneInnerAngle;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.coneInnerAngle = v;  //Setter
+                                this.panner.coneInnerAngle = v;  // Setter
                             }
                         }
 
                         break;
                     case 'coneouterangle' :
                         if (value === undefined) {
-                            return this.panner.coneOuterAngle;  //Getter
+                            return this.panner.coneOuterAngle;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.coneOuterAngle = v;  //Setter
+                                this.panner.coneOuterAngle = v;  // Setter
                             }
                         }
 
                         break;
                     case 'coneoutergain' :
                         if (value === undefined) {
-                            return this.panner.coneOuterGain;  //Getter
+                            return this.panner.coneOuterGain;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
-                                this.panner.coneOuterGain = v;  //Setter
+                                this.panner.coneOuterGain = v;  // Setter
                             }
                         }
 
                         break;
                     case 'panningmodel' :
                         if (value === undefined) {
-                            return this.panner.panningModel;  //Getter
+                            return this.panner.panningModel;  // Getter
                         } else {
                             var v = /HRTF/i.test(value) ? String(value).toUpperCase() : String(value).toLowerCase();
 
@@ -6667,14 +6672,14 @@
                             };
 
                             if (v in MODELS) {
-                                this.panner.panningModel = (Object.prototype.toString.call(this.panner.panningModel) === '[object String]') ? v : MODELS[v];  //Setter
+                                this.panner.panningModel = (Object.prototype.toString.call(this.panner.panningModel) === '[object String]') ? v : MODELS[v];  // Setter
                             }
                         }
 
                         break;
                     case 'distancemodel' :
                         if (value === undefined) {
-                            return this.panner.distanceModel;  //Setter
+                            return this.panner.distanceModel;  // Setter
                         } else {
                             var v = String(value).replace(/-/g, '').toLowerCase();
 
@@ -6685,7 +6690,7 @@
                             };
 
                             if (v in MODELS) {
-                                this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? v : MODELS[v];  //Setter
+                                this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? v : MODELS[v];  // Setter
                             }
                         }
 
@@ -6700,20 +6705,20 @@
 
         /** @override */
         Panner.prototype.connect = function() {
-            //Clear connection
+            // Clear connection
             this.input.disconnect(0);
             this.panner.disconnect(0);
 
             if (this.isActive) {
-                //Effect ON
+                // Effect ON
 
-                //GainNode (input) -> PannerNode -> GainNode (output)
+                // GainNode (input) -> PannerNode -> GainNode (output)
                 this.input.connect(this.panner);
                 this.panner.connect(this.output);
             } else {
-                //Effect OFF
+                // Effect OFF
 
-                //GainNode (input) -> GainNode (output)
+                // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
         };
@@ -6731,10 +6736,10 @@
         function EnvelopeGenerator(context) {
             this.context   = context;
 
-            //{@type Array.<GainNode>}
+            /** @type {Array.<GainNode>} */
             this.generators = [];
 
-            //for GainNode
+            // for GainNode
             this.activeIndexes = [];
             this.activeCounter = 0;
 
@@ -6753,7 +6758,7 @@
          */
         EnvelopeGenerator.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -6766,12 +6771,12 @@
                     case 'sustain' :
                     case 'release' :
                         if (value === undefined) {
-                            return this[k];  //Getter
+                            return this[k];  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
-                                this[k] = v;  //Setter
+                                this[k] = v;  // Setter
                             }
                         }
 
@@ -6804,7 +6809,7 @@
                 } else {
                     counter++;
 
-                    //the all of schedulings are stopped ?
+                    // the all of schedulings are stopped ?
                     if (counter === this.activeCounter) {
                         return true;
                     }
@@ -6843,7 +6848,7 @@
                 s = this.context.currentTime;
             }
 
-            //Attack -> Decay -> Sustain
+            // Attack -> Decay -> Sustain
             var t0      = s;
             var t1      = t0 + this.attack;
             var t2      = this.decay;
@@ -6856,14 +6861,14 @@
                     continue;
                 }
 
-                //Start from gain.value = 0
+                // Start from gain.value = 0
                 this.generators[activeIndex].gain.cancelScheduledValues(t0);
                 this.generators[activeIndex].gain.setValueAtTime(0, t0);
 
-                //Attack : gain.value increases linearly until assigned time (t1)
+                // Attack : gain.value increases linearly until assigned time (t1)
                 this.generators[activeIndex].gain.linearRampToValueAtTime(1, t1);
 
-                //Decay -> Sustain : gain.value gradually decreases to value of sustain during of Decay time (t2) from assigned time (t1)
+                // Decay -> Sustain : gain.value gradually decreases to value of sustain during of Decay time (t2) from assigned time (t1)
                 this.generators[activeIndex].gain.setTargetAtTime(t2Value, t1, t2);
             }
 
@@ -6882,7 +6887,7 @@
                 s = this.context.currentTime;
             }
 
-            //Sustain -> Release
+            // Sustain -> Release
             var t3 = s;
             var t4 = this.release;
 
@@ -6893,11 +6898,11 @@
                     continue;
                 }
 
-                //in the case of mouseup on the way of Decay
+                // in the case of mouseup on the way of Decay
                 this.generators[activeIndex].gain.cancelScheduledValues(t3);
                 this.generators[activeIndex].gain.setValueAtTime(this.generators[activeIndex].gain.value, t3);
 
-                //Release : gain.value gradually decreases to 0 during of Release time (t4) from assigned time (t3)
+                // Release : gain.value gradually decreases to 0 during of Release time (t4) from assigned time (t3)
                 this.generators[activeIndex].gain.setTargetAtTime(0, t3, t4);
             }
 
@@ -6920,17 +6925,17 @@
             return '[OscillatorModule EnvelopeGenerator]';
         };
 
-        //Create the instances of private class
+        // Create the instances of private class
 
         this.listener = new Listener(context);
         this.analyser = new Analyser(context);
         this.recorder = new Recorder(context, this.BUFFER_SIZE, this.NUM_INPUT, this.NUM_OUTPUT);
         this.session  = new Session(context, this.BUFFER_SIZE, this.NUM_INPUT, this.NUM_OUTPUT, this.analyser);
 
-        //for OscillatorModule, OneshotModule
+        // for OscillatorModule, OneshotModule
         this.eg = new EnvelopeGenerator(context);
 
-        //Create the instances of Effector's subclass
+        // Create the instances of Effector's subclass
         this.compressor    = new Compressor(context, this.BUFFER_SIZE);
         this.distortion    = new Distortion(context, this.BUFFER_SIZE);
         this.wah           = new Wah(context, this.BUFFER_SIZE);
@@ -6946,7 +6951,7 @@
         this.reverb        = new Reverb(context, this.BUFFER_SIZE);
         this.panner        = new Panner(context, this.BUFFER_SIZE);
 
-        //The default order for connection
+        // The default order for connection
         this.modules = [
             this.panner,
             this.compressor,
@@ -6981,14 +6986,14 @@
         switch (k) {
             case 'mastervolume' :
                 if (value === undefined) {
-                    return this.masterVolume.gain.value;  //Getter
+                    return this.masterVolume.gain.value;  // Getter
                 } else {
                     var v   = parseFloat(value);
                     var min = this.masterVolume.gain.minValue || 0;
                     var max = this.masterVolume.gain.maxValue || 1;
 
                     if ((v >= min) && (v <= max)) {
-                        this.masterVolume.gain.value = v;  //Setter
+                        this.masterVolume.gain.value = v;  // Setter
                     }
                 }
 
@@ -7032,14 +7037,14 @@
      * @return {SoundModule} This is returned for method chain.
      */
     SoundModule.prototype.connect = function(source, connects) {
-        //Customize connection ?
+        // Customize connection ?
         if (Array.isArray(connects)) {
             this.modules = connects;
         }
 
-        //Start connection
-        //source -> node -> ... -> node -> GainNode (masterVolume) -> AnalyserNode (analyser) -> AudioDestinationNode (output)
-        source.disconnect(0);  //Clear connection
+        // Start connection
+        // source -> node -> ... -> node -> GainNode (masterVolume) -> AnalyserNode (analyser) -> AudioDestinationNode (output)
+        source.disconnect(0);  // Clear connection
 
         if (this.modules.length > 0) {
             source.connect(this.modules[0].input);
@@ -7048,11 +7053,11 @@
         }
 
         for (var i = 0, len = this.modules.length; i < len; i++) {
-            //Clear connection
+            // Clear connection
             this.modules[i].output.disconnect(0);
 
             if (i < (this.modules.length - 1)) {
-                //Connect to next node
+                // Connect to next node
                 this.modules[i].output.connect(this.modules[i + 1].input);
             } else {
                 this.modules[i].output.connect(this.masterVolume);
@@ -7062,11 +7067,11 @@
         this.masterVolume.connect(this.analyser.input);
         this.analyser.output.connect(this.context.destination);
 
-        //for recording
+        // for recording
         this.masterVolume.connect(this.recorder.processor);
         this.recorder.processor.connect(this.context.destination);
 
-        //for session
+        // for session
         this.masterVolume.connect(this.session.sender);
         this.session.sender.connect(this.context.destination);
 
@@ -7103,28 +7108,28 @@
                 return this[m];
             case 'eg' :
                 if (m in this) {
-                    return this[m];  //OscillatorModule, OneshotModule
+                    return this[m];  // OscillatorModule, OneshotModule
                 }
 
-                //No break;
+                // No break;
             case 'glide' :
                 if (m in this) {
-                    return this[m];  //OscillatorModule
+                    return this[m];  // OscillatorModule
                 }
 
-                //No break;
+                // No break;
             case 'vocalcanceler' :
                 if (m in this) {
-                    return this[m];  //AudioModule, MediaModule
+                    return this[m];  // AudioModule, MediaModule
                 }
 
-                //No break;
+                // No break;
             case 'noisegate' :
                 if (m in this) {
-                    return this[m];  //StreamModule
+                    return this[m];  // StreamModule
                 }
 
-                //No break;
+                // No break;
             default :
                 for (var i = 0, len = this.plugins.length; i < len; i++) {
                     if (m === this.plugins[i].name) {
@@ -7184,7 +7189,7 @@
         this.tremolo.stop(s);
         this.ringmodulator.stop(s);
         this.wah.stop(s);
-        //this.filter.stop(s);
+        // this.filter.stop(s);
 
         if (isPlugin) {
             for (var i = 0, len = this.plugins.length; i < len; i++) {
@@ -7224,22 +7229,22 @@
      * @extends {SoundModule}
      */
     function OscillatorModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         SoundModule.call(this, context);
 
         /** @type {Array.<Oscillator>} */
         this.sources = [];
 
-        //for scheduling
+        // for scheduling
         this.times = {
             start : 0,
             stop  : 0
         };
 
-        //This flag determines whether drawing sound wave is executing
+        // This flag determines whether drawing sound wave is executing
         this.isAnalyser = false;
 
-        //Create the instances of private class
+        // Create the instances of private class
         this.glide = new Glide(context);
 
         /** 
@@ -7251,13 +7256,13 @@
             this.context = context;
 
             this.frequencies = {
-                start : -1,  //Abnormal value for the 1st sound
+                start : -1,  // Abnormal value for the 1st sound
                 end   : 0
             };
 
             this.rate = 0;
-            this.time = 0;         //Glide time
-            this.type = 'linear';  //'linear' or 'exponential'
+            this.time = 0;         // Glide time
+            this.type = 'linear';  // 'linear' or 'exponential'
         };
 
         /** 
@@ -7269,7 +7274,7 @@
          */
         Glide.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -7279,24 +7284,24 @@
                 switch (k) {
                     case 'time' :
                         if (value === undefined) {
-                            return this.time;  //Getter
+                            return this.time;  // Getter
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
-                                this.time = v;  //Setter
+                                this.time = v;  // Setter
                             }
                         }
 
                         break;
                     case 'type' :
                         if (value === undefined) {
-                            return this.type;  //Getter
+                            return this.type;  // Getter
                         } else {
                             var v = String(value).toLowerCase();
 
                             if ((v === 'linear') || (v === 'exponential')) {
-                                this.type = v;  //Setter
+                                this.type = v;  // Setter
                             }
                         }
 
@@ -7320,10 +7325,10 @@
             var diff = (this.frequencies.start === -1) ? 0 : (this.frequencies.end - this.frequencies.start);
 
             if ((this.frequencies.start === -1) || (this.time === 0) || (diff === 0)) {
-                //The 1st sound or Glide OFF or The same sound
+                // The 1st sound or Glide OFF or The same sound
                 this.frequencies.start = this.frequencies.end;
             } else {
-                //Since the 2nd sound
+                // Since the 2nd sound
                 this.rate = diff / this.time;
             }
 
@@ -7346,7 +7351,7 @@
             var t0 = s;
             var t1 = t0 + this.time;
 
-            //Start Glide
+            // Start Glide
             oscillator.frequency.cancelScheduledValues(t0);
             oscillator.frequency.setValueAtTime(this.frequencies.start, t0);
             oscillator.frequency[this.type + 'RampToValueAtTime'](this.frequencies.end, t1);
@@ -7359,7 +7364,7 @@
          * @return {Glide} This is returned for method chain.
          */
         Glide.prototype.stop = function() {
-            //Stop Glide or on the way of Glide
+            // Stop Glide or on the way of Glide
             this.frequencies.start = this.frequencies.end;
             return this;
         };
@@ -7393,25 +7398,25 @@
          * @implements {Statable}
          */
         function Oscillator(context, state) {
-            //Call interface constructor
+            // Call interface constructor
             Statable.call(this);
 
             this.isActive = state;
 
-            //for creating instance of OscillatorNode again
+            // for creating instance of OscillatorNode again
             this.context = context;
 
-            //Create the instance of OscillatorNode
+            // Create the instance of OscillatorNode
             this.source = context.createOscillator();
 
-            //for legacy browsers
+            // for legacy browsers
             this.source.setPeriodicWave = this.source.setPeriodicWave || this.source.setWaveTable;
             this.source.start           = this.source.start           || this.source.noteOn;
             this.source.stop            = this.source.stop            || this.source.noteOff;
 
             this.volume = context.createGain();
 
-            //in order to not call in duplicate "start" or "stop"  method in the instance of OscillatorNode
+            // in order to not call in duplicate "start" or "stop"  method in the instance of OscillatorNode
             this.isStop = true;
 
             this.octave  = 0;
@@ -7431,19 +7436,19 @@
          */
         Oscillator.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
             } else {
                 var k = String(key).replace(/-/g, '').toLowerCase();
 
-                var OCTAVE = 1200;  //1 Octave = 1200 cent
+                var OCTAVE = 1200;  // 1 Octave = 1200 cent
 
                 switch (k) {
                     case 'type' :
                         if (value === undefined) {
-                            return this.source.type;  //Getter
+                            return this.source.type;  // Getter
                         } else {
                             if (Object.prototype.toString.call(value) !== '[object Object]') {
                                 var v = String(value).toLowerCase();
@@ -7453,7 +7458,7 @@
                                 this.source.SAWTOOTH = this.source.SAWTOOTH || 2;
                                 this.source.TRIANGLE = this.source.TRIANGLE || 3;
 
-                                //for legacy browsers
+                                // for legacy browsers
                                 var WAVE_TYPE = {
                                     sine     : this.source.SINE,
                                     square   : this.source.SQUARE,
@@ -7462,10 +7467,10 @@
                                 };
 
                                 if (v in WAVE_TYPE) {
-                                    this.source.type = (Object.prototype.toString.call(this.source.type) === '[object String]') ? v : WAVE_TYPE[v];  //Setter
+                                    this.source.type = (Object.prototype.toString.call(this.source.type) === '[object String]') ? v : WAVE_TYPE[v];  // Setter
                                 }
                             } else {
-                                //Custom wave
+                                // Custom wave
                                 if (('real' in value) && ('imag' in value)) {
                                     var reals = null;
                                     var imags = null;
@@ -7483,12 +7488,12 @@
                                     }
 
                                     if ((reals instanceof Float32Array) && (imags instanceof Float32Array)) {
-                                        var MAX_SIZE = 4096;  //This size is defined by specification
+                                        var MAX_SIZE = 4096;  // This size is defined by specification
                     
                                         if (reals.length > MAX_SIZE) {reals = reals.subarray(0, MAX_SIZE);}
                                         if (imags.length > MAX_SIZE) {imags = imags.subarray(0, MAX_SIZE);}
 
-                                        //The 1st value is fixed by 0 (This is is defined by specification)
+                                        // The 1st value is fixed by 0 (This is is defined by specification)
                                         if (reals[0] !== 0) {reals[0] = 0;}
                                         if (imags[0] !== 0) {imags[0] = 0;}
 
@@ -7505,14 +7510,14 @@
                         break;
                     case 'octave' :
                         if (value === undefined) {
-                            return this.octave;  //Getter
+                            return this.octave;  // Getter
                         } else {
                             var v   = this.octave = parseFloat(value);
                             var min = (this.source.detune.minValue || -4800) / OCTAVE;
                             var max = (this.source.detune.maxValue ||  4800) / OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = this.fine + (v * OCTAVE);  //Setter
+                                this.source.detune.value = this.fine + (v * OCTAVE);  // Setter
                             }
                         }
 
@@ -7526,7 +7531,7 @@
                             var max =  OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = v + (this.octave * OCTAVE);  //Setter
+                                this.source.detune.value = v + (this.octave * OCTAVE);  // Setter
                             }
                         }
 
@@ -7534,14 +7539,14 @@
                     case 'volume' :
                     case 'gain'   :
                         if (value === undefined) {
-                            return this.volume.gain.value;  //Getter
+                            return this.volume.gain.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.volume.gain.minValue || 0;
                             var max = this.volume.gain.maxValue || 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.volume.gain.value = v;  //Setter
+                                this.volume.gain.value = v;  // Setter
                             }
                         }
 
@@ -7562,7 +7567,7 @@
          */
         Oscillator.prototype.start = function(output, startTime) {
             if (this.isActive) {
-                //for keeping value
+                // for keeping value
                 var params = {
                     type      : this.source.type,
                     frequency : this.source.frequency.value,
@@ -7576,13 +7581,13 @@
 
                 this.source = this.context.createOscillator();
 
-                //for legacy browsers
+                // for legacy browsers
                 this.source.setPeriodicWave = this.source.setPeriodicWave || this.source.setWaveTable;
                 this.source.start           = this.source.start           || this.source.noteOn;
                 this.source.stop            = this.source.stop            || this.source.noteOff;
 
                 if (params.type === 'custom') {
-                    //Custom wave
+                    // Custom wave
                     var reals        = this.customs.real;
                     var imags        = this.customs.imag;
                     var periodicWave = this.context.createPeriodicWave(reals, imags);
@@ -7595,7 +7600,7 @@
                 this.source.frequency.value = params.frequency;
                 this.source.detune.value    = params.detune;
 
-                //OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume)
+                // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume)
                 //    -> ScriptProcessorNode (composite oscillators) (-> ... -> AudioDestinationNode (output))
                 this.volume.connect(output);
 
@@ -7633,14 +7638,14 @@
         /** @override */
         Oscillator.prototype.state = function(value) {
             if (value === undefined) {
-                return this.isActive;  //Getter
+                return this.isActive;  // Getter
             } else if (String(value).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  //Setter
+                this.isActive = !this.isActive;  // Setter
             } else {
-                this.isActive = Boolean(value);  //Setter
+                this.isActive = Boolean(value);  // Setter
             }
 
-            //In the case of setter
+            // In the case of setter
             return this;
         };
 
@@ -7653,12 +7658,12 @@
             states = [states];
         }
 
-        //Create the instances of private class and the instances of GainNode for Envelope Generator
+        // Create the instances of private class and the instances of GainNode for Envelope Generator
         for (var i = 0, len = states.length ; i < len; i++) {
             this.sources[i]       = new Oscillator(this.context, Boolean(states[i]));
             this.eg.generators[i] = this.context.createGain();
 
-            //for legacy browsers
+            // for legacy browsers
             this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
         }
 
@@ -7675,14 +7680,14 @@
      */
     OscillatorModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
         } else {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
-            //Call superclass method
+            // Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
         }
 
@@ -7717,7 +7722,7 @@
     OscillatorModule.prototype.start = function(frequencies, connects, processCallback) {
         var startTime = this.context.currentTime + this.times.start;
 
-        //Validate the 1st argument
+        // Validate the 1st argument
         if (!Array.isArray(frequencies)) {
             frequencies = [frequencies];
         }
@@ -7727,12 +7732,12 @@
             frequencies[i] = (f >= 0) ? f : 0;
         }
 
-        //Clear previous
+        // Clear previous
         this.eg.clear();
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  //for Firefox
+        this.processor.onaudioprocess = null;  // for Firefox
 
-        //(... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
+        // (... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
 
         for (var i = 0, len = frequencies.length; i < len; i++) {
@@ -7743,30 +7748,30 @@
             var oscillator = this.sources[i];
             var frequency  = frequencies[i];
 
-            //Start sound
+            // Start sound
             oscillator.start(this.processor, startTime);
 
-            //OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume) (-> ...)
+            // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume) (-> ...)
             this.eg.ready(i, oscillator.source, oscillator.volume);
 
-            //Ready Glide -> Start Glide
+            // Ready Glide -> Start Glide
             this.glide.ready(frequency).start(oscillator.source, startTime);
         }
 
-        //Attack -> Decay -> Sustain
+        // Attack -> Decay -> Sustain
         this.eg.start(startTime);
 
-        //Start Effectors
+        // Start Effectors
         this.on(startTime);
 
-        //Draw sound wave
+        // Draw sound wave
         if (!this.isAnalyser) {
             this.analyser.start('time');
             this.analyser.start('fft');
             this.isAnalyser = true;
         }
 
-        //In the case of scheduling stop time
+        // In the case of scheduling stop time
         var duration = this.times.stop - this.times.start;
 
         if (duration > 0) {
@@ -7803,10 +7808,10 @@
     OscillatorModule.prototype.stop = function(processCallback) {
         var stopTime = this.context.currentTime + this.times.stop;
 
-        //Attack or Decay or Sustain -> Release
+        // Attack or Decay or Sustain -> Release
         this.eg.stop(stopTime);
 
-        //Stop Effectors
+        // Stop Effectors
         this.glide.stop();
         this.filter.stop(stopTime);
 
@@ -7824,17 +7829,17 @@
                     self.sources[i].stop(stopTime);
                 }
 
-                //Stop Effectors
+                // Stop Effectors
                 self.off(stopTime);
 
-                //Stop drawing sound wave
+                // Stop drawing sound wave
                 self.analyser.stop('time');
                 self.analyser.stop('fft');
                 self.isAnalyser = false;
 
-                //Stop onaudioprocess event
+                // Stop onaudioprocess event
                 self.processor.disconnect(0);
-                self.processor.onaudioprocess = null;  //for Firefox
+                self.processor.onaudioprocess = null;  // for Firefox
             }, ((this.times.stop + this.eg.release) * 1000));
         }
 
@@ -7850,28 +7855,28 @@
                 outputLs.set(inputLs);
                 outputRs.set(inputRs);
 
-                //Stop ?
+                // Stop ?
                 if (self.eg.isStop()) {
-                    //Stop
+                    // Stop
                     var stopTime = self.context.currentTime;
 
                     for (var i = 0, len = self.sources.length; i < len; i++) {
                         self.sources[i].stop(stopTime);
                     }
 
-                    //Stop Effectors
+                    // Stop Effectors
                     self.off(stopTime);
 
-                    //Stop drawing sound wave
+                    // Stop drawing sound wave
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
                     self.isAnalyser = false;
 
-                    //Stop onaudioprocess event
+                    // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  //for Firefox
+                    this.onaudioprocess = null;  // for Firefox
                 } else {
-                    //Release
+                    // Release
                 }
             };
         }
@@ -7921,19 +7926,19 @@
      * @extends {SoundModule}
      */
     function OneshotModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         SoundModule.call(this, context);
 
-        this.sources   = [];  //{@type Array.<AudioBufferSourceNode>}
-        this.resources = [];  //{@type Array.<string>}
-        this.buffers   = [];  //{@type Array.<AudioBuffer>}
-        this.volumes   = [];  //{@type Array.<GainNode>}
-        this.isStops   = [];  //{@type Array.<boolean>}  in order to not call in duplicate "start" or "stop"  method in the instance of AudioBufferSourceNode
+        this.sources   = [];  /** @type {Array.<AudioBufferSourceNode>} */
+        this.resources = [];  /** @type {Array.<string>} */
+        this.buffers   = [];  /** @type {Array.<AudioBuffer>} */
+        this.volumes   = [];  /** @type {Array.<GainNode>} */
+        this.isStops   = [];  /** @type {Array.<boolean>} in order to not call in duplicate "start" or "stop" method in the instance of AudioBufferSourceNode */
 
-        //for audio sources
-        this.settings = [];  //{@type Array.<object>}
+        // for audio sources
+        this.settings = [];  /** @type {Array.<object>} */
 
-        //for scheduling
+        // for scheduling
         this.times = {
             start : 0,
             stop  : 0
@@ -7943,7 +7948,7 @@
 
         this.isStop = true;
 
-        //This flag determines whether drawing sound wave is executing
+        // This flag determines whether drawing sound wave is executing
         this.isAnalyser = false;
     }
 
@@ -7963,7 +7968,7 @@
      * @override
      */
     OneshotModule.prototype.setup = function(resources, settings, timeout, successCallback, errorCallback, progressCallback) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -8011,38 +8016,38 @@
                 this.volumes[i]       = this.context.createGain();
                 this.eg.generators[i] = this.context.createGain();
 
-                //for legacy browsers
+                // for legacy browsers
                 this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
             }
 
             this.settings = settings;
         }
 
-        //for errorCallback
+        // for errorCallback
         var ERROR_AJAX         = 'error';
         var ERROR_AJAX_TIMEOUT = 'timeout';
         var ERROR_DECODE       = 'decode';
 
-        //If the error is at least 1, this method aborts the all of connections.
-        //Therefore, this flag are shared with the all instances of XMLHttpRequest.
+        // If the error is at least 1, this method aborts the all of connections.
+        // Therefore, this flag are shared with the all instances of XMLHttpRequest.
         var isError = false;
 
         var t = parseInt(timeout);
 
         var self = this;
 
-        //Get ArrayBuffer by Ajax -> Create the instances of AudioBuffer
+        // Get ArrayBuffer by Ajax -> Create the instances of AudioBuffer
         var load = function(url, index) {
             var xhr = new XMLHttpRequest();
 
             if ((FULL_MODE === undefined) || FULL_MODE) {
-                //XMLHttpRequest Level 2
+                // XMLHttpRequest Level 2
                 xhr.responseType = 'arraybuffer';
             } else {
                 xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
 
-            //Timeout
+            // Timeout
             xhr.timeout = (t > 0) ? t : 60000;
 
             xhr.ontimeout = function(error) {
@@ -8053,7 +8058,7 @@
                 isError = true;
             };
 
-            //Progress
+            // Progress
             xhr.onprogress = function(event) {
                 if (isError) {
                     xhr.abort();
@@ -8062,7 +8067,7 @@
                 }
             };
 
-            //Error
+            // Error
             xhr.onerror = function(event) {
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
                     errorCallback(event, ERROR_AJAX);
@@ -8071,7 +8076,7 @@
                 isError = true;
             };
 
-            //Success
+            // Success
             xhr.onload = function(event) {
                 if (xhr.status === 200) {
                     var arrayBuffer = null;
@@ -8082,9 +8087,9 @@
                         }
 
                         var decodeSuccessCallback = function(audioBuffer) {
-                            self.buffers[index] = audioBuffer;  //Save instance of AudioBuffer
+                            self.buffers[index] = audioBuffer;  // Save instance of AudioBuffer
 
-                            //The creating the instances of AudioBuffer has completed ?
+                            // The creating the instances of AudioBuffer has completed ?
                             for (var i = 0, len = self.buffers.length; i < len; i++) {
                                 if (self.buffers[i] === undefined) {
                                     return;
@@ -8102,7 +8107,7 @@
                             }
                         };
 
-                        //Create the instance of AudioBuffer (Asynchronously)
+                        // Create the instance of AudioBuffer (Asynchronously)
                         self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
                     };
 
@@ -8155,10 +8160,10 @@
 
         for (var i = 0, len = this.resources.length; i < len; i++) {
             if (Object.prototype.toString.call(this.resources[i]) === '[object String]') {
-                //Get the instances of AudioBuffer from the designated URLs.
+                // Get the instances of AudioBuffer from the designated URLs.
                 load.call(this, this.resources[i], i);
             } else if (this.resources[i] instanceof AudioBuffer) {
-                //Get the instances of AudioBuffer directly
+                // Get the instances of AudioBuffer directly
                 this.buffers[i] = this.resources[i];
             }
         }
@@ -8176,29 +8181,29 @@
      */
     OneshotModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
         } else {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
-            //Call superclass method
+            // Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
 
             if (r !== undefined) {
-                return r;  //Getter
+                return r;  // Getter
             } else {
                 switch (k) {
                     case 'transpose' :
                         if (value === undefined) {
-                            return this.transpose;  //Getter
+                            return this.transpose;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
 
                             if (v > min) {
-                                this.transpose = v;  //Setter
+                                this.transpose = v;  // Setter
                             }
                         }
 
@@ -8252,27 +8257,27 @@
         var volume       = this.settings[activeIndex].volume;
 
         if (this.buffers[bufferIndex] === undefined) {
-            return;  //"setup" method has not been executed
+            return;  // "setup" method has not been executed
         }
 
-        //the instance of AudioBufferSourceNode already exists ?
+        // the instance of AudioBufferSourceNode already exists ?
         if (this.sources[activeIndex] !== undefined) {
             this.sources[activeIndex].stop(this.context.currentTime);
             this.sources[activeIndex].disconnect(0);
             delete this.sources[activeIndex];
         }
 
-        //Create the instance of AudioBufferSourceNode
+        // Create the instance of AudioBufferSourceNode
         var source = this.context.createBufferSource();
 
-        //for legacy browsers
+        // for legacy browsers
         source.start = source.start || source.noteGrainOn;
         source.stop  = source.stop  || source.noteOff;
 
-        //Set the instance of AudioBuffer
+        // Set the instance of AudioBuffer
         source.buffer = this.buffers[bufferIndex];
 
-        //Set properties
+        // Set properties
         source.playbackRate.value = playbackRate * this.transpose;
         source.loop               = loop;
         source.loopStart          = loopStart;
@@ -8280,7 +8285,7 @@
 
         this.volumes[activeIndex].gain.value = volume;
 
-        //AudioBufferSourceNode (input) -> EnvelopeGenerator -> GainNode -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+        // AudioBufferSourceNode (input) -> EnvelopeGenerator -> GainNode -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
         this.eg.ready(activeIndex, source, this.volumes[activeIndex]);
         this.volumes[activeIndex].connect(this.processor);
         this.connect(this.processor, connects);
@@ -8291,13 +8296,13 @@
 
         this.sources[activeIndex] = source;
 
-        //Attack -> Decay -> Sustain
+        // Attack -> Decay -> Sustain
         this.eg.start(startTime);
 
-        //Start Effectors
+        // Start Effectors
         this.on(startTime);
 
-        //Draw sound wave
+        // Draw sound wave
         if (!this.isAnalyser) {
             this.analyser.start('time');
             this.analyser.start('fft');
@@ -8308,7 +8313,7 @@
 
         var self = this;
 
-        //In the case of scheduling stop time
+        // In the case of scheduling stop time
         var duration = this.times.stop - this.times.start;
 
         if (duration > 0) {
@@ -8317,7 +8322,7 @@
             }, (duration * 1000));
         }
 
-        //Call on stopping audio
+        // Call on stopping audio
         source.onended = function() {
             self.isStops[activeIndex] = true;
         };
@@ -8331,21 +8336,21 @@
                 });
 
                 if (self.isStop) {
-                    //Stop
+                    // Stop
 
-                    //Stop Effectors
+                    // Stop Effectors
                     self.on(self.context.currentTime);
 
                     self.eg.clear();
 
-                    //Stop drawing sound wave
+                    // Stop drawing sound wave
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
                     self.isAnalyser = false;
 
-                    //Stop onaudioprocess event
+                    // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  //for Firefox
+                    this.onaudioprocess = null;  // for Firefox
                 } else {
                     var inputLs  = event.inputBuffer.getChannelData(0);
                     var inputRs  = event.inputBuffer.getChannelData(1);
@@ -8381,10 +8386,10 @@
 
         var stopTime = this.context.currentTime + this.times.stop;
 
-        //Attack or Decay or Sustain -> Release
+        // Attack or Decay or Sustain -> Release
         this.eg.stop(stopTime);
 
-        //Stop Effectors
+        // Stop Effectors
         this.filter.stop(stopTime);
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
@@ -8426,11 +8431,11 @@
      * @extends {SoundModule}
      */
     function AudioModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         SoundModule.call(this, context);
 
-        this.source = context.createBufferSource();  //for the instance of AudioBufferSourceNode
-        this.buffer = null;                          //for the instance of AudioBuffer
+        this.source = context.createBufferSource();  // for the instance of AudioBufferSourceNode
+        this.buffer = null;                          // for the instance of AudioBuffer
 
         this.currentTime = 0;
         this.paused = true;
@@ -8445,7 +8450,7 @@
             error  : function() {}
         };
 
-        //Create the instance of private class
+        // Create the instance of private class
         this.vocalcanceler = new VocalCanceler();
 
         /** 
@@ -8465,7 +8470,7 @@
          */
         VocalCanceler.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -8475,14 +8480,14 @@
                 switch (k) {
                     case 'depth' :
                         if (value === undefined) {
-                            return this.depth;  //Getter
+                            return this.depth;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.depth = v;  //Setter
+                                this.depth = v;  // Setter
                             }
                         }
 
@@ -8525,7 +8530,7 @@
      */
     AudioModule.prototype.setup = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.setup(k, arguments[0][k]);
             }
@@ -8552,30 +8557,30 @@
      */
     AudioModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
         } else {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
-            //Call superclass method
+            // Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
 
             if (r !== undefined) {
-                return r;  //Getter
+                return r;  // Getter
             } else {
                 switch (k) {
                     case 'playbackrate' :
                         if (value === undefined) {
-                            return this.source.playbackRate.value;  //Getter
+                            return this.source.playbackRate.value;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = this.source.playbackRate.minValue || 0;
                             var max = this.source.playbackRate.maxValue || 1024;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.playbackRate.value = v;  //Setter
+                                this.source.playbackRate.value = v;  // Setter
                             }
                         }
 
@@ -8583,17 +8588,17 @@
                     case 'loop'    :
                     case 'looping' :
                         if (value === undefined) {
-                            return this.source.loop;  //Getter
+                            return this.source.loop;  // Getter
                         } else {
-                            this.source.loop = Boolean(value);  //Setter
+                            this.source.loop = Boolean(value);  // Setter
                         }
 
                         break;
                     case 'currenttime' :
                         if (value === undefined) {
-                            return this.currentTime;  //Getter
+                            return this.currentTime;  // Getter
                         } else {
-                            //Setter
+                            // Setter
                             var v = parseFloat(value);
 
                             if (this.buffer instanceof AudioBuffer) {
@@ -8607,21 +8612,21 @@
                             if ((v >= min) && (v <= max)) {
                                 if (this.paused) {
                                     this.stop();
-                                    this.currentTime = v;  //Setter
+                                    this.currentTime = v;  // Setter
                                 } else {
                                     this.stop();
-                                    this.start(v);  //Setter
+                                    this.start(v);  // Setter
                                 }
                             }
                         }
 
                         break;
                     case 'duration' :
-                        return (this.buffer instanceof AudioBuffer) ? this.buffer.duration : 0;  //Getter only
+                        return (this.buffer instanceof AudioBuffer) ? this.buffer.duration : 0;  // Getter only
                     case 'samplerate' :
-                        return (this.buffer instanceof AudioBuffer) ? this.buffer.sampleRate : this.SAMPLE_RATE;  //Getter only
+                        return (this.buffer instanceof AudioBuffer) ? this.buffer.sampleRate : this.SAMPLE_RATE;  // Getter only
                     case 'channels' :
-                        return (this.buffer instanceof AudioBuffer) ? this.buffer.numberOfChannels : 0;  //Getter only
+                        return (this.buffer instanceof AudioBuffer) ? this.buffer.numberOfChannels : 0;  // Getter only
                     default :
                         break;
                 }
@@ -8640,15 +8645,15 @@
     AudioModule.prototype.ready = function(arrayBuffer) {
         if (arrayBuffer instanceof ArrayBuffer) {
             var successCallback = function(buffer) {
-                this.buffer = buffer;  //Get the instance of AudioBuffer
+                this.buffer = buffer;  // Get the instance of AudioBuffer
 
-                this.analyser.start('time-all-L', buffer);  //Draw audio wave (entire of time domain)
-                this.analyser.start('time-all-R', buffer);  //Draw audio wave (entire of time domain)
+                this.analyser.start('time-all-L', buffer);  // Draw audio wave (entire of time domain)
+                this.analyser.start('time-all-R', buffer);  // Draw audio wave (entire of time domain)
 
                 this.callbacks.ready(buffer);
             };
 
-            //Create the instance of AudioBuffer (Asynchronously)
+            // Create the instance of AudioBuffer (Asynchronously)
             this.context.decodeAudioData(arrayBuffer, successCallback.bind(this), this.callbacks.error.bind(this));
 
             this.callbacks.decode(arrayBuffer);
@@ -8676,35 +8681,35 @@
             var playbackRate = this.source.playbackRate.value;
             var loop         = this.source.loop;
 
-            //Create the instance of AudioBufferSourceNode
+            // Create the instance of AudioBufferSourceNode
             this.source = this.context.createBufferSource();
 
-            //for legacy browsers
+            // for legacy browsers
             this.source.start = this.source.start || this.source.noteGrainOn;
             this.source.stop  = this.source.stop  || this.source.noteOff;
 
-            this.source.buffer             = this.buffer;  //Set the instance of AudioBuffer
+            this.source.buffer             = this.buffer;  // Set the instance of AudioBuffer
             this.source.playbackRate.value = playbackRate;
             this.source.loop               = loop;
 
             if ((FULL_MODE === undefined) || FULL_MODE) {
-                //AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+                // AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
                 this.source.connect(this.processor);
                 this.connect(this.processor, connects);
             } else {
-                //AudioBufferSourceNode (input) -> ... -> AudioDestinationNode (output)
+                // AudioBufferSourceNode (input) -> ... -> AudioDestinationNode (output)
                 this.connect(this.source, connects);
             }
 
             this.source.start(startTime, pos, (this.buffer.duration - pos));
 
-            //Draw sound wave
+            // Draw sound wave
             this.analyser.start('time');
             this.analyser.start('fft');
 
             this.paused = false;
 
-            //Start Effectors
+            // Start Effectors
             this.on(startTime);
 
             this.callbacks.start(this.source, this.currentTime);
@@ -8730,7 +8735,7 @@
                             var index = Math.floor(self.currentTime * self.source.buffer.sampleRate);
                             var n100msec = 0.100 * self.source.buffer.sampleRate;
 
-                            //Execute callback every 100 msec
+                            // Execute callback every 100 msec
                             if ((index % n100msec) === 0) {
                                 self.callbacks.update(self.source, self.currentTime);
                             }
@@ -8763,18 +8768,18 @@
 
             this.source.stop(stopTime);
 
-            //Stop Effectors
+            // Stop Effectors
             this.off(stopTime, true);
 
-            //Stop drawing sound wave
+            // Stop drawing sound wave
             this.analyser.stop('time');
             this.analyser.stop('fft');
 
-            //Clear
+            // Clear
 
-            //Stop onaudioprocess event
+            // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  //for Firefox
+            this.processor.onaudioprocess = null;  // for Firefox
             this.paused = true;
             this.callbacks.stop(this.source, this.currentTime);
         }
@@ -8860,12 +8865,12 @@
      * @extends {AudioModule}
      */
     function MediaModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         AudioModule.call(this, context);
 
-        this.source = null;  //for the instance of MediaElementAudioSourceNode
-        this.media  = null;  //for HTMLMediaElement
-        this.ext    = '';    //'wav', 'ogg', 'mp3, 'webm', 'ogv', 'mp4' ...etc
+        this.source = null;  // for the instance of MediaElementAudioSourceNode
+        this.media  = null;  // for HTMLMediaElement
+        this.ext    = '';    // 'wav', 'ogg', 'mp3, 'webm', 'ogv', 'mp4' ...etc
 
         this.duration     = 0;
         this.playbackRate = 1.0;
@@ -8873,10 +8878,10 @@
         this.loop         = false;
         this.muted        = false;
 
-        //The keys are the event interfaces that are defined by HTMLMediaElement.
-        //For example, "loadstart", "loadedmetadata", "loadeddata", "canplay", "canplaythrough", "timeupdate", "ended" ...etc
+        // The keys are the event interfaces that are defined by HTMLMediaElement.
+        // For example, "loadstart", "loadedmetadata", "loadeddata", "canplay", "canplaythrough", "timeupdate", "ended" ...etc
         this.callbacks = {
-            loadstart : function() {}  //for creating the instance of MediaElementAudioSourceNode
+            loadstart : function() {}  // for creating the instance of MediaElementAudioSourceNode
         };
     }
 
@@ -8895,7 +8900,7 @@
      * @override
      */
     MediaModule.prototype.setup = function(id, type, formats, callbacks) {
-        //The argument is associative array ?
+        // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
@@ -8944,7 +8949,7 @@
             switch (k) {
                 case 'loadstart' :
                     this.media.addEventListener('loadstart', function(event) {
-                        //To create the instance of MediaElementAudioSourceNode again causes error to occur.
+                        // To create the instance of MediaElementAudioSourceNode again causes error to occur.
                         if (!(self.source instanceof MediaElementAudioSourceNode)) {
                             self.source = self.context.createMediaElementSource(this);
                         }
@@ -8964,16 +8969,16 @@
                     this.media.addEventListener('ended', function(event) {
                         this.pause();
 
-                        //Stop Effectors
+                        // Stop Effectors
                         self.off(self.context.currentTime);
 
-                        //Stop drawing sound wave
+                        // Stop drawing sound wave
                         self.analyser.stop('time');
                         self.analyser.stop('fft');
 
-                        //Stop onaudioprocess event
+                        // Stop onaudioprocess event
                         self.processor.disconnect(0);
-                        self.processor.onaudioprocess = null;  //for Firefox
+                        self.processor.onaudioprocess = null;  // for Firefox
                         self.callbacks.ended(event, this);
                     }, false);
 
@@ -9000,30 +9005,30 @@
      */
     MediaModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
         } else {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
-            //Call superclass method
+            // Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
 
-            //Getter ?
+            // Getter ?
             if (r !== undefined) {
                 return r;
             } else {
                 switch (k) {
                     case 'playbackrate' :
                         if (value === undefined) {
-                            return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;  //Getter
+                            return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;  // Getter
                         } else {
                             var v   = parseFloat(value);
-                            var min = 0.5;  //for Chrome
+                            var min = 0.5;  // for Chrome
 
                             if (v >= min) {
-                                //Setter
+                                // Setter
                                 if (this.media instanceof HTMLMediaElement) {
                                     this.media.playbackRate = v;
                                 }
@@ -9035,7 +9040,7 @@
                         break;
                     case 'currenttime' :
                         if (value === undefined) {
-                            return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;  //Getter
+                            return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;  // Getter
                         } else {
                             var v = parseFloat(value);
 
@@ -9047,7 +9052,7 @@
                             }
 
                             if ((v >= min) && (v <= max)) {
-                                //Setter
+                                // Setter
                                 this.media.currentTime = v;
                             }
                         }
@@ -9057,9 +9062,9 @@
                     case 'muted'    :
                     case 'controls' :
                         if (value === undefined) {
-                            return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];  //Getter
+                            return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];  // Getter
                         } else {
-                            //Setter
+                            // Setter
                             if (this.media instanceof HTMLMediaElement) {
                                 this.media[k] = Boolean(value);
                             }
@@ -9071,13 +9076,13 @@
                     case 'width'  :
                     case 'height' :
                         if (value === undefined) {
-                            return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;  //Getter
+                            return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;  // Getter
                         } else {
                             var v   = parseInt(value);
                             var min = 0;
 
                             if (v >= min) {
-                                //Setter
+                                // Setter
                                 if (this.media instanceof HTMLVideoElement) {
                                     this.media[k] = v;
                                 }
@@ -9086,9 +9091,9 @@
 
                         break;
                     case 'duration' :
-                        return this.duration;  //Getter only
+                        return this.duration;  // Getter only
                     case 'channels' :
-                        return (this.source instanceof MediaElementAudioSourceNode) ? this.source.channelCount : 0;  //Getter only
+                        return (this.source instanceof MediaElementAudioSourceNode) ? this.source.channelCount : 0;  // Getter only
                     default :
                         break;
                 }
@@ -9108,11 +9113,11 @@
         var src = String(source);
 
         try {
-            //Data URL or Object URL ?
+            // Data URL or Object URL ?
             if ((src.indexOf('data:') !== -1) || (src.indexOf('blob:') !== -1)) {
-                this.media.src = src;  //Data URL or Object URL
+                this.media.src = src;  // Data URL or Object URL
             } else {
-                this.media.src = src + '.' + this.ext;  //Path
+                this.media.src = src + '.' + this.ext;  // Path
             }
         } catch (error) {
             throw new Error('The designated resource cannot be loaded.');
@@ -9131,7 +9136,7 @@
      */
     MediaModule.prototype.start = function(position, connects, processCallback) {
         if ((this.source instanceof MediaElementAudioSourceNode) && this.media.paused) {
-            //MediaElementAudioSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+            // MediaElementAudioSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
             this.source.connect(this.processor);
             this.connect(this.processor, connects);
 
@@ -9145,10 +9150,10 @@
             this.media.loop         = this.loop;
             this.media.muted        = this.muted;
 
-            //Start Effectors
+            // Start Effectors
             this.on(this.context.currentTime);
 
-            //Draw sound wave
+            // Draw sound wave
             this.analyser.start('time');
             this.analyser.start('fft');
 
@@ -9183,16 +9188,16 @@
         if ((this.source instanceof MediaElementAudioSourceNode) && !this.media.paused) {
             this.media.pause();
 
-            //Stop Effectors
+            // Stop Effectors
             this.off(this.context.currentTime, true);
 
-            //Stop drawing sound wave
+            // Stop drawing sound wave
             this.analyser.stop('time');
             this.analyser.stop('fft');
 
-            //Stop onaudioprocess event
+            // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  //for Firefox
+            this.processor.onaudioprocess = null;  // for Firefox
         }
 
         return this;
@@ -9260,13 +9265,13 @@
     MediaModule.prototype.fullscreen = function() {
         if (this.media instanceof HTMLVideoElement) {
             if (this.media.webkitRequestFullscreen) {
-                //Chrome Safari
+                // Chrome Safari
                 this.media.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
             } else if (this.media.mozRequestFullScreen) {
-                //Firefox
+                // Firefox
                 this.media.mozRequestFullScreen();
             } else if (this.media.requestFullscreen) {
-                //Opera
+                // Opera
                 this.media.requestFullscreen();
             } else {
                 throw new Error('Cannot change to full screen.');
@@ -9282,13 +9287,13 @@
      */
     MediaModule.prototype.exitFullscreeen = function() {
         if (document.webkitExitFullscreen) {
-            //Chrome Safari
+            // Chrome Safari
             document.webkitExitFullscreen();
         } else if (document.mozCancelFullscreen) {
-            //Firefox
+            // Firefox
             document.mozCancelFullscreen();
         } else if (document.exitFullscreen) {
-            //Opera
+            // Opera
             document.exitFullscreen();
         } else {
             throw new Error('Cannot exit from full screen.');
@@ -9310,13 +9315,13 @@
      * @extends {SoundModule}
      */
     function StreamModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         SoundModule.call(this, context);
 
-        //for the instance of MediaStreamAudioSourceNode
+        // for the instance of MediaStreamAudioSourceNode
         this.source = null;
 
-        //for getUserMedia()
+        // for getUserMedia()
         this.medias = {
             audio : true,
             video : false
@@ -9329,7 +9334,7 @@
 
         this.isStop  = true;
 
-        //Create the instance of private class
+        // Create the instance of private class
         this.noisegate = new NoiseGate();
 
         /** 
@@ -9349,7 +9354,7 @@
          */
         NoiseGate.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-                //Associative array
+                // Associative array
                 for (var k in arguments[0]) {
                     this.param(k, arguments[0][k]);
                 }
@@ -9359,14 +9364,14 @@
                 switch (k) {
                     case 'level' :
                         if (value === undefined) {
-                            return this.level;  //Getter
+                            return this.level;  // Getter
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
 
                             if ((v >= min) && (v <= max)) {
-                                this.level = v;  //Setter
+                                this.level = v;  // Setter
                             }
                         }
 
@@ -9388,10 +9393,10 @@
             var d = Math.abs(parseFloat(data));
 
             if (d > this.level) {
-                //The amplitude is equal to argument.
+                // The amplitude is equal to argument.
                 return d;
             } else {
-                //Because signal is detected as background noise, the amplitude is 0 .
+                // Because signal is detected as background noise, the amplitude is 0 .
                 return 0;
             }
         };
@@ -9437,14 +9442,14 @@
      */
     StreamModule.prototype.param = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.param(k, arguments[0][k]);
             }
         } else {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
-            //Call superclass method
+            // Call superclass method
             var r = SoundModule.prototype.param.call(this, k, value);
         }
 
@@ -9475,14 +9480,14 @@
         var start = function(stream, connects, processCallback) {
             this.source = this.context.createMediaStreamSource(stream);
 
-            //MediaStreamAudioSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+            // MediaStreamAudioSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
             this.source.connect(this.processor);
             this.connect(this.processor, connects);
 
-            //Start Effectors
+            // Start Effectors
             this.on(this.context.currentTime);
 
-            //Draw sound wave
+            // Draw sound wave
             if (!isAnalyser) {
                 this.analyser.start('time');
                 this.analyser.start('fft');
@@ -9531,16 +9536,16 @@
     StreamModule.prototype.stop = function() {
         this.source = null;
 
-        //Stop Effectors
+        // Stop Effectors
         this.off(this.context.currentTime, true);
 
-        //Stop drawing sound wave
+        // Stop drawing sound wave
         this.analyser.stop('time');
         this.analyser.stop('fft');
 
-        //Stop onaudioprocess event
+        // Stop onaudioprocess event
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  //for Firefox
+        this.processor.onaudioprocess = null;  // for Firefox
 
         this.isStop = true;
 
@@ -9593,7 +9598,7 @@
      * @extends {SoundModule}
      */
     function MixerModule(context) {
-        //Call superclass constructor
+        // Call superclass constructor
         SoundModule.call(this, context);
 
         /** @type {Array.<OscillatorModule>|Array.<OneshotModule>|Array.<AudioModule>|Array.<MediaModule>}|Array.<StreamModule> */
@@ -9627,10 +9632,10 @@
 
             var stopTime = this.context.currentTime;
 
-            //Stop Effectors of each source
+            // Stop Effectors of each source
             this.off(stopTime, false);
 
-            //Stop Analyser, Recorder, Session
+            // Stop Analyser, Recorder, Session
             source.analyser.stop('time');
             source.analyser.stop('fft');
             source.isAnalyser = false;
@@ -9638,20 +9643,20 @@
             source.recorder.stop();
             source.session.close();
 
-            //ScriptProcessorNode (each source) -> ScriptProcessorNode (MixerModule)
+            // ScriptProcessorNode (each source) -> ScriptProcessorNode (MixerModule)
             source.processor.disconnect(0);
             source.processor.connect(this.processor);
         }
 
-        //(... ->) ScriptProcessorNode (mix sources) -> ... -> AudioDestinationNode (output)
+        // (... ->) ScriptProcessorNode (mix sources) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor);
 
         var startTime = this.context.currentTime;
 
-        //Start Effectors
+        // Start Effectors
         this.on(startTime);
 
-        //Draw sound wave
+        // Draw sound wave
         if (!this.isAnalyser) {
             this.analyser.start('time');
             this.analyser.start('fft');
@@ -9666,7 +9671,7 @@
             var outputLs = event.outputBuffer.getChannelData(0);
             var outputRs = event.outputBuffer.getChannelData(1);
 
-            //Stop ?
+            // Stop ?
             var isStop = false;
 
             for (var i = 0, len = self.sources.length; i < 10; i++) {
@@ -9688,17 +9693,17 @@
             if (isStop) {
                 var stopTime = self.context.currentTime;
 
-                //Stop Effectors
+                // Stop Effectors
                 self.stop(stopTime, true);
 
-                //Stop drawing sound wave
+                // Stop drawing sound wave
                 self.analyser.stop('time');
                 self.analyser.stop('fft');
                 self.isAnalyser = false;
 
-                //Stop onaudioprocess event
+                // Stop onaudioprocess event
                 this.disconnect(0);
-                this.onaudioprocess = null;  //for Firefox
+                this.onaudioprocess = null;  // for Firefox
             } else {
                 outputLs.set(inputLs);
                 outputRs.set(inputRs);
@@ -9737,12 +9742,12 @@
     function MML(context) {
         this.context = context;
 
-        //for array of OscillatorNode or the instance of OscillatorModule or OneshotModule
+        // for array of OscillatorNode or the instance of OscillatorModule or OneshotModule
         this.source = null;
 
-        this.sequences = [];  //{@type Array.<Array.<object>>}
-        this.timerids  = [];  //{@type Array.<number>}
-        this.prev      = [];  //{@type Array.<object>}
+        this.sequences = [];  /** @type {Array.<Array.<object>>} */
+        this.timerids  = [];  /** @type {Array.<number>} */
+        this.prev      = [];  /** @type {Array.<object>} */
 
         this.callbacks = {
             start : function() {},
@@ -9755,7 +9760,7 @@
     /**
      * static properties
      */
-    MML.ONE_MINUTES       = 60;  //sec
+    MML.ONE_MINUTES       = 60;  // sec
     MML.EQUAL_TEMPERAMENT = 12;
     MML.QUARTER_NOTE      = 4;
     MML.REGEXP_MML        = /\s*(?:T\d+)\s*|\s*(?:O\d+)\s*|\s*(?:(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)(?:&(?:[CDEFGABR][#+-]?)+(?:256|192|144|128|96|72|64|48|36|32|24|18|16|12|8|6|4|2|1)\.?)*\s*/gi;
@@ -9778,7 +9783,7 @@
      */
     MML.prototype.setup = function(key, value) {
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
-            //Associative array
+            // Associative array
             for (var k in arguments[0]) {
                 this.setup(k, arguments[0][k]);
             }
@@ -9803,7 +9808,7 @@
      */
     MML.prototype.ready = function(source, mmls) {
         if (this.source !== null) {
-            this.stop();  //Stop the previous MML
+            this.stop();  // Stop the previous MML
         }
 
         this.sequences = [];
@@ -9833,7 +9838,7 @@
         while (mmls.length > 0) {
             var mml = String(mmls.shift());
 
-            //{@type Array.<object>}
+            /** @type {Array.<object>}*/
             var sequences = [];
 
             var notes = mml.match(MML.REGEXP_MML);
@@ -9870,13 +9875,13 @@
             };
 
             var computeFrequency = function(index) {
-                //The 12 equal temperament
+                // The 12 equal temperament
                 //
-                //Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
+                // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
                 //
-                //A * 1.059463 -> A# (half up)
+                // A * 1.059463 -> A# (half up)
 
-                var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  //about 1.059463
+                var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
                 var MIN_A           = 27.5;
 
                 if (index >= 0) {
@@ -9924,30 +9929,30 @@
                         var name  = chord.charAt(i);
                         var index = computeIndex.call(this, octave, name.toUpperCase());
 
-                        //Half up or Half down (Sharp or Flat) ?
+                        // Half up or Half down (Sharp or Flat) ?
                         switch (chord.charAt(i + 1)) {
                             case '#' :
                             case '+' :
-                                //Half up (Sharp)
+                                // Half up (Sharp)
                                 index++;
                                 i++;
                                 break;
                             case '-' :
-                                //Half down (Flat)
+                                // Half down (Flat)
                                 index--;
                                 i++;
                                 break;
                             default :
-                                //Normal (Natural)
+                                // Normal (Natural)
                                 break;
                         }
 
-                        //in the case of chord
+                        // in the case of chord
                         if (index >= indexes[0]) {
                             index -= MML.EQUAL_TEMPERAMENT;
                         }
 
-                        //Validation
+                        // Validation
                         if (index < 0) {
                             this.callbacks.error(MML.ERROR_MML_NOTE, note);
                             return;
@@ -9961,7 +9966,7 @@
                     for (var i = 0, len = indexes.length; i < len; i++) {
                         var frequency = (indexes[i] !== 'R') ? computeFrequency.call(this, indexes[i], note) : 0;
 
-                        //Validation
+                        // Validation
                         if (frequency === -1) {
                             this.callbacks.error(MML.ERROR_MML_NOTE, note);
                             return;
@@ -9970,7 +9975,7 @@
                         frequencies.push(frequency);
                     }
 
-                    var durations = note.split('&');  //Tie
+                    var durations = note.split('&');  // Tie
                     var duration  = 0;
 
                     while (durations.length > 0) {
@@ -9988,47 +9993,47 @@
                             case 256 :
                                 var numOf4note = MML.QUARTER_NOTE / parseInt(d);
 
-                                //a dotted note ?
+                                // a dotted note ?
                                 duration += (d.indexOf('.') !== -1) ? ((1.5 * numOf4note) * timeOf4note) : (numOf4note * timeOf4note);
                                 break;
                             case   6 :
-                                //Triplet of half note
+                                // Triplet of half note
                                 duration += (2 * timeOf4note) / 3;
                                 break;
                             case  12 :
-                                //Triplet of quarter note
+                                // Triplet of quarter note
                                 duration += timeOf4note / 3;
                                 break;
                             case  18 :
-                                //Nonuplet of half note
+                                // Nonuplet of half note
                                 duration += (2 * timeOf4note) / 9;
                                 break;
                             case  24 :
-                                //Triplet of 8th note
+                                // Triplet of 8th note
                                 duration += (0.5 * timeOf4note) / 3;
                                 break;
                             case  36 :
-                                //Nonuplet of quarter note
+                                // Nonuplet of quarter note
                                 duration += timeOf4note / 9;
                                 break;
                             case  48 :
-                                //Triplet of 16th note
+                                // Triplet of 16th note
                                 duration += (0.25 * timeOf4note) / 3;
                                 break;
                             case  72 :
-                                //Nonuplet of 8th note
+                                // Nonuplet of 8th note
                                 duration += (0.5 * timeOf4note) / 9;
                                 break;
                             case  96 :
-                                //Triplet of 32th note
+                                // Triplet of 32th note
                                 duration += (0.125 * timeOf4note) / 3;
                                 break;
                             case 144 :
-                                //Nonuplet of 16th note
+                                // Nonuplet of 16th note
                                 duration += (0.25 * timeOf4note) / 9;
                                 break;
                             case 192 :
-                                //Triplet of 64th note
+                                // Triplet of 64th note
                                 duration += (0.0625 * timeOf4note) / 3;
                                 break;
                             default :
@@ -10053,7 +10058,7 @@
             };
 
             if (sequences.length > 0) {
-                //"start" method gets element by "pop" for performance
+                // "start" method gets element by "pop" for performance
                 sequences.reverse();
 
                 this.sequences.push(sequences);
@@ -10079,7 +10084,7 @@
                 return this;
             }
 
-            //End ?
+            // End ?
             if (this.sequences[p].length === 0) {
                 this.stop(processCallback);
                 this.callbacks.ended();
@@ -10098,7 +10103,7 @@
 
                     source = this.context.createOscillator();
 
-                    //for legacy browsers
+                    // for legacy browsers
                     source.start = source.start || source.noteOn;
                     source.stop  = source.stop  || source.noteOff;
 
@@ -10107,7 +10112,7 @@
                     source.detune.value    = detune;
 
                     if (Array.isArray(connects)) {
-                        //OscillatorNode (input) -> AudioNode -> ... -> AudioNode -> AudioDestinationNode (output)
+                        // OscillatorNode (input) -> AudioNode -> ... -> AudioNode -> AudioDestinationNode (output)
                         source.connect(connects[0]);
 
                         for (var i = 0, len = connects.length; i < len; i++) {
@@ -10126,7 +10131,7 @@
                             }
                         }
                     } else {
-                        //OscillatorNode (input) -> AudioDestinationNode (output)
+                        // OscillatorNode (input) -> AudioDestinationNode (output)
                         source.connect(this.context.destination);
                     }
 
@@ -10184,10 +10189,10 @@
                     }
                 }
 
-                //for "stop" method
+                // for "stop" method
                 self.prev = sequence;
 
-                //Start next sound by recursive call
+                // Start next sound by recursive call
                 self.start(p, connects, processCallback);
 
                 sequence = null;
@@ -10289,9 +10294,9 @@
             var timerid = this.timerids[i];
 
             if ((timerid === null) || (timerid === undefined)) {
-                //Next timer
+                // Next timer
             } else {
-                //Playing the MML
+                // Playing the MML
                 return false;
             }
         }
@@ -10334,7 +10339,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    //Create instances
+    // Create instances
     var sound      = new SoundModule(audiocontext);
     var oscillator = new OscillatorModule(audiocontext);
     var oneshot    = new OneshotModule(audiocontext);
@@ -10386,7 +10391,7 @@
         }
     };
 
-    //Static properties
+    // Static properties
     XSound.IS_XSOUND   = IS_XSOUND;
     XSound.FULL_MODE   = FULL_MODE;
     XSound.SAMPLE_RATE = sound.SAMPLE_RATE;
@@ -10394,7 +10399,7 @@
     XSound.NUM_INPUT   = sound.NUM_INPUT;
     XSound.NUM_OUTPUT  = sound.NUM_OUTPUT;
 
-    //Static methods
+    // Static methods
     XSound.read          = read;
     XSound.file          = file;
     XSound.ajax          = ajax;
@@ -10419,7 +10424,7 @@
             mml        : new MML(audiocontext)
         };
 
-        //Closure
+        // Closure
         return function(source, index) {
             var s = String(source).replace(/-/g, '').toLowerCase();
 
@@ -10495,8 +10500,8 @@
         return '[XSound]';
     };
 
-    //Set 2 objects as property of window object
+    // Set 2 objects as property of window object
     global.XSound = XSound;
-    global.X      = XSound;  //Alias of XSound
+    global.X      = XSound;  // Alias of XSound
 
 })(window);
