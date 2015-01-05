@@ -4992,6 +4992,8 @@
             this.filter.gain.value      = 0;
 
             this.maxFrequency = this.filter.frequency.value;
+            this.range        = 0.1;  // 10% -> between this.maxFrequency * 0.1 and this.maxFrequency
+
             this.attack  = 0.01;
             this.decay   = 0.3;
             this.sustain = 1.0;
@@ -5089,6 +5091,22 @@
                         }
 
                         break;
+                    case 'range' :
+                        if (value === undefined) {
+                            return this.range;  // Getter
+                        } else {
+                            var v   = parseFloat(value);
+                            var min = 0;
+                            var max = 1;
+
+                            if ((v >= min) && (v <= max)) {
+                                this.range= v;  // Setter
+                            } else {
+                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
+                            }
+                        }
+
+                        break;
                     case 'attack'  :
                     case 'decay'   :
                     case 'sustain' :
@@ -5137,9 +5155,6 @@
 
         /** @override */
         Filter.prototype.start = function(startTime) {
-            // for the case of end on the way of scheduling
-            this.filter.frequency.value = this.maxFrequency;
-
             if (this.isActive) {
                 var s = parseFloat(startTime);
 
@@ -5150,11 +5165,13 @@
                 var t0      = s;
                 var t1      = t0 + this.attack;
                 var t2      = this.decay;
-                var t2Value = this.sustain * this.filter.frequency.value;
+                var t2Value = this.sustain * this.maxFrequency;
+
+                var minFrequnecy = this.maxFrequency * this.range;
 
                 // Envelope Generator for filter
                 this.filter.frequency.cancelScheduledValues(t0);
-                this.filter.frequency.setValueAtTime(this.filter.frequency.defaultValue, t0);
+                this.filter.frequency.setValueAtTime(minFrequnecy, t0);
                 this.filter.frequency.linearRampToValueAtTime(this.maxFrequency, t1);  // Attack
                 this.filter.frequency.setTargetAtTime(t2Value, t1, t2);  // Decay -> Sustain
             }
@@ -5174,11 +5191,12 @@
                 var t3 = s;
                 var t4 = this.release;
 
+                var minFrequnecy = this.maxFrequency * this.range;
+
                 // Envelope Generator for filter
                 this.filter.frequency.cancelScheduledValues(t3);
                 this.filter.frequency.setValueAtTime(this.filter.frequency.value, t3);
-                this.filter.frequency.setTargetAtTime(this.filter.frequency.defaultValue, t3, t4);  // Sustain -> Release
-                this.filter.frequency.setValueAtTime(this.maxFrequency, (t3 + t4));
+                this.filter.frequency.setTargetAtTime(minFrequnecy, t3, t4);  // Sustain -> Release
             }
 
             return this;

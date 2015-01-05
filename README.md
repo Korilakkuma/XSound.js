@@ -1081,6 +1081,7 @@ However, this is omitted the following.
     params.frequency = X(source).module('filter').param('frequency');  // The default value is 350
     params.resonance = X(source).module('filter').param('Q');          // The default value is 1
     params.gain      = X(source).module('filter').param('gain');       // The default value is 0
+    params.range     = X(source).module('filter').param('range');      // The default value is 0.1 (10 %)
     params.attack    = X(source).module('filter').param('attack');     // The default value is 0.01
     params.decay     = X(source).module('filter').param('decay');      // The default value is 0.3
     params.sustain   = X(source).module('filter').param('sustain');    // The default value is 0.5
@@ -1091,6 +1092,7 @@ However, this is omitted the following.
     X(source).module('filter').param('frequency', 1000);  // The range of value is between 10 and half the sample-rate
     X(source).module('filter').param('Q', 20);            // The range of value is between 0.0001 and 1000
     X(source).module('filter').param('gain', 18);         // The range of value is between -40 and 40
+    X(source).module('filter').param('range', 0.5);       // The range of value is between 0 and 1
     X(source).module('filter').param('attack', 0.5);      // The range of value is between 0 and 1
     X(source).module('filter').param('decay', 0.5);       // The range of value is between 0 and 1
     X(source).module('filter').param('sustain', 0.5);     // The range of value is between 0 and 1
@@ -1101,6 +1103,7 @@ However, this is omitted the following.
                               .param('frequency', 1000)
                               .param('Q', 20)
                               .param('gain', 18)
+                              .param('range', 0.5)
                               .param('attack', 0.5)
                               .param('decay', 0.5)
                               .param('sustain', 0.5)
@@ -1112,6 +1115,7 @@ However, this is omitted the following.
         frequency : 1000,
         Q         : 20,
         gain      : 18,
+        range     : 0.5,
         attack    : 0.5,
         decay     : 0.5,
         sustain   : 0.5,
