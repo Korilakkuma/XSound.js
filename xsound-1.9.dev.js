@@ -5477,17 +5477,12 @@
                         } else {
                             var v = String(value).toLowerCase();
 
-                            this.lfo.SINE     = this.lfo.SINE     || 0;
-                            this.lfo.SQUARE   = this.lfo.SQUARE   || 1;
-                            this.lfo.SAWTOOTH = this.lfo.SAWTOOTH || 2;
-                            this.lfo.TRIANGLE = this.lfo.TRIANGLE || 3;
-
                             // for legacy browsers
                             var WAVE_TYPE = {
-                                sine     : this.lfo.SINE,
-                                square   : this.lfo.SQUARE,
-                                sawtooth : this.lfo.SAWTOOTH,
-                                triangle : this.lfo.TRIANGLE
+                                sine     : this.lfo.SINE     || 0,
+                                square   : this.lfo.SQUARE   || 1,
+                                sawtooth : this.lfo.SAWTOOTH || 2,
+                                triangle : this.lfo.TRIANGLE || 3
                             };
 
                             if (v in WAVE_TYPE) {
@@ -7796,17 +7791,12 @@
                             if (Object.prototype.toString.call(value) !== '[object Object]') {
                                 var v = String(value).toLowerCase();
 
-                                this.source.SINE     = this.source.SINE     || 0;
-                                this.source.SQUARE   = this.source.SQUARE   || 1;
-                                this.source.SAWTOOTH = this.source.SAWTOOTH || 2;
-                                this.source.TRIANGLE = this.source.TRIANGLE || 3;
-
                                 // for legacy browsers
                                 var WAVE_TYPE = {
-                                    sine     : this.source.SINE,
-                                    square   : this.source.SQUARE,
-                                    sawtooth : this.source.SAWTOOTH,
-                                    triangle : this.source.TRIANGLE
+                                    sine     : this.source.SINE     || 0,
+                                    square   : this.source.SQUARE   || 1,
+                                    sawtooth : this.source.SAWTOOTH || 2,
+                                    triangle : this.source.TRIANGLE || 3
                                 };
 
                                 if (v in WAVE_TYPE) {
