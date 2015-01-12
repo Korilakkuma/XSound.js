@@ -39,7 +39,7 @@ etc...
 The application that uses this library is in the following URL.  
 Please use Chrome (Mac / Windows) or Safari (Mac) or Opera (Mac / Windows).  
 
-* [X Sound](http://curtaincall.weblike.jp/portfolio-x-sound/)
+* [X Sound](http://korilakkuma.github.io/X-Sound/)
 
 * [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
 
