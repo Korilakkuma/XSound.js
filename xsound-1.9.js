@@ -10346,15 +10346,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 
     // Create instances
-    var sound      = new SoundModule(audiocontext);
-    var oscillator = new OscillatorModule(audiocontext);
-    var oneshot    = new OneshotModule(audiocontext);
-    var audio      = new AudioModule(audiocontext);
-    var media      = new MediaModule(audiocontext);
-    var fallback   = new MediaFallbackModule();
-    var stream     = new StreamModule(audiocontext);
-    var mixer      = new MixerModule(audiocontext);
-    var mml        = new MML(audiocontext);
+    var sound = new SoundModule(audiocontext);
+
+    var sources = {
+        oscillator : new OscillatorModule(audiocontext),
+        oneshot    : new OneshotModule(audiocontext),
+        audio      : new AudioModule(audiocontext),
+        media      : new MediaModule(audiocontext),
+        fallback   : new MediaFallbackModule(),
+        stream     : new StreamModule(audiocontext),
+        mixer      : new MixerModule(audiocontext),
+        mml        : new MML(audiocontext)
+    };
+
+    // Cloned instances
+    var clones = {
+        oscillator : new OscillatorModule(audiocontext),
+        oneshot    : new OneshotModule(audiocontext),
+        audio      : new AudioModule(audiocontext),
+        media      : new MediaModule(audiocontext),
+        fallback   : new MediaFallbackModule(),
+        stream     : new StreamModule(audiocontext),
+        mixer      : new MixerModule(audiocontext),
+        mml        : new MML(audiocontext)
+    };
 
     /** 
      * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML.
@@ -10368,30 +10383,24 @@
         switch (s) {
             case 'oscillator' :
                 if (index === undefined) {
-                    return oscillator;
+                    return sources.oscillator;
                 } else {
                     var i = parseInt(index);
 
-                    if ((i >= 0) && (i < oscillator.sources.length)) {
-                        return oscillator.sources[i];
+                    if ((i >= 0) && (i < sources.oscillator.sources.length)) {
+                        return sources.oscillator.sources[i];
                     }
                 }
 
                 break;
-            case 'oneshot' :
-                return oneshot;
-            case 'audio' :
-                return audio;
-            case 'media' :
-                return media;
+            case 'oneshot'  :
+            case 'audio'    :
+            case 'media'    :
             case 'fallback' :
-                return fallback;
-            case 'stream' :
-                 return stream;
-            case 'mixer' :
-                return mixer;
-            case 'mml' :
-                return mml;
+            case 'stream'   :
+            case 'mixer'    :
+            case 'mml'      :
+                return sources[s];
             default :
                 break;
         }
@@ -10419,17 +10428,6 @@
      * @return {function} This is returned as closure for getter of cloned module.
      */
     XSound.clone = function() {
-        var clones = {
-            oscillator : new OscillatorModule(audiocontext),
-            oneshot    : new OneshotModule(audiocontext),
-            audio      : new AudioModule(audiocontext),
-            media      : new MediaModule(audiocontext),
-            fallback   : new MediaFallbackModule(),
-            stream     : new StreamModule(audiocontext),
-            mixer      : new MixerModule(audiocontext),
-            mml        : new MML(audiocontext)
-        };
-
         // Closure
         return function(source, index) {
             var s = String(source).replace(/-/g, '').toLowerCase();
@@ -10447,20 +10445,14 @@
                     }
 
                     break;
-                case 'oneshot' :
-                    return clones.oneshot;
-                case 'audio' :
-                    return clones.audio;
-                case 'media' :
-                    return clones.media;
+                case 'oneshot'  :
+                case 'audio'    :
+                case 'media'    :
                 case 'fallback' :
-                    return clones.fallback;
-                case 'stream' :
-                    return clones.stream;
-                case 'mixer' :
-                    return clones.mixer;
-                case 'mml' :
-                    return clones.mml;
+                case 'stream'   :
+                case 'mixer'    :
+                case 'mml'      :
+                    return clones[s];
                 default :
                     break;
             };
@@ -10469,18 +10461,31 @@
 
     /** 
      * This static method releases memory of unnecessary instances.
-     * @param {Array.<SoundModule|MML|MediaFallbackModule>} sources This argument is array that has the instances of SoundModule or MML or MediaFallbackModule.
+     * @param {Array.<SoundModule|MML|MediaFallbackModule>} sourceLists This argument is array that has the instances of SoundModule or MML or MediaFallbackModule.
      */
-    XSound.free = function(sources) {
-        if (!Array.isArray(sources)) {
-            sources = [sources];
+    XSound.free = function(sourceLists) {
+        if (!Array.isArray(sourceLists)) {
+            sourceLists = [sourceLists];
         }
 
-        for (var i = 0, len = sources.length; i < len; i++) {
-            var source = sources[i];
+        for (var i = 0, len = sourceLists.length; i < len; i++) {
+            var sourceList = sourceLists[i];
 
-            if ((source instanceof SoundModule) || (source instanceof MML) || (source instanceof MediaFallbackModule)) {
-                source = null;
+            // Already deleted ?
+            if (sourceList === null) {
+                continue;
+            }
+
+            for (var source in sources) {
+                if (sourceList === sources[source]) {
+                    sources[source] = null;
+                }
+            }
+
+            for (var source in clones) {
+                if (sourceList === clones[source]) {
+                    clones[source] = null;
+                }
             }
         }
     };
@@ -10509,5 +10514,8 @@
     // Set 2 objects as property of window object
     global.XSound = XSound;
     global.X      = XSound;  // Alias of XSound
+
+    // GC
+    sound = null;
 
 })(window);
