@@ -1189,6 +1189,31 @@
             return this;
         };
 
+        /**
+         * This method gets effecter's parameters as associative array.
+         * @return {object}
+         */
+        Listener.prototype.params = function() {
+            var params = {
+                dopplerfactor : this.listener.dopplerfactor,
+                speedOfSound  : this.listener.speedOfSound,
+                positions     : this.positions,
+                fronts        : this.fronts,
+                ups           : this.ups,
+                velocities    : this.velocities
+            };
+
+            return params;
+        };
+
+        /**
+         * This method gets effecter's parameters as JSON.
+         * @return {string}
+         */
+        Listener.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
         /** @override */
         Listener.prototype.toString = function() {
             return '[SoundModule Listener]';
@@ -4379,6 +4404,24 @@
             return this;
         };
 
+        /**
+         * This method gets effecter's parameters as associative array.
+         * @return {object}
+         * @abstruct
+         **/
+        Effector.prototype.params = function() {
+            return {};
+        };
+
+        /**
+         * This method gets effecter's parameters as JSON.
+         * @return {string}
+         * @abstruct
+         */
+        Effector.prototype.toJSON = function() {
+            return '';
+        };
+
         /** @override */
         Effector.prototype.toString = function() {
             return '[SoundModule Effector]';
@@ -4475,6 +4518,25 @@
             }
 
             return this;
+        };
+
+        /** @override */
+        Compressor.prototype.params = function() {
+            var params = {
+                state     : this.isActive,
+                threshold : this.compressor.threshold.value,
+                knee      : this.compressor.knee.value,
+                ratio     : this.compressor.ratio.value,
+                attack    : this.compressor.attack.value,
+                release   : this.compressor.release.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Compressor.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -4690,6 +4752,25 @@
         };
 
         /** @override */
+        Distortion.prototype.params = function() {
+            var params = {
+                state   : this.isActive,
+                curve   : this.type,
+                samples : this.numberOfSamples,
+                drive   : this.drive.gain.value,
+                color   : this.color.frequency.value,
+                tone    : this.tone.frequency.value
+            };
+
+            return params;
+        };
+
+        /** @ovreride */
+        Distortion.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Distortion.prototype.toString = function() {
             return '[SoundModule Distortion]';
         };
@@ -4851,6 +4932,24 @@
         };
 
         /** @override */
+        Wah.prototype.params = function() {
+            var params = {
+                state     : this.isActive,
+                cutoff    : this.lowpass.frequency.value,
+                depth     : this.depthRate,
+                rate      : this.rate.value,
+                resonance : this.lowpass.Q.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Wah.prototype.toJSON = function() {
+            return JSON.strignify(this.params());
+        };
+
+        /** @override */
         Wah.prototype.toString = function() {
             return '[SoundModule Wah]';
         };
@@ -4962,6 +5061,24 @@
                 // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
+        };
+
+        /** @override */
+        Equalizer.prototype.params = function() {
+            var params = {
+                state    : this.isActive,
+                bass     : this.bass.gain.value,
+                middle   : this.middle.gain.value,
+                treble   : this.treble.gain.value,
+                presence : this.presence.gain.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Equalizer.prototype.toJSON = function() {
+            return JSON.stringify(params);
         };
 
         /** @override */
@@ -5221,6 +5338,29 @@
         };
 
         /** @override */
+        Filter.prototype.params = function() {
+            var params = {
+                state     : this.isActive,
+                type      : this.filter.type,
+                frequency : this.filter.frequency.value,
+                Q         : this.filter.Q.value,
+                gain      : this.filter.gain.value,
+                range     : this.range,
+                attack    : this.attack,
+                decay     : this.decay,
+                sustain   : this.sustain,
+                release   : this.release
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Filter.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Filter.prototype.toString = function() {
             return '[SoundModule Filter]';
         };
@@ -5396,6 +5536,22 @@
         };
 
         /** @override */
+        Autopanner.prototype.params = function() {
+            var params = {
+                state : this.isActive,
+                depth : this.depth.gain.value,
+                rate  : this.rate.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Autopanner.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Autopanner.prototype.toString = function() {
             return '[SoundModule Autopanner]';
         };
@@ -5538,6 +5694,23 @@
         };
 
         /** @override */
+        Tremolo.prototype.params = function() {
+            var params = {
+                state : this.isActive,
+                depth : this.depth.gain.value,
+                rate  : this.rate.value,
+                wave  : this.lfo.type
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Tremolo.prototype.toJSON = function() {
+            return JSON.stringify(this.param());
+        };
+
+        /** @override */
         Tremolo.prototype.toString = function() {
             return '[SoundModule Tremolo]';
         };
@@ -5655,6 +5828,22 @@
             }
 
             return this;
+        };
+
+        /** @override */
+        Ringmodulator.prototype.params = function() {
+            var params = {
+                state : this.isActive,
+                depth : this.depth.gain.value,
+                rate  : this.rate.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Ringmodulator.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -5890,6 +6079,27 @@
         };
 
         /** @override */
+        Phaser.prototype.params = function() {
+            var params = {
+                state     : this.isActive,
+                stage     : this.numberOfStages,
+                frequency : this.filters[0].frequency.value,
+                resonance : this.filters[0].Q.value,
+                depth     : this.depthRate,
+                rate      : this.rate.value,
+                mix       : this.mix.gain.value,
+                feedback  : this.feedback.gain.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Phaser.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Phaser.prototype.toString = function() {
             return '[SoundModule Phaser]';
         };
@@ -6078,6 +6288,26 @@
             }
 
             return this;
+        };
+
+        /** @override */
+        Flanger.prototype.params = function() {
+            var params = {
+                state    : this.isActive,
+                time     : this.delay.delayTime.value,
+                depth    : this.depthRate,
+                rate     : this.rate.value,
+                mix      : this.mix.gain.value,
+                tone     : this.tone.frequency.value,
+                feedback : this.feedback.gain.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Flanger.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -6272,6 +6502,25 @@
         };
 
         /** @override */
+        Chorus.prototype.params = function() {
+            var params = {
+                state    : this.isActive,
+                time     : this.delay.delayTime.value,
+                depth    : this.depthRate,
+                rate     : this.rate.value,
+                mix      : this.mix.gain.value,
+                tone     : this.tone.frequency.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Chorus.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Chorus.prototype.toString = function() {
             return '[SoundModule Chorus]';
         };
@@ -6414,6 +6663,25 @@
                 // GainNode (input) -> GainNode (output)
                 this.input.connect(this.output);
             }
+        };
+
+        /** @override */
+        Delay.prototype.params = function() {
+            var params = {
+                state    : this.isActive,
+                time     : this.delay.delayTime.value,
+                dry      : this.dry.gain.value,
+                wet      : this.wet.gain.value,
+                tone     : this.tone.frequency.value,
+                feedback : this.feedback.gain.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Delay.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -6791,6 +7059,23 @@
         };
 
         /** @override */
+        Reverb.prototype.params = function() {
+            var params = {
+                state : this.isActive,
+                dry   : this.dry.gain.value,
+                wet   : this.wet.gain.value,
+                tone  : this.tone.frequency.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Reverb.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Reverb.prototype.toString = function() {
             return '[SoundModule Reverb]';
         };
@@ -7049,6 +7334,31 @@
         };
 
         /** @override */
+        Panner.prototype.params = function() {
+            var params = {
+                state          : this.isActive,
+                positions      : this.positions,
+                orientations   : this.orientations,
+                velocities     : this.velocities,
+                refdistance    : this.panner.refDistance,
+                maxdistance    : this.panner.maxDistance,
+                rollofffactor  : this.panner.rolloffFactor,
+                coneinnerangle : this.panner.coneInnerAngle,
+                coneouterangle : this.panner.coneOuterAngle,
+                coneoutergain  : this.panner.coneOuterGain,
+                panningmodel   : this.panner.panningModel,
+                distancemodel  : this.panner.distanceModel
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Panner.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
         Panner.prototype.toString = function() {
             return '[SoundModule Panner]';
         };
@@ -7246,6 +7556,29 @@
             this.activeCounter = 0;
 
             return this;
+        };
+
+        /**
+         * This method gets effecter's parameters as associative array.
+         * @return {object}
+         */
+        EnvelopeGenerator.prototype.params = function() {
+            var params = {
+                attack  : this.attack,
+                decay   : this.decay,
+                sustain : this.sustain,
+                release : this.release
+            };
+
+            return params;
+        };
+
+        /**
+         * This method gets effecter's parameters as JSON.
+         * @return {string}
+         */
+        EnvelopeGenerator.prototype.toJSON = function() {
+            return JSON.strignify(this.params());
         };
 
         /** @override */
@@ -7548,6 +7881,38 @@
         return this;
     };
 
+    /**
+     * This method gets effecter's parameters as associative array.
+     * @return {object}
+     */
+    SoundModule.prototype.params = function() {
+        var params = {};
+
+        for (var module in this) {
+            if (Object.prototype.toString.call(this[module]) === '[object Function]') {
+                continue;
+            }
+
+            var m = module.toLowerCase();
+
+            if (m === 'mastervolume') {
+                params[m] = this[module].gain.value;  // AudioParam
+            } else if ((Object.prototype.toString.call(this[module]) === '[object Object]') && ('params' in this[module])) {
+                params[m] = this[module].params();
+            }
+        }
+
+        return params;
+    };
+
+    /**
+     * This method gets effecter's parameters as JSON.
+     * @return {string}
+     */
+    SoundModule.prototype.toJSON = function() {
+        return JSON.stringify(this.params());
+    };
+
     /** @override */
     SoundModule.prototype.toString = function() {
         return '[SoundModule]';
@@ -7811,7 +8176,7 @@
                                 } else {
                                     var reals = null;
                                     var imags = null;
-            
+
                                     if (value.real instanceof Float32Array) {
                                         reals = value.real;
                                     } else if (Array.isArray(value.real)) {
@@ -7830,7 +8195,7 @@
 
                                     if ((reals instanceof Float32Array) && (imags instanceof Float32Array)) {
                                         var MAX_SIZE = 4096;  // This size is defined by specification
-                    
+
                                         if (reals.length > MAX_SIZE) {reals = reals.subarray(0, MAX_SIZE);}
                                         if (imags.length > MAX_SIZE) {imags = imags.subarray(0, MAX_SIZE);}
 
@@ -8260,6 +8625,33 @@
      */
     OscillatorModule.prototype.length = function() {
         return this.sources.length;
+    };
+
+    /** @override */
+    OscillatorModule.prototype.params = function() {
+        // Call superclass method
+        var params = SoundModule.prototype.params.call(this);
+
+        params.oscillator = {
+            glide : {
+                type : this.glide.type,
+                time : this.glide.time
+            }
+        };
+
+        for (var i = 0, len = this.sources.length; i < len; i++) {
+            var source = this.sources[i];
+
+            params.oscillator['oscillator' + i] = {
+                state  : source.isActive,
+                gain   : source.volume.gain.value,
+                type   : source.source.type,
+                octave : source.octave,
+                fine   : source.fine
+            };
+        }
+
+        return params;
     };
 
     /** @override */
@@ -8774,6 +9166,18 @@
     };
 
     /** @override */
+    OneshotModule.prototype.params = function() {
+        // Call superclass method
+        var params = SoundModule.prototype.params.call(this);
+
+        params.oneshot = {
+            transpose : this.transpose
+        };
+
+        return params;
+    };
+
+    /** @override */
     OneshotModule.prototype.toString = function() {
         return '[OneshotModule]';
     };
@@ -9222,6 +9626,21 @@
      */
     AudioModule.prototype.isPaused = function() {
         return this.paused;
+    };
+
+    /** @override */
+    AudioModule.prototype.params = function() {
+        // Call superclass method
+        var params = SoundModule.prototype.params.call(this);
+
+        params.audio = {
+            playbackrate  : this.source.playbackRate.value,
+            vocalcanceler : {
+                depth : this.vocalcanceler.depth
+            }
+        };
+
+        return params;
     };
 
     /** @override */
@@ -9689,6 +10108,21 @@
     };
 
     /** @override */
+    MediaModule.prototype.params = function() {
+        // Call superclass method
+        var params = SoundModule.prototype.params.call(this);
+
+        params.media = {
+            playbackrate  : this.playbackRate,
+            vocalcanceler : {
+                depth : this.vocalcanceler.depth
+            }
+        };
+
+        return params;
+    };
+
+    /** @override */
     MediaModule.prototype.toString = function() {
         return '[MediaModule]';
     };
@@ -9972,6 +10406,20 @@
      */
     StreamModule.prototype.isStreaming = function() {
         return this.isStop ? false : true;
+    };
+
+    /** @override */
+    StreamModule.prototype.params = function() {
+        // Call superclass method
+        var params = SoundModule.prototype.params.call(this);
+
+        params.stream = {
+            noisegate : {
+                level : this.noisegate.level
+            }
+        };
+
+        return params;
     };
 
     /** @override */
