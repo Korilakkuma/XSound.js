@@ -1772,6 +1772,16 @@ for example,
   
 It is necessary to connect Panner for using the Listener.
   
+### Get Parameters Collectively
+  
+As associative array,
+  
+    var params = X(source).params();
+  
+As JSON,
+  
+    var json = X(source).toJSON();
+  
 ## Visualization
   
 ### Initialization
