@@ -38,7 +38,7 @@
     // These functions are static methods for "XSound".
 
     /** 
-     * TThis static method reads file of audio or text.
+     * This static method reads file of audio or text.
      * @param {Blob} file This argument is the instance of Blob. This is entity of file.
      * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
      * @param {function} successCallback This argument is executed as next process when reading file is successful.

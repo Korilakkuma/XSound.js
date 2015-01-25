@@ -100,23 +100,19 @@
         switch (String(mode).toUpperCase()) {
             case 'NONE' :
             case '0'    :
-                ERROR_MODE      = ERROR_MODES.NONE;
-                this.ERROR_MODE = ERROR_MODES.NONE;
+                XSound.ERROR_MODE = ERROR_MODES.NONE;
                 break;
             case 'ALERT' :
             case '1'     :
-                ERROR_MODE      = ERROR_MODES.ALERT;
-                this.ERROR_MODE = ERROR_MODES.ALERT;
+                XSound.ERROR_MODE = ERROR_MODES.ALERT;
                 break;
             case 'CONSOLE' :
             case '2'       :
-                ERROR_MODE      = ERROR_MODES.CONSOLE;
-                this.ERROR_MODE = ERROR_MODES.CONSOLE;
+                XSound.ERROR_MODE = ERROR_MODES.CONSOLE;
                 break;
             case 'EXCEPTION' :
             case '3'         :
-                ERROR_MODE      = ERROR_MODES.EXCEPTION;
-                this.ERROR_MODE = ERROR_MODES.EXCEPTION;
+                XSound.ERROR_MODE = ERROR_MODES.EXCEPTION;
                 break;
             default :
                 break;
@@ -124,7 +120,7 @@
     };
 
     /** 
-     * TThis static method reads file of audio or text.
+     * This static method reads file of audio or text.
      * @param {Blob} file This argument is the instance of Blob. This is entity of file.
      * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
      * @param {function} successCallback This argument is executed as next process when reading file is successful.
