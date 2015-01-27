@@ -43,11 +43,13 @@ Please use Chrome (Mac / Windows) or Safari (Mac) or Opera (Mac / Windows).
 
 * [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
 
-* [Panner / Listener](http://curtaincall.weblike.jp/portfolio-x-sound/javascript/myworks/tests/AudioModule/test-audio-panner-listener)
-
 Now, I'm creating website for Web Audio API. Please use the following site for understanding README.  
 
 * [WEB SOUNDER](http://curtaincall.weblike.jp/portfolio-web-sounder/)
+  
+## Download & API Document
+  
+* [XSound.js Download & API Document](http://korilakkuma.github.io/XSound/)
   
 ## Usage
   
@@ -74,11 +76,11 @@ For example,
 If path to module does not exist, module path must be designated by the 2nd argument.  
 For exmaple,
   
-    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket/lib/websocket.js
+    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket
   
 In the case of recording log, the path of log file must be designated by the 3rd argument.
   
-    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket/lib/websocket.js websocket.log
+    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket websocket.log
   
 ## Global Objects
   
@@ -182,7 +184,7 @@ In the case of single sound,
 or,
   
     // 440 Hz (A) is the 49th in keyboard of piano
-    X('oscillator').ready(0, 0).start(X.toFrequencies([49]));  // or, X('oscillator').start(X.toFrequencies([49]));
+    X('oscillator').ready(0, 0).start(X.toFrequencies([48]));  // or, X('oscillator').start(X.toFrequencies([48]));
   
 In the case of multi sounds (for example, chord),
   
@@ -567,6 +569,7 @@ It is required to create the instance of AudioBuffer in order to to play the aud
                 },
                 error : function(event, error) {
                     // "event" is "onerror" event object in the instance of FileReader
+                    // "error" is error code of FileReader
                 },
                 progress : function(event) {
                     // "event" is "onprogress" event object in the instance of FileReader
