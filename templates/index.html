@@ -1,0 +1,98 @@
+        <section>
+            <section>
+                <h1>XSound.js</h1>
+                <hr />
+                <p>HTML5 Web Audio API Library</p>
+            </section>
+            <section>
+                <h1>Overview</h1>
+                <hr />
+                <p>
+                    This library enables developers to use <strong>Web Audio API by description like jQuery</strong>.<br />
+                    In concrete, this library may be useful to implement the following features.
+                </p>
+                <ul class="list-marker">
+                    <li>Create Sound</li>
+                    <li>Play the One-Shot Audio</li>
+                    <li>Play the Audio</li>
+                    <li>Play the Media (Fallback by HTML5 MediaElement)</li>
+                    <li>Play the MML (Music Macro Language)</li>
+                    <li>Streaming (by WebRTC)</li>
+                    <li>Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb, and Original Effector …etc)</li>
+                    <li>Visualization (Overview in Time Domain / Time Domain / Spectrum)</li>
+                    <li>Recording (Create WAVE file)</li>
+                    <li>Session (by WebSocket)</li>
+                </ul>
+                <p>The structure of description is the following.</p>
+<pre>
+<code>
+XSound(/* sound source */).setup();
+XSound(/* sound source */).param();
+XSound(/* sound source */).ready();
+XSound(/* sound source */).start();
+XSound(/* sound source */).stop();
+
+XSound(/* sound source */).module(/* effectors, analyser, recorder, session */).setup();
+XSound(/* sound source */).module(/* effectors, analyser, recorder, session */).param();
+XSound(/* sound source */).module(/* effectors, analyser, recorder, session */).start();
+XSound(/* sound source */).module(/* effectors, analyser, recorder, session */).stop();
+</code>
+</pre>
+                <p>or</p>
+<pre>
+<code>
+X(/* sound source */).setup();
+X(/* sound source */).param();
+X(/* sound source */).ready();
+X(/* sound source */).start();
+X(/* sound source */).stop();
+
+X(/* sound source */).module(/* effectors, analyser, recorder, session */).setup();
+X(/* sound source */).module(/* effectors, analyser, recorder, session */).param();
+X(/* sound source */).module(/* effectors, analyser, recorder, session */).start();
+X(/* sound source */).module(/* effectors, analyser, recorder, session */).stop();
+</code>
+</pre>
+                <p>…etc</p>
+            </section>
+            <section>
+                <h1>Demo</h1>
+                <hr />
+                <p>
+                    The application that uses this library is in the following URL.<br />
+                    Please use Chrome (Mac OS X / Windows) or Safari (Mac OS X) or Opera (Mac OS X / Windows).
+                </p>
+                <ul class="list-marker">
+                    <li><a href="http://korilakkuma.github.io/X-Sound/" target="_blank">X Sound</a></li>
+                    <li><a href="http://curtaincall.weblike.jp/portfolio-music-v/" target="_blank">Music V</a></li>
+                </ul>
+                <p>Now, I'm creating website for Web Audio API. Please use the following site for understanding API Document.</p>
+                <ul class="list-marker">
+                    <li><a href="http://curtaincall.weblike.jp/portfolio-web-sounder/" target="_blank">WEB SOUNDER</a></li>
+                </ul>
+            </section>
+            <section>
+                <h1>Usage</h1>
+                <hr />
+<pre><code>&lt;script type="text/javascript" src="xsound.min.js"&gt;&lt;/script&gt;</code></pre>
+                <p>In the case of displaying error message for development,</p>
+<pre><code>&lt;script type="text/javascript" src="xsound.dev.js"&gt;&lt;/script&gt;</code></pre>
+                <p>In the case of using WebSocket,</p>
+<pre><code>$ node xsound-server-session-websocket.js  // Use "websocket" module</code></pre>
+                <p>or,</p>
+<pre><code>$ node xsound-server-session-ws.js  // Use "ws" module</code></pre>
+                <p>
+                    Default port number is 8000.<br>
+                    This port number can be changed by designating argument.<br />
+                    For example,
+                </p>
+<pre><code>$ node xsound-server-session-websocket.js 8080  // Listen by 8080 ...</code></pre>
+                <p>
+                    If path to module does not exist, module path must be designated by the 2nd argument.<br />
+                    For exmaple,
+                </p>
+<pre><code>$ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket</code></pre>
+                <p>In the case of recording log, the path of log file must be designated by the 3rd argument.</p>
+<pre><code>$ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket websocket.log</code></pre>
+            </section>
+        </section>
