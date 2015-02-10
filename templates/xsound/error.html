@@ -1,0 +1,53 @@
+        <section>
+            <section>
+                <h1>error <span class="type">undefined</span></h1>
+                <hr />
+                <p>
+                    This method is setter for &quot;ERROR_MODE&quot; property.
+                    This method is only defined by development version.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span> or <span class="type">string</span></td>
+                            <td>
+                                This argument is one of 0, 1, 2, 3 in the case of number type.
+                                This argument is one of &apos;NONE&apos;, &apos;CONSOLE&apos;, &apos;ALERT&apos;, &apos;EXCEPTION&apos; in the case of string type.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.error&quot;);
+
+console.dir(X.error(0));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(1));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(2));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(3));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(&apos;NONE&apos;));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(&apos;CONSOLE&apos;));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(&apos;ALERT&apos;));
+console.log(X.ERROR_MODE);
+
+console.dir(X.error(&apos;EXCEPTION&apos;));
+console.log(X.ERROR_MODE);
+</textarea>
+            </section>
+        </section>

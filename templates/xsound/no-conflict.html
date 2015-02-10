@@ -1,0 +1,39 @@
+        <section>
+            <section>
+                <h1>noConflict <span class="type">XSound</span></h1>
+                <hr />
+                <p>
+                    This method deletes global object that is defined by this library.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">undefined</span> or <span class="type">boolean</span></td>
+                            <td>
+                                If argument is true, the both of global objects are deleted.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.noConflict&quot;);
+
+X.noConflict();
+
+//undefined
+console.dir(X);
+
+var $X = XSound.noConflict(true);
+
+// undefined
+console.dir(XSound);
+
+console.dir($X);
+</textarea>
+            </section>
+        </section>

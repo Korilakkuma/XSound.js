@@ -1,0 +1,48 @@
+        <section>
+            <section>
+                <h1>free <span class="type">undefined</span></h1>
+                <hr />
+                <p>
+                    This method releases memory for sound source.
+                    Namely, this method executes garbage collection (GC) explicitly.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Array</span> or <span class="type">SoundModule</span></td>
+                            <td>
+                                This argument is the array that contains sound source object.
+                                Or, This argument is sound source object.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.free&quot;);
+
+X.free([
+    X(&apos;oscillator&apos;),
+    X(&apos;oneshot&apos;),
+    X(&apos;audio&apos;),
+    X(&apos;media&apos;),
+    X(&apos;stream&apos;),
+    X(&apos;mixer&apos;),
+    X(&apos;mml&apos;)
+]);
+
+// null
+console.dir(X(&apos;oscillator&apos;));
+console.dir(X(&apos;oneshot&apos;));
+console.dir(X(&apos;audio&apos;));
+console.dir(X(&apos;media&apos;));
+console.dir(X(&apos;stream&apos;));
+console.dir(X(&apos;mixer&apos;));
+console.dir(X(&apos;mml&apos;));
+</textarea>
+            </section>
+        </section>

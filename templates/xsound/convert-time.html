@@ -1,0 +1,34 @@
+        <section>
+            <section>
+                <h1>convertTime <span class="type">Object</span></h1>
+                <hr />
+                <p>
+                    This method returns the associative array that has 3 keys of 'minutes', 'seconds', and 'milliseconds'.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>
+                                The unit of this value is seconds.
+                                If this value is less than 0, this method displays error message in console.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.convertTime&quot;);
+
+console.dir(X.convertTime());
+console.dir(X.convertTime(-1));  // Error
+console.dir(X.convertTime(0));
+console.dir(X.convertTime(60));
+console.dir(X.convertTime(66.666));
+</textarea>
+            </section>
+        </section>

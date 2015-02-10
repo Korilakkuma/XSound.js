@@ -1,0 +1,129 @@
+        <section>
+            <section>
+                <h1>file <span class="type">File (extends Blob)</span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of File (extends Blob) and reads this.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>
+                                This argument is plain object that has the following properties.
+                                <dl>
+                                    <dt>event <span class="type">Event</span></dt>
+                                    <dd>This value is event object.</dd>
+                                    <dt>type <span class="type">string</span></dt>
+                                    <dd>This value is one of &apos;ArrayBuffer&apos;, &apos;DataURL&apos;, &apos;Text&apos;</dd>
+                                    <dt>success <span class="type">function</span></dt>
+                                    <dd>This function is invoked on read success.</dd>
+                                    <dt>error <span class="type">function</span></dt>
+                                    <dd>This function is invoked on read error.</dd>
+                                    <dt>progress <span class="type">function</span></dt>
+                                    <dd>This function is invoked while file is read.</dd>
+                                </dl>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.file&quot;);
+
+document.querySelector(&apos;[type=&quot;file&quot;]&apos;).addEventListener('change', function(event) {
+    try {
+        var file = X.file({
+            event    : event,
+            type     : &apos;ArrayBuffer&apos;,
+            success  : function(event, arrayBuffer) {
+                // The 1st argument is &apos;onload&apos; event object in the instance of FileReader
+                // The 2nd argument is ArrayBuffer
+
+                console.log(&apos;success&apos;);
+                console.dir(event);
+                console.dir(arrayBuffer);
+            },
+            error    : function(event, error) {
+                // The 1st argument is either &apos;onerror&apos; event object in FileReader
+                // The 2nd argument is error code of FileReader
+
+                console.log(&apos;error&apos;);
+                console.dir(event);
+                console.dir(error);
+            },
+            progress : function(event) {
+                // The 1st argument is XMLHttpRequestProgressEvent
+
+                console.log(&apos;progress&apos;);
+                console.dir(event);
+            }
+        });
+
+        console.dir(file);
+    } catch (error) {
+        window.alert(error.message);
+    }
+}, false);
+
+var dropArea = document.querySelector(&apos;.drop-area&apos;);
+
+dropArea.addEventListener(&apos;dragenter&apos;, function(event) {
+    event.preventDefault();
+    this.classList.add(&apos;over&apos;);
+}, false);
+
+dropArea.addEventListener(&apos;dragover&apos;, function(event) {
+    event.preventDefault();
+}, false);
+
+dropArea.addEventListener(&apos;dragleave&apos;, function(event) {
+    event.preventDefault();
+    this.classList.remove(&apos;over&apos;);
+}, false);
+
+dropArea.addEventListener(&apos;drop&apos;, function(event) {
+    this.classList.remove(&apos;over&apos;);
+
+    try {
+        var file = X.file({
+            event    : event,
+            type     : &apos;ArrayBuffer&apos;,
+            success  : function(event, arrayBuffer) {
+                // The 1st argument is &apos;onload&apos; event object in the instance of FileReader
+                // The 2nd argument is ArrayBuffer
+
+                console.log(&apos;success&apos;);
+                console.dir(event);
+                console.dir(arrayBuffer);
+            },
+            error    : function(event, error) {
+                // The 1st argument is either &apos;onerror&apos; event object in FileReader
+                // The 2nd argument is error code of FileReader
+
+                console.log(&apos;error&apos;);
+                console.dir(event);
+                console.dir(error);
+            },
+            progress : function(event) {
+                // The 1st argument is XMLHttpRequestProgressEvent
+
+                console.log(&apos;progress&apos;);
+                console.dir(event);
+            }
+        });
+
+        console.dir(file);
+    } catch (error) {
+        window.alert(error.message);
+    }
+}, false);
+</textarea>
+                <p class="sound-controllers"><input type='file' /></p>
+                <div class="drop-area">Drop File</div>
+            </section>
+        </section>
