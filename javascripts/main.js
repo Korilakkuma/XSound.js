@@ -42,6 +42,8 @@ $(function() {
     var route = function(hash) {
         var matches = hash.match(/^#!?([^-]*)?-(.*)$/);
 
+        $('#' + matches[1] + '-api').addClass('selected');
+
         return 'templates/' + matches[1] + '/' + matches[2] + '.html';
     };
 
@@ -51,7 +53,7 @@ $(function() {
         getTemplate(route(location.hash));
     }
 
-    $('#sidebar section h2 a, #sidebar dl dd a').on('click', function(event) {
+    $('#sidebar > section:first-child > h2 > a, #sidebar dl dd a').on('click', function(event) {
         event.preventDefault();
 
         var href = $(this).attr('href');
@@ -65,4 +67,15 @@ $(function() {
         location.reload();
     });
 
+    $('#sidebar > section > h2 > a:not(.selected)').parent('h2').next('dl').hide();
+    $('#sidebar > section:not(:first-child) > h2 > a').on('click', function(event) {
+        event.preventDefault();
+
+        if ($(this).parent('h2').next('dl').is(':visible')) {
+            $('#sidebar > section > dl').slideUp('fast', 'swing');
+        } else {
+            $('#sidebar > section > dl').slideUp('fast', 'swing');
+            $(this).parent('h2').next('dl').slideDown('slow', 'swing');
+        }
+    });
 });
