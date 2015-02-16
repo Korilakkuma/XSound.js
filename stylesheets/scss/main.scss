@@ -253,6 +253,7 @@ table {
         tr {
             th {
                 padding:0.5rem;
+                border:1px solid rgba(#999, 1.0);
                 font-size:1rem;
                 font-weight:lighter;
                 text-align:center;
@@ -297,6 +298,48 @@ table {
     color:rgba(#333, 1.0);
 }
 
+.sound-controllers {
+    margin:2rem 0rem 0rem 2rem;
+
+    dt {
+        margin:1rem 0rem;
+        font-size:1rem;
+
+        // list marker
+        &:before {
+            content:"";
+            display:inline-block;
+            margin-right:0.5rem;
+            border-top   :10px solid $transparent;
+            border-left  :15px solid rgba(#777, 1.0);
+            border-bottom:10px solid $transparent;
+            vertical-align:-0.4rem;
+        }
+    }
+
+    dd {
+        font-size:1rem;
+
+        label {
+            cursor:pointer;
+        }
+
+        [type="radio"] {
+            margin-left:0.25rem;
+            vertical-align:0.1rem;
+        }
+
+        [type="range"] {
+            cursor:pointer;
+            width:100%;
+
+            &:active {
+                cursor:ew-resize;
+            }
+        }
+    }
+}
+
 [type="file"] {cursor:pointer;}
 
 .drop-area {
@@ -315,6 +358,40 @@ table {
     border:3px dashed rgba(#CCC, 1.0);
     color:rgba(#CCC, 1.0);
     background-color:rgba(#EEE, 1.0);
+}
+
+.buttons {
+    margin-top:2rem;
+
+    li {
+        display:block;
+        float:left;
+
+        &:not(first-child) {
+            margin-left:0.5rem;
+        }
+
+        button {
+            cursor:pointer;
+            border:none;
+            width:120px;
+            height:60px;
+            line-height:60px;
+            font-size:1rem;
+            color:rgba(#FFF, 1.0);
+            background-color:rgba(#CCC, 1.0);
+
+            @include setTransition(background-color 1s ease 0s);
+
+            &:hover {
+                background-color:rgba(#999, 1.0);
+            }
+
+            &:active {
+                @include boxshadow(0px 1px 1px 1px rgba($black, 0.2) inset);
+            }
+        }
+    }
 }
 
 hr {
@@ -371,6 +448,15 @@ a {
     .list-marker li {
         &:before {vertical-align:-0.25rem;}
     }
+
+    .sound-controllers {
+        dt {
+            // list marker
+            &:before {
+                vertical-align:-0.3rem;
+            }
+        }
+    }
 }
 
 @media only screen and (min-width:1024px) {
@@ -407,5 +493,14 @@ a {
 
     .list-marker li {
         &:before {vertical-align:-0.25rem;}
+    }
+
+    .sound-controllers {
+        dt {
+            // list marker
+            &:before {
+                vertical-align:-0.25rem;
+            }
+        }
     }
 }
