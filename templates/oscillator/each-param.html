@@ -1,0 +1,92 @@
+        <section>
+            <section>
+                <h1>param <span class="type">string | number | Oscillator</span></h1>
+                <hr />
+                <p>
+                    This method gets or sets parameters of each oscillator.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>This value is associative array for parameters.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;oscillator&apos;, 0).param&quot;);
+
+X(&apos;oscillator&apos;).setup(true).start(440);
+
+document.querySelector(&apos;[name=&quot;form-type&quot;]&apos;).addEventListener(&apos;change&apos;, function() {
+    for (var i = 0, len = this.elements[&apos;radio-type&apos;].length; i < len; i++) {
+        if (this.elements[&apos;radio-type&apos;][i].checked) {
+            X(&apos;oscillator&apos;, 0).param({
+                type   : this.elements[&apos;radio-type&apos;][i].value,
+                gain   : X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;),
+                octave : X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;),
+                fine   : X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;)
+            });
+
+            break;
+        }
+    }
+}, false);
+
+document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param({
+        type   : X(&apos;oscillator&apos;, 0).param(&apos;type&apos;),
+        gain   : this.valueAsNumber,
+        octave : X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;),
+        fine   : X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;)
+    });
+
+    document.querySelector(&apos;#output-gain&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-octave&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param({
+        type   : X(&apos;oscillator&apos;, 0).param(&apos;type&apos;),
+        gain   : X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;),
+        octave : this.valueAsNumber,
+        fine   : X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;)
+    });
+
+    document.querySelector(&apos;#output-octave&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-fine&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param({
+        type   : X(&apos;oscillator&apos;, 0).param(&apos;type&apos;),
+        gain   : X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;),
+        octave : X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;),
+        fine   : this.valueAsNumber
+    });
+
+    document.querySelector(&apos;#output-fine&apos;).textContent = this.value;
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt>Type</dt>
+                    <dd>
+                        <form name="form-type">
+                            <label><input type="radio" name="radio-type" value="sine" checked /> SINE</label>
+                            <label><input type="radio" name="radio-type" value="square"   /> SQUARE</label>
+                            <label><input type="radio" name="radio-type" value="sawtooth" /> SAWTOOTH</label>
+                            <label><input type="radio" name="radio-type" value="triangle" /> TRIANGLE</label>
+                        </form>
+                    </dd>
+                    <dt><label for="range-gain">Gain : <span id="output-gain">1</span></label></dt>
+                    <dd><input type="range" id="range-gain" value="1" min="0" max="1" step="0.05" /><dd>
+                    <dt><label for="range-octave">Octave : <span id="output-octave">0</span></label></dt>
+                    <dd><input type="range" id="range-octave" value="0" min="-4" max="4" step="1" /><dd>
+                        <dt><label for="range-fine">Fine : <span id="output-fine">0</span></label></dt>
+                    <dd><input type="range" id="range-fine" value="0" min="-1200" max="1200" step="10" /><dd>
+                </dl>
+            </section>
+        </section>

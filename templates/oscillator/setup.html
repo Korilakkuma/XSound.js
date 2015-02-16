@@ -1,0 +1,38 @@
+        <section>
+            <section>
+                <h1>setup <span class="type">OscillatorModule</span></h1>
+                <hr />
+                <p>
+                    This method setups oscillators.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Array</span> or <span class="type">boolean</span></td>
+                            <td>This value is initial oscillator state.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;oscillator&apos;).setup&quot;);
+
+X(&apos;oscillator&apos;).setup(true);
+console.log(X(&apos;oscillator&apos;, 0).state());  // true
+
+X(&apos;oscillator&apos;).setup(false);
+console.log(X(&apos;oscillator&apos;, 0).state());  // false
+
+// Use multiple oscillators
+X(&apos;oscillator&apos;).setup([true, false, true, false]);
+console.log(X(&apos;oscillator&apos;, 0).state());  // true
+console.log(X(&apos;oscillator&apos;, 1).state());  // false
+console.log(X(&apos;oscillator&apos;, 2).state());  // true
+console.log(X(&apos;oscillator&apos;, 3).state());  // false
+</textarea>
+            </section>
+        </section>

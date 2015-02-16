@@ -1,0 +1,35 @@
+        <section>
+            <section>
+                <h1>ready <span class="type">OscillatorModule</span></h1>
+                <hr />
+                <p>
+                    This method sets sound scheduling.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is the start time.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is the duration time.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;oscillator&apos;).stop&quot;);
+
+X(&apos;oscillator&apos;).setup(true);
+
+// The start after 5 seconds and the stop after 10 seconds
+X(&apos;oscillator&apos;).ready(5, 10).start(440).stop();
+</textarea>
+            </section>
+        </section>
