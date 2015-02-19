@@ -53,6 +53,14 @@ $(function() {
         getTemplate(route(location.hash));
     }
 
+    window.onpopstate = function(event) {
+        if (location.hash === '') {
+            getTemplate('templates/index.html');
+        } else {
+            getTemplate(route(location.hash));
+        }
+    };
+
     $('#sidebar > section:first-child > h2 > a, #sidebar dl dd a').on('click', function(event) {
         event.preventDefault();
 
