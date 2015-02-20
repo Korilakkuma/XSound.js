@@ -1,0 +1,146 @@
+        <section>
+            <section>
+                <h1>param <span class="type">number | boolean | AudioModule</span></h1>
+                <hr />
+                <p>
+                    This method gets or sets parameters.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>This value is associative array for parameters.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).param&quot;);
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.dir(arrayBuffer);
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.dir(buffer);
+
+        document.querySelector(&apos;#range-current-time&apos;).setAttribute(&apos;max&apos;, X(&apos;audio&apos;).param(&apos;duration&apos;));  // Read only
+        document.querySelector(&apos;#output-sample-rate&apos;).textContent = X(&apos;audio&apos;).param(&apos;sampleRate&apos;);       // Read only
+        document.querySelector(&apos;#output-channels&apos;).textContent    = X(&apos;audio&apos;).param(&apos;channels&apos;);         // Read only
+
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                this.textContent = &apos;START&apos;;
+            }
+
+            X(&apos;audio&apos;).toggle(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+        }, false);
+
+        document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).param({
+                masterVolume : this.valueAsNumber,
+                playbackRate : X(&apos;audio&apos;).param(&apos;playbackRate&apos;),
+                currentTime  : X(&apos;audio&apos;).param(&apos;currentTime&apos;),
+                loop         : X(&apos;audio&apos;).param(&apos;loop&apos;)
+            });
+
+            document.querySelector(&apos;#output-master-volume&apos;).textContent = this.value;
+        }, false);
+
+        document.querySelector(&apos;#range-playback-rate&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).param({
+                masterVolume : X(&apos;audio&apos;).param(&apos;masterVolume&apos;),
+                playbackRate : this.valueAsNumber,
+                currentTime  : X(&apos;audio&apos;).param(&apos;currentTime&apos;),
+                loop         : X(&apos;audio&apos;).param(&apos;loop&apos;)
+            });
+
+            document.querySelector(&apos;#output-playback-rate&apos;).textContent = this.value;
+        }, false);
+
+        document.querySelector(&apos;#range-current-time&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).param({
+                masterVolume : X(&apos;audio&apos;).param(&apos;masterVolume&apos;),
+                playbackRate : X(&apos;audio&apos;).param(&apos;playbackRate&apos;),
+                currentTime  : this.valueAsNumber,
+                loop         : X(&apos;audio&apos;).param(&apos;loop&apos;)
+            });
+
+            document.querySelector(&apos;#output-current-time&apos;).textContent = this.value;
+        }, false);
+
+        document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+            X(&apos;audio&apos;).param({
+                masterVolume : X(&apos;audio&apos;).param(&apos;masterVolume&apos;),
+                playbackRate : X(&apos;audio&apos;).param(&apos;playbackRate&apos;),
+                currentTime  : X(&apos;audio&apos;).param(&apos;currentTime&apos;),
+                loop         : this.checked
+            });
+        }, false);
+    },
+    start : function(source, currentTime) {
+        console.log(&apos;start&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    stop : function(source, currentTime) {
+        console.log(&apos;stop&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    update : function(source, currentTime) {
+        console.log(&apos;update&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+
+        document.querySelector(&apos;#range-current-time&apos;).valueAsNumber = X(&apos;audio&apos;).param(&apos;currentTime&apos;);
+        document.querySelector(&apos;#output-current-time&apos;).textContent  = X(&apos;audio&apos;).param(&apos;currentTime&apos;);
+    },
+    ended : function(source, currentTime) {
+        console.log(&apos;ended&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt>Sample Rate</dt>
+                    <dd><span id="output-sample-rate">0</span> Hz</dd>
+                    <dt>Channels</dt>
+                    <dd><span id="output-channels">0</span> channels</dd>
+                    <dt><label><input type="checkbox" /> Loop</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="range-master-volume">Master Volume : <span id="output-master-volume">1</span></label></dt>
+                    <dd><input type="range" id="range-master-volume" value="1" min="0" max="1" step="0.05" /><dd>
+                    <dt><label for="range-playback-rate">Playback Rate : <span id="output-playback-rate">1</span></label></dt>
+                    <dd><input type="range" id="range-playback-rate" value='1' min='0.05' max="2" step="0.05" /></dd>
+                    <dt><label for="range-current-time">Current Time : <span id="output-current-time">0</span></label></dt>
+                    <dd><input type="range" id="range-current-time" value="0" min="0" max="0" step="1" /></dd>
+                </dl>
+            </section>
+        </section>

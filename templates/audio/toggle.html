@@ -1,0 +1,95 @@
+        <section>
+            <section>
+                <h1>toggle <span class="type">AudioModule</span></h1>
+                <hr />
+                <p>
+                    This method starts or stops audio.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is the start time.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">Array</span></td>
+                            <td>This value is the array for changing connection.</td>
+                        </tr>
+                        <tr>
+                            <th>3rd</th>
+                            <td><span class="type">function</span></td>
+                            <td>This value is <a href="http://webaudio.github.io/web-audio-api/#the-scriptprocessornode-interface---deprecated" target="_blank">onaudioprocess</a> event hanlder.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).start&quot;);
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.dir(arrayBuffer);
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.dir(buffer);
+
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                this.textContent = &apos;START&apos;;
+            }
+
+            X(&apos;audio&apos;).toggle(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+        }, false);
+    },
+    start : function(source, currentTime) {
+        console.log(&apos;start&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    stop : function(source, currentTime) {
+        console.log(&apos;stop&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    update : function(source, currentTime) {
+        console.log(&apos;update&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    ended : function(source, currentTime) {
+        console.log(&apos;ended&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
+            </section>
+        </section>

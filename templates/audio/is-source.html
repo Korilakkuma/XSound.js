@@ -1,0 +1,46 @@
+        <section>
+            <section>
+                <h1>isSource <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check for presence or absence of AudioBuffer and AudioBufferSourceNode.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).isSource&quot;);
+
+console.log(X(&apos;audio&apos;).isSource());
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.log(X(&apos;audio&apos;).isSource());
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.log(X(&apos;audio&apos;).isSource());
+
+        X(&apos;audio&apos;).start(0);
+    },
+    start : function(source, currentTime) {
+        console.log(&apos;start&apos;);
+        console.log(X(&apos;audio&apos;).isSource());
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+            </section>
+        </section>

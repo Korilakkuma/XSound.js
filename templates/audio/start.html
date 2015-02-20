@@ -1,0 +1,78 @@
+        <section>
+            <section>
+                <h1>start <span class="type">AudioModule</span></h1>
+                <hr />
+                <p>
+                    This method starts audio.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is the start time..</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">Array</span></td>
+                            <td>This value is the array for changing connection.</td>
+                        </tr>
+                        <tr>
+                            <th>3rd</th>
+                            <td><span class="type">function</span></td>
+                            <td>This value is <a href="http://webaudio.github.io/web-audio-api/#the-scriptprocessornode-interface---deprecated" target="_blank">onaudioprocess</a> event hanlder.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).start&quot;);
+
+console.log(&quot;X(&apos;audio&apos;).ready&quot;);
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.dir(arrayBuffer);
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.dir(buffer);
+
+        X(&apos;audio&apos;).start(0);
+    },
+    start : function(source, currentTime) {
+        console.log(&apos;start&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    update : function(source, currentTime) {
+        console.log(&apos;update&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    ended : function(source, currentTime) {
+        console.log(&apos;ended&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+            </section>
+        </section>

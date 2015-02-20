@@ -1,0 +1,40 @@
+        <section>
+            <section>
+                <h1>isBuffer <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check for presence or absence of AudioBuffer.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).isBuffer&quot;);
+
+console.log(X(&apos;audio&apos;).isBuffer());
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.log(X(&apos;audio&apos;).isBuffer());
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.log(X(&apos;audio&apos;).isBuffer());
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+            </section>
+        </section>

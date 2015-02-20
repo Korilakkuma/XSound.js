@@ -1,0 +1,65 @@
+        <section>
+            <section>
+                <h1>isPaused <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check pause.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).isPaused&quot;);
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+    },
+    ready : function(buffer) {
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
+    },
+    start : function(source, currentTime) {
+        console.log(&apos;start&apos;);
+        console.log(X(&apos;audio&apos;).isPaused());
+    },
+    stop : function(source, currentTime) {
+        console.log(&apos;stop&apos;);
+        console.log(X(&apos;audio&apos;).isPaused());
+    },
+    update : function(source, currentTime) {
+        console.log(&apos;update&apos;);
+        console.log(X(&apos;audio&apos;).isPaused());
+    },
+    ended : function(source, currentTime) {
+        console.log(&apos;ended&apos;);
+        console.log(X(&apos;audio&apos;).isPaused());
+
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
+            </section>
+        </section>

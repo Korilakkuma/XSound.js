@@ -1,0 +1,49 @@
+        <section>
+            <section>
+                <h1>ready <span class="type">AudioModule</span></h1>
+                <hr />
+                <p>
+                    This method decodes the instance of ArrayBuffer.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">ArrayBuffer</span></td>
+                            <td>This value is the instance of ArrayBuffer.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;audio&apos;).ready&quot;);
+
+X(&apos;audio&apos;).setup({
+    decode : function(arrayBuffer) {
+        console.log(&apos;decode&apos;);
+        console.dir(arrayBuffer);
+    },
+    ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.dir(buffer);
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    },
+    error : function(event, textStatus) {
+    },
+    progress : function(event) {
+    }
+});
+</textarea>
+            </section>
+        </section>
