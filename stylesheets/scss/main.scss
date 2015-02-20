@@ -78,8 +78,8 @@ h2 {font-size:1.5rem;}
 
 h1 .type {
     float:right;
-    margin-top:0.7rem;
-    font-size:75%;
+    margin-top:1rem;
+    font-size:50%;
     font-style:italic;
     color:rgba(#d00, 1.0);
 }
@@ -299,7 +299,7 @@ table {
 }
 
 .sound-controllers {
-    margin:2rem 0rem 0rem 2rem;
+    margin-left:2rem;
 
     dt {
         margin:1rem 0rem;
@@ -331,6 +331,7 @@ table {
 
         [type="range"] {
             cursor:pointer;
+            outline:none;
             width:100%;
 
             &:active {
@@ -340,7 +341,14 @@ table {
     }
 }
 
-[type="file"] {cursor:pointer;}
+[type="file"] {
+    cursor:pointer;
+    margin:2rem 0rem;
+}
+
+audio, video {
+    margin:2rem 0rem 0rem 2rem;
+}
 
 .drop-area {
     margin:1rem auto;
@@ -360,8 +368,29 @@ table {
     background-color:rgba(#EEE, 1.0);
 }
 
+button {
+    cursor:pointer;
+    border:none;
+    width:120px;
+    height:60px;
+    line-height:60px;
+    font-size:1rem;
+    color:rgba(#FFF, 1.0);
+    background-color:rgba(#CCC, 1.0);
+
+    @include setTransition(background-color 1s ease 0s);
+
+    &:hover {
+        background-color:rgba(#999, 1.0);
+    }
+
+    &:active {
+        @include boxshadow(0px 1px 1px 1px rgba($black, 0.2) inset);
+    }
+}
+
 .buttons {
-    margin-top:2rem;
+    margin:2rem 0rem 0rem 2rem;
 
     li {
         display:block;
@@ -369,27 +398,6 @@ table {
 
         &:not(first-child) {
             margin-left:0.5rem;
-        }
-
-        button {
-            cursor:pointer;
-            border:none;
-            width:120px;
-            height:60px;
-            line-height:60px;
-            font-size:1rem;
-            color:rgba(#FFF, 1.0);
-            background-color:rgba(#CCC, 1.0);
-
-            @include setTransition(background-color 1s ease 0s);
-
-            &:hover {
-                background-color:rgba(#999, 1.0);
-            }
-
-            &:active {
-                @include boxshadow(0px 1px 1px 1px rgba($black, 0.2) inset);
-            }
         }
     }
 }
