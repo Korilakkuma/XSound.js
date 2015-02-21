@@ -560,22 +560,18 @@
 
         var self = this;
 
-        for (var k in this.callbacks) {
-            switch (k) {
-                case 'loadedmetadata' :
-                    this.media.addEventListener('loadedmetadata', function(event) {
-                        self.duration = this.duration;
-                        self.callbacks.loadedmetadata(event, this);
-                    }, false);
+        this.media.addEventListener('loadedmetadata', function(event) {
+            self.duration = this.duration;
 
-                    break;
-                default :
-                    this.media.addEventListener(k, function(event) {
-                        self.callbacks[(event.type).toLowerCase()](event, this);
-                    }, false);
-
-                    break;
+            if ('loadedmetadata' in self.callbacks) {
+                self.callbacks.loadedmetadata(event, this);
             }
+        }, false);
+
+        for (var k in this.callbacks) {
+            this.media.addEventListener(k, function(event) {
+                self.callbacks[(event.type).toLowerCase()](event, this);
+            }, false);
         }
 
         return this;
@@ -839,7 +835,7 @@
      * This method shows video in original size from full screen.
      * @return {MediaFallbackModule} This is returned for method chain.
      */
-    MediaFallbackModule.prototype.exitFullscreeen = function() {
+    MediaFallbackModule.prototype.exitFullscreen = function() {
         if (document.webkitExitFullscreen) {
             // Chrome Safari
             document.webkitExitFullscreen();
@@ -9736,51 +9732,48 @@
 
         var self = this;
 
-        for (var k in this.callbacks) {
-            switch (k) {
-                case 'loadstart' :
-                    this.media.addEventListener('loadstart', function(event) {
-                        // To create the instance of MediaElementAudioSourceNode again causes error to occur.
-                        if (!(self.source instanceof MediaElementAudioSourceNode)) {
-                            self.source = self.context.createMediaElementSource(this);
-                        }
-
-                        self.callbacks.loadstart(event, this);
-                    }, false);
-
-                    break;
-                case 'loadedmetadata' :
-                    this.media.addEventListener('loadedmetadata', function(event) {
-                        self.duration = this.duration;
-                        self.callbacks.loadedmetadata(event, this);
-                    }, false);
-
-                    break;
-                case 'ended' :
-                    this.media.addEventListener('ended', function(event) {
-                        this.pause();
-
-                        // Stop Effectors
-                        self.off(self.context.currentTime);
-
-                        // Stop drawing sound wave
-                        self.analyser.stop('time');
-                        self.analyser.stop('fft');
-
-                        // Stop onaudioprocess event
-                        self.processor.disconnect(0);
-                        self.processor.onaudioprocess = null;  // for Firefox
-                        self.callbacks.ended(event, this);
-                    }, false);
-
-                    break;
-                default :
-                    this.media.addEventListener(k, function(event) {
-                        self.callbacks[(event.type).toLowerCase()](event, this);
-                    }, false);
-
-                    break;
+        this.media.addEventListener('loadstart', function(event) {
+            // To create the instance of MediaElementAudioSourceNode again causes error to occur.
+            if (!(self.source instanceof MediaElementAudioSourceNode)) {
+                self.source = self.context.createMediaElementSource(this);
             }
+
+            if ('loadstart' in self.callbacks) {
+                self.callbacks.loadstart(event, this);
+            }
+        }, false);
+
+        this.media.addEventListener('loadedmetadata', function(event) {
+            self.duration = this.duration;
+
+            if ('loadedmetadata' in self.callbacks) {
+                self.callbacks.loadedmetadata(event, this);
+            }
+        }, false);
+
+        this.media.addEventListener('ended', function(event) {
+            this.pause();
+
+            // Stop Effectors
+            self.off(self.context.currentTime);
+
+            // Stop drawing sound wave
+            self.analyser.stop('time');
+            self.analyser.stop('fft');
+
+            // Stop onaudioprocess event
+            self.processor.disconnect(0);
+            self.processor.onaudioprocess = null;  // for Firefox
+
+            if ('ended' in self.callbacks) {
+                self.callbacks.ended(event, this);
+            }
+        }, false);
+
+        for (var k in this.callbacks) {
+            this.media.addEventListener(k, function(event) {
+                self.callbacks[(event.type).toLowerCase()](event, this);
+            }, false);
         }
 
         return this;
@@ -10086,7 +10079,7 @@
      * This method shows video in original size from full screen.
      * @return {MediaModule} This is returned for method chain.
      */
-    MediaModule.prototype.exitFullscreeen = function() {
+    MediaModule.prototype.exitFullscreen = function() {
         if (document.webkitExitFullscreen) {
             // Chrome Safari
             document.webkitExitFullscreen();
