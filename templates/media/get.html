@@ -1,0 +1,37 @@
+        <section>
+            <section>
+                <h1>get <span class="type">HTMLAudioElement | HTMLVideoElement</span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of HTMLAudioElement or HTMLVideoElement.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;media&apos;).get&quot;);
+
+var mediaPlayer = null;
+
+if (X.IS_XSOUND) {
+    mediaPlayer = X(&apos;media&apos;);
+} else {
+    mediaPlayer = X(&apos;media&apos;);
+}
+
+try {
+    X(&apos;media&apos;).setup({
+        id        : &apos;audio-element&apos;,
+        type      : &apos;audio&apos;,
+        formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
+        callbacks : {}
+    });
+} catch (error) {
+    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    window.alert(error.message);
+}
+
+console.dir(X(&apos;media&apos;).get());
+</textarea>
+                <p><audio id="audio-element" controls></audio></p>
+            </section>
+        </section>

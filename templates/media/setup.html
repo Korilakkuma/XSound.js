@@ -1,0 +1,73 @@
+        <section>
+            <section>
+                <h1>setup <span class="type">MediaModule | MediaFallbackModule</span></h1>
+                <hr />
+                <p>
+                    This method setups HTMLMediaElement, media formats and callback functions.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>
+                                This argument is plain object that has the following properties.
+                                <dl>
+                                    <dt>id <span class="type">string</span></dt>
+                                    <dd>This value is id Attribute of HTMLAudioElement or HTMLVideoElement.</dd>
+                                    <dt>type <span class="type">string</span></dt>
+                                    <dd>This value is either &apos;audio&apos; or &apos;video&apos;</dd>
+                                    <dt>formats <span class="type">Array</span></dt>
+                                    <dd>This value is the array that contains media formats.</dd>
+                                    <dt>callbacks <span class="type">Object</span></dt>
+                                    <dd>This value is the associative array that contains the callback functions that are defined by HTMLMediaElement.</dd>
+                                </dl>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;media&apos;).setup&quot;);
+
+var mediaPlayer = null;
+
+if (X.IS_XSOUND) {
+    mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
+} else {
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+}
+
+var callbacks = {
+    // The 1st argument is event object
+    // The 2nd argument is the instance of HTMLAudioElement or HTMLVideoElement
+    loadstart      : function(event, media) {},
+    loadedmetadata : function(event, media) {},
+    loadeddata     : function(event, media) {},
+    canplay        : function(event, media) {},
+    canplaythrough : function(event, media) {},
+    play           : function(event, media) {},
+    pause          : function(event, media) {},
+    timeupdate     : function(event, media) {},
+    ended          : function(event, media) {}
+    // ...etc
+};
+
+try {
+    X(&apos;media&apos;).setup({
+        id        : &apos;audio-element&apos;,
+        type      : &apos;audio&apos;,
+        formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
+        callbacks : callbacks
+    });
+} catch (error) {
+    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    window.alert(error.message);
+}
+</textarea>
+                <p><audio id="audio-element" controls></audio></p>
+            </section>
+        </section>

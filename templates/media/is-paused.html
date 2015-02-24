@@ -1,0 +1,76 @@
+        <section>
+            <section>
+                <h1>isPaused <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check pause.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;media&apos;).isPaused&quot;);
+
+var mediaPlayer = null;
+
+if (X.IS_XSOUND) {
+    mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
+} else {
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+}
+
+var callbacks = {
+    canplaythrough : function(event, media) {
+        console.log(&apos;canplaythrough&apos;);
+        console.log(X(&apos;media&apos;).isPaused());
+
+        document.querySelector(&apos;button&apos;).onclick = function() {
+            if (X(&apos;media&apos;).isPaused()) {
+                X(&apos;media&apos;).start(X(&apos;media&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;media&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        };
+    },
+    play           : function(event, media) {
+        console.log(&apos;play&apos;);
+        console.log(X(&apos;media&apos;).isPaused());
+    },
+    pause          : function(event, media) {
+        console.log(&apos;pause&apos;);
+        console.log(X(&apos;media&apos;).isPaused());
+    },
+    timeupdate     : function(event, media) {
+        console.log(&apos;timeupdate&apos;);
+        console.log(X(&apos;media&apos;).isPaused());
+    },
+    ended          : function(event, media) {
+        console.log(&apos;ended&apos;);
+        console.log(X(&apos;media&apos;).isPaused());
+
+        X(&apos;media&apos;).param({&apos;currentTime&apos; : 0});
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+};
+
+try {
+    X(&apos;media&apos;).setup({
+        id        : &apos;audio-element&apos;,
+        type      : &apos;audio&apos;,
+        formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
+        callbacks : callbacks
+    });
+
+    X(&apos;media&apos;).ready(&apos;resources/audio/kurenai-twin&apos;);
+} catch (error) {
+    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    window.alert(error.message);
+}
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility"><audio id="audio-element"></audio></dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
+            </section>
+        </section>

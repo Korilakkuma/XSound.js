@@ -1,0 +1,46 @@
+        <section>
+            <section>
+                <h1>isSource <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check for presence or absence of MediaElementAudioSourceNode.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;media&apos;).isSource&quot;);
+
+console.log(X(&apos;media&apos;).isSource());
+
+var mediaPlayer = null;
+
+if (X.IS_XSOUND) {
+    mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
+} else {
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+}
+
+var callbacks = {
+    loadstart : function(event, media) {
+        console.log(&apos;loadstart&apos;);
+        console.log(X(&apos;media&apos;).isSource());
+    }
+};
+
+try {
+    X(&apos;media&apos;).setup({
+        id        : &apos;audio-element&apos;,
+        type      : &apos;audio&apos;,
+        formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
+        callbacks : callbacks
+    }).ready(&apos;resources/audio/kurenai-twin&apos;);
+
+    console.log(X(&apos;media&apos;).isSource());
+} catch (error) {
+    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    window.alert(error.message);
+}
+</textarea>
+                <p><audio id="audio-element" controls></audio></p>
+            </section>
+        </section>
