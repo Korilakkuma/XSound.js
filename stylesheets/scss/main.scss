@@ -81,7 +81,7 @@ h1 .type {
     margin-top:1rem;
     font-size:50%;
     font-style:italic;
-    color:rgba(#d00, 1.0);
+    color:rgba($accentColor1, 1.0);
 }
 
 #project-title {
@@ -266,7 +266,7 @@ table {
 
                 .type {
                     font-style:italic;
-                    color:rgba(#d00, 1.0);
+                    color:rgba($accentColor1, 1.0);
                 }
 
                 dl {
@@ -410,7 +410,7 @@ hr {
 }
 
 footer {
-    margin-top:4rem;
+    margin-top:2rem;
     padding:4rem;
     background-color:rgba($baseColor, 1.0);
     text-align:center;
@@ -451,6 +451,10 @@ a {
             margin-right:1rem;
             text-align:right;
         }
+    }
+
+    .navigation-separator {
+        display:none;
     }
 
     .list-marker li {
@@ -497,6 +501,10 @@ a {
                 dd {margin:0.25rem 0rem;}
             }
         }
+    }
+
+    .navigation-separator {
+        display:none;
     }
 
     .list-marker li {
