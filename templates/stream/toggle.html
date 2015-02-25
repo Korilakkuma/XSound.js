@@ -1,0 +1,50 @@
+        <section>
+            <section>
+                <h1>toggle <span class="type">StreamModule</span></h1>
+                <hr />
+                <p>
+                    This method starts or stops streaming.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Array</span></td>
+                            <td>This value is the array for changing connection.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">function</span></td>
+                            <td>This value is <a href="http://webaudio.github.io/web-audio-api/#the-scriptprocessornode-interface---deprecated" target="_blank">onaudioprocess</a> event hanlder.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;stream&apos;).toggle&quot;);
+
+try {
+    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready().start();
+} catch (error) {
+    window.alert(error.message);
+}
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (X(&apos;stream&apos;).isStreaming()) {
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        this.textContent = &apos;START&apos;;
+    }
+
+    X(&apos;stream&apos;).toggle();
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Stream Controller</dt>
+                    <dd><button type="button">STOP</button></dd>
+                </dl>
+            </section>
+        </section>

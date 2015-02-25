@@ -1,0 +1,34 @@
+        <section>
+            <section>
+                <h1>stop <span class="type">StreamModule</span></h1>
+                <hr />
+                <p>
+                    This method stops streaming.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;stream&apos;).stop&quot;);
+
+try {
+    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready().start();
+} catch (error) {
+    window.alert(error.message);
+}
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (X(&apos;stream&apos;).isStreaming()) {
+        X(&apos;stream&apos;).stop();
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;stream&apos;).start();
+        this.textContent = &apos;START&apos;;
+    }
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Stream Controller</dt>
+                    <dd><button type="button">STOP</button></dd>
+                </dl>
+            </section>
+        </section>
