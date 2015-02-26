@@ -1,0 +1,36 @@
+        <section>
+            <section>
+                <h1>mix <span class="type">MixerModule</span></h1>
+                <hr />
+                <p>
+                    This method mixes sound sources.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Array</span></td>
+                            <td>This value is the array that contains sound sources.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mixer&apos;).mix&quot;);
+
+var C = X.clone();
+
+X(&apos;oscillator&apos;).setup(true).ready(0, 0).start(220);
+C(&apos;oscillator&apos;).setup(true).ready(0, 0).start(440);
+
+X(&apos;oscillator&apos;, 0).param({type : &apos;sawtooth&apos;, gain : 0.3});
+C(&apos;oscillator&apos;, 0).param({type : &apos;sawtooth&apos;, gain : 0.7});
+
+// Mix sounds
+X(&apos;mixer&apos;).mix([X(&apos;oscillator&apos;), C(&apos;oscillator&apos;)]);
+</textarea>
+            </section>
+        </section>

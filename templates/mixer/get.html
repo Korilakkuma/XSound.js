@@ -1,0 +1,35 @@
+        <section>
+            <section>
+                <h1>get <span class="type">SoundModule | Array</span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of SoundNode or the array that contains the instance of SoundNode.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is SoundModule index.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mixer&apos;).get&quot;);
+
+var C = X.clone();
+
+// Mix sounds
+X(&apos;mixer&apos;).mix([X(&apos;oscillator&apos;), C(&apos;oscillator&apos;)]);
+
+console.dir(X(&apos;mixer&apos;).get(0));  /** {@type OscillatorNode} */
+console.dir(X(&apos;mixer&apos;).get(1));  /** {@type OscillatorNode} */
+
+console.dir(X(&apos;mixer&apos;).get());  /** {@type Array.<OscillatorNode>} */
+</textarea>
+            </section>
+        </section>
