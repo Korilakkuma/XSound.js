@@ -6528,10 +6528,7 @@
             // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
-            // Max delay time is 5000 [ms]
-            this.MAX_DELAY_TIME = 5;
-
-            this.delay    = context.createDelay(this.MAX_DELAY_TIME);
+            this.delay    = context.createDelay(Delay.MAX_DELAY_TIME);
             this.dry      = context.createGain();
             this.wet      = context.createGain();
             this.tone     = context.createBiquadFilter();
@@ -6551,6 +6548,9 @@
             this.state(false);
         };
 
+        // Max delay time is 5000 [ms]
+        Delay.MAX_DELAY_TIME = 5;
+
         /** @override */
         Delay.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
@@ -6569,7 +6569,7 @@
                         } else {
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
-                            var max = this.delay.delayTime.maxValue || this.MAX_DELAY_TIME;
+                            var max = this.delay.delayTime.maxValue || Delay.MAX_DELAY_TIME;
 
                             if ((v >= min) && (v <= max)) {
                                 this.delay.delayTime.value = v;  // Setter
@@ -9286,12 +9286,12 @@
      * @override
      */
     AudioModule.prototype.setup = function(key, value) {
-        if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
+        if ((arguments.length > 0) && (Object.prototype.toString.call(arguments[0]) === '[object Object]')) {
             // Associative array
             for (var k in arguments[0]) {
                 this.setup(k, arguments[0][k]);
             }
-        } else {
+        } else if (arguments.length > 1) {
             var k = String(key).replace(/-/g, '').toLowerCase();
 
             if (k in this.callbacks) {
@@ -10609,12 +10609,12 @@
      * @return {MML} This is returned for method chain.
      */
     MML.prototype.setup = function(key, value) {
-        if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
+        if ((arguments.length > 0) && (Object.prototype.toString.call(arguments[0]) === '[object Object]')) {
             // Associative array
             for (var k in arguments[0]) {
                 this.setup(k, arguments[0][k]);
             }
-        } else {
+        } else if (arguments.length > 1) {
             var k = String(key).toLowerCase();
 
             if (k in this.callbacks) {
