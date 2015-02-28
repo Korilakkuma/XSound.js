@@ -1,0 +1,23 @@
+        <section>
+            <section>
+                <h1>isSequences <span class="type">boolean</span></h1>
+                <hr />
+                <p>
+                    This method is to check for presence or absence of parsed MML.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mml&apos;).isSequences&quot;);
+
+var mainpart  = &apos;T74O4C4D4E4F4G4A4B4O5C4&apos;;
+var subpart   = &apos;T74O3C4D4E4F4G4A4B4O5C4&apos;;
+
+console.log(X(&apos;mml&apos;).isSequences());
+
+X(&apos;mml&apos;).setup().ready(X(&apos;oscillator&apos;), [mainpart, subpart]);
+
+console.log(X(&apos;mml&apos;).isSequences());
+</textarea>
+            </section>
+        </section>

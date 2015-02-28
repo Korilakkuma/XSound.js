@@ -1,0 +1,30 @@
+        <section>
+            <section>
+                <h1>get <span class="type">string (Data URL)</span></h1>
+                <hr />
+                <p>
+                    This method creates MML text file.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is MML string.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mml&apos;).download&quot;);
+
+var mml         = &apos;T74O4C4D4E4F4G4A4B4O5C4&apos;;
+var mmlTextFile = X(&apos;mml&apos;).download(mml);
+
+console.log(mmlTextFile);
+</textarea>
+            </section>
+        </section>

@@ -1,0 +1,36 @@
+        <section>
+            <section>
+                <h1>ready <span class="type">Array</span></h1>
+                <hr />
+                <p>
+                    This method parses MML string.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">OscillatorModule</span> or <span class="type">OneshotModule</span></td>
+                            <td>This value is the instance of OscillatorModule or OneshotModule.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">Array</span></td>
+                            <td>This value is the array that contains MML string.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mml&apos;).ready&quot;);
+
+var mainpart  = &apos;T74O4C4D4E4F4G4A4B4O5C4&apos;;
+var subpart   = &apos;T74O3C4D4E4F4G4A4B4O5C4&apos;;
+var sequences = X(&apos;mml&apos;).setup().ready(X(&apos;oscillator&apos;), [mainpart, subpart]);
+
+console.dir(sequences);
+</textarea>
+            </section>
+        </section>

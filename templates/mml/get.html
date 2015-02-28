@@ -1,0 +1,35 @@
+        <section>
+            <section>
+                <h1>get <span class="type">Array</span></h1>
+                <hr />
+                <p>
+                    This method gets the array that contains parsed MML.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is index for MML part.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;mml&apos;).get&quot;);
+
+var mainpart  = &apos;T74O4C4D4E4F4G4A4B4O5C4&apos;;
+var subpart   = &apos;T74O3C4D4E4F4G4A4B4O5C4&apos;;
+
+X(&apos;mml&apos;).setup().ready(X(&apos;oscillator&apos;), [mainpart, subpart]);
+
+console.dir(X(&apos;mml&apos;).get(0));  /** {@type Array.<Object>} */
+console.dir(X(&apos;mml&apos;).get(1));  /** {@type Array.<Object> */
+
+console.dir(X(&apos;mml&apos;).get());  /** {@type Array.<Array.<Object>>} */
+</textarea>
+            </section>
+        </section>
