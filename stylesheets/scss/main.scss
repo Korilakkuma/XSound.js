@@ -72,16 +72,33 @@ h1, h2 {
     color:rgba(#666, 1.0);
 }
 
-h1 {font-size:2rem;}
+h1 {
+    font-size:2rem;
+}
 
-h2 {font-size:1.5rem;}
+h2 {
+    font-size:1.5rem;
+}
 
-h1 .type {
-    float:right;
-    margin-top:1rem;
-    font-size:50%;
-    font-style:italic;
-    color:rgba($accentColor1, 1.0);
+h1 {
+    .type {
+        float:right;
+        margin-top:1rem;
+        font-size:50%;
+        font-style:italic;
+        color:rgba($accentColor1, 1.0);
+    }
+
+    .applicable {
+        float:right;
+        margin-top:1rem;
+        font-size:50%;
+        font-style:italic;
+
+        span {
+            color:rgba($accentColor1, 1.0);
+        }
+    }
 }
 
 #project-title {
@@ -89,6 +106,7 @@ h1 .type {
     font-size:3rem;
     font-weight:lighter;
     color:rgba($accentColor1, 1.0);
+    text-align:center;
     text-shadow:-1px -1px 1px rgba($black, 1.0);
 }
 
@@ -97,11 +115,12 @@ h1 .type {
     font-weight:300;
     color:rgba($accentColor1, 1.0);
     background:none;
+    text-align:center;
     text-shadow:-1px -1px 1px rgba($black, 1.0);
 }
 
 #forkme-banner {
-    display:block;
+    display:none;
     position:absolute;
     top:0;
     right:0px;
@@ -119,7 +138,9 @@ h1 .type {
 
     @include setTransition(background-color 1.0s ease);
 
-    &:hover {background-color:rgba($accentColor2, 1.0);}
+    &:hover {
+        background-color:rgba($accentColor2, 1.0);
+    }
 }
 
 #downloads {
@@ -143,7 +164,9 @@ h1 .type {
     background-repeat:no-repeat;
     background-position:bottom left;
 
-    &:hover {background-position:top left;}
+    &:hover {
+        background-position:top left;
+    }
 }
 
 .tar-download-link {
@@ -155,7 +178,9 @@ h1 .type {
     background-repeat:no-repeat;
     background-position:bottom right;
 
-    &:hover {background-position:top right;}
+    &:hover {
+        background-position:top right;
+    }
 }
 
 #contents {
@@ -168,12 +193,16 @@ h1 .type {
 #maincontents {
     width:100%;
 
-    section {margin:1rem 0rem;}
+    section {
+        margin:1rem 0rem;
+    }
 }
 
 #sidebar {
     section {
-        &:last-child {margin-bottom:1rem;}
+        &:last-child {
+            margin-bottom:1rem;
+        }
 
         h2 {
             font-size:1.5rem;
@@ -181,7 +210,9 @@ h1 .type {
         }
 
         dl {
-            dt {font-size:1.25rem;}
+            dt {
+                font-size:1.25rem;
+            }
 
             dd {
                 margin:1rem 0rem;
@@ -225,6 +256,7 @@ pre {
 table {
     margin:1rem auto 2rem;
     border:1px solid rgba(#999, 1.0);
+    width:100%;
 
     caption {
         margin-bottom:0.5rem;
@@ -428,15 +460,31 @@ a {
 
     @include setTransition(color 1.0s ease);
 
-    &:hover, &.selected {color:rgba($accentColor2, 1.0);}
+    &:hover, &.selected {
+        color:rgba($accentColor2, 1.0);
+    }
 }
 
 @media only screen and (min-width:768px) and (max-width:1023px) {
-    html, body {font-size:unquote(($baseFontSize * 0.875) + "px");}
+    html, body {
+        font-size:unquote(($baseFontSize * 0.875) + "px");
+    }
 
-    #downloads {display:block !important;}
+    #project-title, #project-tagline {
+        text-align:left;
+    }
 
-    #contents {width:95%;}
+    #forkme-banner {
+        display:block;
+    }
+
+    #downloads {
+        display:block !important;
+    }
+
+    #contents {
+        width:95%;
+    }
 
     #maincontents {
         float:left;
@@ -458,7 +506,9 @@ a {
     }
 
     .list-marker li {
-        &:before {vertical-align:-0.25rem;}
+        &:before {
+            vertical-align:-0.25rem;
+        }
     }
 
     .sound-controllers {
@@ -472,12 +522,29 @@ a {
 }
 
 @media only screen and (min-width:1024px) {
-    html, body {font-size:unquote($baseFontSize + "px");}
+    html, body {
+        font-size:unquote($baseFontSize + "px");
+    }
 
-    #project-title   {font-size:4rem;}
-    #project-tagline {font-size:2rem;}
+    #project-title, #project-tagline {
+        text-align:left;
+    }
 
-    #downloads {display:block !important;}
+    #project-title {
+        font-size:4rem;
+    }
+
+    #project-tagline {
+        font-size:2rem;
+    }
+
+    #forkme-banner {
+        display:block;
+    }
+
+    #downloads {
+        display:block !important;
+    }
 
     #contents {
         width:95%;
@@ -497,7 +564,7 @@ a {
             text-align:right;
 
             dl {
-                dt {margin:0.5rem 0rem;}
+                dt {margin:0.50rem 0rem;}
                 dd {margin:0.25rem 0rem;}
             }
         }
@@ -508,7 +575,9 @@ a {
     }
 
     .list-marker li {
-        &:before {vertical-align:-0.25rem;}
+        &:before {
+            vertical-align:-0.25rem;
+        }
     }
 
     .sound-controllers {
