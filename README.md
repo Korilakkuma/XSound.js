@@ -679,7 +679,7 @@ Get node object of HTMLMediaElement and select media format and register callbac
   
 It is required to create the instance of MediaElementAudioSourceNode in order to to play the media.
   
-    X('media').ready('http://xxx.jp/sample.wav');  // The argument is path name or Data URL or Object URL for media resource
+    X('media').ready('http://xxx.jp/sample');  // The argument is path name (except extension) or Data URL or Object URL for media resource
   
 ### Start Media
   
