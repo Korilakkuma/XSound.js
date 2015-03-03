@@ -1,0 +1,84 @@
+        <section>
+            <section>
+                <h1>glide <span class="applicable">Applicable : <span>OscillatorModule</span></span></h1>
+                <hr />
+                <p>
+                    This module is Glide.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>time</th>
+                            <td><span class="type">number</span></td>
+                            <td>&gt;= 0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>type</th>
+                            <td><span class="type">string</span></td>
+                            <td>&apos;linear&apos; or &apos;exponential&apos;</td>
+                            <td>&apos;linear&apos;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
+    var frequency = Math.random() * 5 * 440;
+
+    X(&apos;oscillator&apos;).start(frequency);
+    this.textContent = &apos;STOP&apos;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchstart&apos;, function() {
+    var frequency = Math.random() * 5 * 440;
+
+    X(&apos;oscillator&apos;).start(frequency);
+    this.textContent = &apos;STOP&apos;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mouseup&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;
+}, false);
+
+document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;glide&apos;).param(&apos;time&apos;, this.valueAsNumber);
+    document.querySelector(&apos;#output-time&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;glide&apos;).param(&apos;time&apos;);
+}, false);
+
+document.querySelector(&apos;#form-type&apos;).addEventListener(&apos;change&apos;, function() {
+    for (var i = 0, len = this.elements[&apos;radio-type&apos;].length; i < len; i++) {
+        if (this.elements[&apos;radio-type&apos;][i].checked) {
+            X(&apos;oscillator&apos;).module(&apos;glide&apos;).param(&apos;type&apos;, this.elements[&apos;radio-type&apos;][i].value);
+            console.log(X(&apos;oscillator&apos;).module(&apos;glide&apos;).param(&apos;type&apos;));
+            break;
+        }
+    }
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label for="range-time">Time : <span id="output-time">0</span></label></dt>
+                    <dd><input type="range" id="range-time" value="0" min="0" max="1" step="0.05" /></dd>
+                    <dt>Type</dt>
+                    <dd>
+                        <form id="form-type">
+                            <label><input type="radio" name="radio-type" value="linear" checked /> linear</label>
+                            <label><input type="radio" name="radio-type" value="exponential" /> exponential</label>
+                        </form>
+                    </dd>
+                </dl>
+            </section>
+        </section>

@@ -1,0 +1,108 @@
+        <section>
+            <section>
+                <h1>equalizer <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Equalizer.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>bass</th>
+                            <td><span class="type">number</span></td>
+                            <td>-40 &lt;= value &lt;= 40</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>middle</th>
+                            <td><span class="type">number</span></td>
+                            <td>-40 &lt;= value &lt;= 40</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>treble</th>
+                            <td><span class="type">number</span></td>
+                            <td>-40 &lt;= value &lt;= 40</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>presence</th>
+                            <td><span class="type">number</span></td>
+                            <td>-40 &lt;= value &lt;= 40</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;audio&apos;).setup({
+    ready : function(buffer) {
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
+
+        X(&apos;audio&apos;).module(&apos;equalizer&apos;).state(true);
+
+        document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;equalizer&apos;).state(this.checked);
+        }, false);
+
+        document.querySelector(&apos;#range-bass&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;bass&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-bass&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;bass&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-middle&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;middle&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-middle&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;middle&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-treble&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;treble&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-treble&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;treble&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-presence&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;presence&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-presence&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;presence&apos;);
+        }, false);
+    },
+    ended : function(source, currentTime) {
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Equalizer</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="range-bass">Bass: <span id="output-bass">0</span></label></dt>
+                    <dd><input type="range" id="range-bass" value="0" min="-40" max="40" step="1" /></dd>
+                    <dt><label for="range-middle">Middle: <span id="output-middle">0</span></label></dt>
+                    <dd><input type="range" id="range-middle" value="0" min="-40" max="40" step="1" /></dd>
+                    <dt><label for="range-treble">Treble: <span id="output-treble">0</span></label></dt>
+                    <dd><input type="range" id="range-treble" value="0" min="-40" max="40" step="1" /></dd>
+                    <dt><label for="range-presence">Presence: <span id="output-presence">0</span></label></dt>
+                    <dd><input type="range" id="range-presence" value="0" min="-40" max="40" step="1" /></dd>
+                </dl>
+            </section>
+        </section>

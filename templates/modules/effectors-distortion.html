@@ -1,0 +1,138 @@
+        <section>
+            <section>
+                <h1>distortion <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Distortion.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>curve</th>
+                            <td><span class="type">string</span></td>
+                            <td>&apos;clean&apos;, &apos;crunch&apos;, &apos;overdrive&apos;, &apos;distortion&apos;, &apos;fuzz&apos;</td>
+                            <td>&apos;clean&apos;</td>
+                        </tr>
+                        <tr>
+                            <th>samples</th>
+                            <td><span class="type">number</span></td>
+                            <td>value &gt; 0</td>
+                            <td>4096</td>
+                        </tr>
+                        <tr>
+                            <th>drive</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <th>color</th>
+                            <td><span class="type">number</span></td>
+                            <td>10 &lt;= value &lt;= half the sample-rate</td>
+                            <td>350</td>
+                        </tr>
+                        <tr>
+                            <th>tone</th>
+                            <td><span class="type">number</span></td>
+                            <td>10 &lt;= value &lt;= half the sample-rate</td>
+                            <td>350</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;audio&apos;).setup({
+    ready : function(buffer) {
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
+
+        X(&apos;audio&apos;).module(&apos;distortion&apos;).state(true);
+
+        document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).state(this.checked);
+        }, false);
+
+        document.querySelector(&apos;#select-curve&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;curve&apos;, this.value);
+        }, false);
+
+        document.querySelector(&apos;#select-samples&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;knee&apos;, parseInt(this.value));
+        }, false);
+
+        document.querySelector(&apos;#range-drive&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;drive&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-drive&apos;).textContent = X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;drive&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-color&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;color&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-color&apos;).textContent = X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;color&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;tone&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-tone&apos;).textContent = X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;tone&apos;);
+        }, false);
+    },
+    ended : function(source, currentTime) {
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Distortion</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="select-curve">Curve</label></dt>
+                    <dd>
+                        <select id="select-curve">
+                            <option value="clean" selected>clean</option>
+                            <option value="crunch">crunch</option>
+                            <option value="overdrive">overdrive</option>
+                            <option value="distortion">distortion</option>
+                            <option value="fuzz">fuzz</option>
+                        </select>
+                    </dd>
+                    <dt><label for="select-samples">Samples</label></dt>
+                    <dd>
+                        <select id="select-samples">
+                            <option value="256">256</option>
+                            <option value="512">512</option>
+                            <option value="1024">1024</option>
+                            <option value="2048">2048</option>
+                            <option value="4096" selected>4096</option>
+                            <option value="8192">8192</option>
+                            <option value="16384">16384</option>
+                            <option value="32768">32768</option>
+                        </select>
+                    </dd>
+                    <dt><label for="range-drive">Drive: <span id="output-drive">1</span></label></dt>
+                    <dd><input type="range" id="range-drive" value="1" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-color">Color : <span id="output-color">350</span></label></dt>
+                    <dd><input type="range" id="range-color" value="350" min="10" max="8000" step="1" /></dd>
+                    <dt><label for="range-tone">Tone : <span id="output-tone">350</span></label></dt>
+                    <dd><input type="range" id="range-tone" value="350" min="10" max="8000" step="1" /></dd>
+                </dl>
+            </section>
+        </section>

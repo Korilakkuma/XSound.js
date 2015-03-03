@@ -1,0 +1,124 @@
+        <section>
+            <section>
+                <h1>reverb <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Reverb.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>type</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= (the number of preset RIRs - 1)</td>
+                            <td>null</td>
+                        </tr>
+                        <tr>
+                            <th>dry</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <th>wet</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>tone</th>
+                            <td><span class="type">number</span></td>
+                            <td>10 &lt;= value &lt;= half the sample-rate</td>
+                            <td>350</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;audio&apos;).setup({
+    ready : function(buffer) {
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
+
+        X(&apos;audio&apos;).module(&apos;reverb&apos;).state(true).param(&apos;type&apos;, 0);
+
+        document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;reverb&apos;).state(this.checked);
+        }, false);
+
+        document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;dry&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-dry&apos;).textContent = X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;dry&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;wet&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-wet&apos;).textContent = X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;wet&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;tone&apos;, this.valueAsNumber);
+            document.querySelector(&apos;#output-tone&apos;).textContent = X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;tone&apos;);
+        }, false);
+    },
+    ended : function(source, currentTime) {
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X(&apos;audio&apos;).module(&apos;reverb&apos;).preset({
+    rirs     : [&apos;resources/rirs/s1_p1_o.wav&apos;],
+    timeout  : 10000,
+    success  : function(event, rirs) {
+        // The 1st argument is XMLHttpRequestProgressEvent
+        // The 2nd argument is the array that contains AudioBuffer of RIRs.
+
+        X.ajax({
+            url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+            timeout : 60000,
+            success : function(event, arrayBuffer) {
+                // ArrayBuffer -> AudioBuffer
+                X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+            }
+        });
+    },
+    error    : function(event, textStatus) {
+        // The 1st argument is either XMLHttpRequestProgressEvent or &apos;onerror&apos; event object in FileReader
+        // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, error code of FileReader
+
+        console.log(&apos;error&apos;);
+        console.dir(event);
+        console.dir(textStatus);
+    },
+    progress : function(event) {
+        // The 1st argument is XMLHttpRequestProgressEvent
+
+        console.log(&apos;progress&apos;);
+        console.dir(event);
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Reverb</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="range-dry">Dry : <span id="output-dry">1</span></label></dt>
+                    <dd><input type="range" id="range-dry" value="1" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-wet">Wet: <span id="output-wet">0</span></label></dt>
+                    <dd><input type="range" id="range-wet" value="0" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-tone">Tone : <span id="output-tone">350</span></label></dt>
+                    <dd><input type="range" id="range-tone" value="350" min="10" max="8000" step="1" /></dd>
+                </dl>
+            </section>
+        </section>
