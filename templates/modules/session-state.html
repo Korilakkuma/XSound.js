@@ -1,0 +1,61 @@
+        <section>
+            <section>
+                <h1>state <span class="type">boolean | Session</span></h1>
+                <hr />
+                <p>
+                    This method gets or sets state of session.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">undefined</span> or <span class="type">boolean</span></td>
+                            <td>This value is to determine session state</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+try {
+    X(&apos;oscillator&apos;).module(&apos;session&apos;).setup({
+        tls   : false,
+        host  : &apos;210.152.156.200&apos;,
+        port  : &apos;8000&apos;,
+        path  : &apos;/home/node/websocket/&apos;,
+        open  : function(event, socket) {
+            X(&apos;oscillator&apos;).start(440);
+            X(&apos;oscillator&apos;).module(&apos;session&apos;).start();
+
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+                if (X(&apos;oscillator&apos;).module(&apos;session&apos;).state()) {
+                    X(&apos;oscillator&apos;).module(&apos;session&apos;).state(false);
+                    this.textContent = &apos;ON&apos;
+                } else {
+                    X(&apos;oscillator&apos;).module(&apos;session&apos;).state(true);
+                    this.textContent = &apos;OFF&apos;
+                }
+            }, false);
+        },
+        close : function(event, socket) {
+            window.alert(&apos;onclose&apos;);
+
+            console.log(&apos;close&apos;);
+            console.dir(event);
+            console.dir(socket);
+        }
+    }).state(true);
+} catch (error) {
+    window.alert(error.message);
+}
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Session Controller</dt>
+                    <dd><button type="button">OFF</button></dd>
+                </dl>
+            </section>
+        </section>
