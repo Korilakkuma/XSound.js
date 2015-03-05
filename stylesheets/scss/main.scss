@@ -350,6 +350,7 @@ table {
     }
 
     dd {
+        margin:1rem 0rem;
         font-size:1rem;
 
         label {
@@ -379,7 +380,7 @@ table {
 }
 
 audio, video {
-    margin:2rem 0rem 0rem 2rem;
+    margin:2rem 0rem;
 }
 
 .drop-area {
