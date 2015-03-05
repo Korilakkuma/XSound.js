@@ -1,0 +1,27 @@
+        <section>
+            <section>
+                <h1>stop <span class="type">Recorder</span></h1>
+                <hr />
+                <p>
+                    This method stops recording.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).setup(4).ready(0).start();
+
+X(&apos;oscillator&apos;).start(440);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    X(&apos;oscillator&apos;).module(&apos;recorder&apos;).stop();
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Record Controller</dt>
+                    <dd><button type="button">STOP</button></dd>
+                </dl>
+            </section>
+        </section>

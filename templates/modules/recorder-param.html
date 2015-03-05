@@ -1,0 +1,57 @@
+        <section>
+            <section>
+                <h1>param <span class="type">number | Recorder</span></h1>
+                <hr />
+                <p>
+                    This method gets or sets gain of track.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>This value is associative array for parameters.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).setup(4).ready(0).start();
+
+X(&apos;oscillator&apos;).start(440);
+
+document.querySelector(&apos;#range-channel-left&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param({gainL : this.valueAsNumber});
+    document.querySelector(&apos;#output-channel-left&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param(&apos;gainL&apos;);
+}, false);
+
+document.querySelector(&apos;#range-channel-right&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param({gainR : this.valueAsNumber});
+    document.querySelector(&apos;#output-channel-right&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param(&apos;gainR&apos;);
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    X(&apos;oscillator&apos;).module(&apos;recorder&apos;).stop();
+
+    var wave = X(&apos;oscillator&apos;).module(&apos;recorder&apos;).create(&apos;all&apos;, 2, 16, &apos;base64&apos;);
+
+    document.querySelector(&apos;audio&apos;).setAttribute(&apos;src&apos;, wave);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Record Controller</dt>
+                    <dt><label for="range-channel-left">Left Channel : <span id="output-channel-left">1</span></label></dt>
+                    <dd><input type="range" id="range-channel-left" value="1" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-channel-right">Right Channel : <span id="output-channel-right">1</span></label></dt>
+                    <dd><input type="range" id="range-channel-right" value="1" min="0" max="1" step="0.05" /></dd>
+                    <dd><button type="button">CREATE</button></dd>
+                    <dd><audio controls></audio></dd>
+                </dl>
+            </section>
+        </section>
