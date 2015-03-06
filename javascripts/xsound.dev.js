@@ -7575,7 +7575,7 @@
 
         /** @override */
         EnvelopeGenerator.prototype.toString = function() {
-            return '[OscillatorModule EnvelopeGenerator]';
+            return '[SoundModule EnvelopeGenerator]';
         };
 
         // Create the instances of private class
