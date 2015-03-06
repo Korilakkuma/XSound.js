@@ -383,6 +383,17 @@ audio, video {
     margin:2rem 0rem;
 }
 
+.draw-container {
+    margin:2rem 0rem 0rem 2rem;
+    width:500px;
+    overflow-x:scroll;
+}
+
+canvas, svg, #captured-wave {
+    margin:2rem 0rem;
+    background-color:$black;
+}
+
 .drop-area {
     margin:1rem auto;
     border:3px dashed $transparent;
