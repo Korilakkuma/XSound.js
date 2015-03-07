@@ -82,6 +82,7 @@ h2 {
 
 h1 {
     .type {
+        display:none;
         float:right;
         margin-top:1rem;
         font-size:50%;
@@ -383,9 +384,9 @@ audio, video {
     margin:2rem 0rem;
 }
 
-.draw-container {
+.draw-container,
+#svg-visualizer-parent {
     margin:2rem 0rem 0rem 2rem;
-    width:500px;
     overflow-x:scroll;
 }
 
@@ -482,6 +483,12 @@ a {
         font-size:unquote(($baseFontSize * 0.875) + "px");
     }
 
+    h1 {
+        .type {
+            display:block;
+        }
+    }
+
     #project-title, #project-tagline {
         text-align:left;
     }
@@ -536,6 +543,12 @@ a {
 @media only screen and (min-width:1024px) {
     html, body {
         font-size:unquote($baseFontSize + "px");
+    }
+
+    h1 {
+        .type {
+            display:block;
+        }
     }
 
     #project-title, #project-tagline {
