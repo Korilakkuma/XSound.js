@@ -61,6 +61,7 @@ $(function() {
         }
     };
 
+    // Transition
     $('#sidebar > section:first-child > h2 > a, #sidebar dl dd a').on('click', function(event) {
         event.preventDefault();
 
@@ -75,6 +76,7 @@ $(function() {
         location.reload();
     });
 
+    // Accordion-Panel
     $('#sidebar > section > h2 > a:not(.selected)').parent('h2').next('dl').hide();
     $('#sidebar > section:not(:first-child) > h2 > a').on('click', function(event) {
         event.preventDefault();
@@ -83,7 +85,7 @@ $(function() {
             $('#sidebar > section > dl').slideUp('fast', 'swing');
         } else {
             $('#sidebar > section > dl').slideUp('fast', 'swing');
-            $(this).parent('h2').next('dl').slideDown('slow', 'swing');
+            $(this).parent('h2').next('dl').slideDown('fast', 'swing');
         }
     });
 });
