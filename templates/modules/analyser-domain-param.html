@@ -1,0 +1,216 @@
+        <section>
+            <section>
+                <h1>domain#param <span class="type">number | string | (TimeAll | Time | FFT)</span></h1>
+                <hr />
+                <p>
+                    This method gets or sets parameters for visualization.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>This value is associative array for parameters.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
+
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).state(true);
+
+document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;mousedown&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;PAUSE&apos;
+}, false);
+
+document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;touchstart&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;PAUSE&apos;
+}, false);
+
+document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;mouseup&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;
+}, false);
+
+document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;touchend&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;
+}, false);
+
+document.querySelector(&apos;#range-interval&apos;).addEventListener(&apos;change&apos;, function() {
+    var interval = this.valueAsNumber;
+
+    if (interval === 0) {
+        interval = &apos;auto&apos;;
+    }
+
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({interval : interval});
+
+    document.querySelector(&apos;#output-interval&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-width&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({width : this.valueAsNumber});
+    document.querySelector(&apos;#output-width&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-top&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({top : this.valueAsNumber});
+    document.querySelector(&apos;#output-top&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-right&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({right : this.valueAsNumber});
+    document.querySelector(&apos;#output-right&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-bottom&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({bottom : this.valueAsNumber});
+    document.querySelector(&apos;#output-bottom&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#range-left&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({left : this.valueAsNumber});
+    document.querySelector(&apos;#output-left&apos;).textContent = this.value;
+}, false);
+
+document.querySelector(&apos;#form-shape&apos;).addEventListener(&apos;change&apos;, function() {
+    for (var i = 0, len = this.elements[&apos;radio-shape&apos;].length; i < len; i++) {
+        if (this.elements[&apos;radio-shape&apos;][i].checked) {
+            X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({shape : this.elements[&apos;radio-shape&apos;][i].value});
+            break;
+        }
+    }
+}, false);
+
+document.querySelector(&apos;#select-background-color&apos;).addEventListener(&apos;change&apos;, function() {
+    document.querySelector(&apos;#canvas-visualizer&apos;).style.backgroundColor = this.value;
+}, false);
+
+document.querySelector(&apos;#select-wave&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({wave : this.value});
+}, false);
+
+document.querySelector(&apos;#select-grid&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({grid : this.value});
+}, false);
+
+document.querySelector(&apos;#select-text&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({text : this.value});
+}, false);
+
+document.querySelector(&apos;#select-font-family&apos;).addEventListener(&apos;change&apos;, function() {
+    var font = document.querySelector(&apos;#range-font-size&apos;).value + &apos;px &apos; + this.value;
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : font});
+}, false);
+
+document.querySelector(&apos;#range-font-size&apos;).addEventListener(&apos;change&apos;, function() {
+    var font = this.value + &apos;px &apos; + document.querySelector(&apos;#select-font-family&apos;).value;
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : font});
+
+    document.querySelector(&apos;#output-font-size&apos;).textContent = this.value;
+}, false);
+</textarea>
+                <div class="draw-container">
+                    <canvas id="canvas-visualizer" width="480" height="120"></canvas>
+                </div>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label for="range-interval">interval : <span id="output-interval">1000</span> msec</label></dt>
+                    <dd><input type="range" id="range-interval" value="1000" min="0" max="1000" step="1" /></dd>
+                    <dt><label for="range-width">width : <span id="output-width">1.5</span></label></dt>
+                    <dd><input type="range" id="range-width" value="1.5" min="0" max="5" step="0.5" /></dd>
+                    <dt><label for="range-top">top : <span id="output-top">15</span></label></dt>
+                    <dd><input type="range" id="range-top" value="15" min="0" max="30" step="1" /></dd>
+                    <dt><label for="range-right">right : <span id="output-right">15</span></label></dt>
+                    <dd><input type="range" id="range-right" value="15" min="0" max="30" step="1" /></dd>
+                    <dt><label for="range-top">bottom : <span id="output-bottom">15</span></label></dt>
+                    <dd><input type="range" id="range-bottom" value="15" min="0" max="30" step="1" /></dd>
+                    <dt><label for="range-top">left : <span id="output-left">15</span></label></dt>
+                    <dd><input type="range" id="range-left" value="15" min="0" max="30" step="1" /></dd>
+                    <dt>shape</dt>
+                    <dd>
+                        <form id="form-shape">
+                            <label><input type="radio" name="radio-shape" value="line" checked /> line</label>
+                            <label><input type="radio" name="radio-shape" value="rect" /> rect</label>
+                        </form>
+                    </dd>
+                    <dt><label for="select-background-color">background-color</label></dt>
+                    <dd>
+                        <select id="select-background-color">
+                            <option value="rgba(255, 0, 0, 1.0)">red</option>
+                            <option value="rgba(0, 255, 0, 1.0)">green</option>
+                            <option value="rgba(0, 0, 255, 1.0)">blue</option>
+                            <option value="rgba(0, 255, 255, 1.0)">cyan</option>
+                            <option value="rgba(255, 0, 255, 1.0)">magenta</option>
+                            <option value="rgba(255, 255, 0, 1.0)">yellow</option>
+                            <option value="rgba(0, 0, 0, 1.0)" selected>black</option>
+                            <option value="rgba(153, 153, 153, 1.0)">gray</option>
+                            <option value="rgba(255, 255, 255, 1.0)">white</option>
+                        </select>
+                    </dd>
+                    <dt><label for="select-wave">wave</label></dt>
+                    <dd>
+                        <select id="select-wave">
+                            <option value="rgba(255, 0, 0, 1.0)">red</option>
+                            <option value="rgba(0, 255, 0, 1.0)">green</option>
+                            <option value="rgba(0, 0, 255, 1.0)" selected>blue</option>
+                            <option value="rgba(0, 255, 255, 1.0)">cyan</option>
+                            <option value="rgba(255, 0, 255, 1.0)">magenta</option>
+                            <option value="rgba(255, 255, 0, 1.0)">yellow</option>
+                            <option value="rgba(0, 0, 0, 1.0)">black</option>
+                            <option value="rgba(153, 153, 153, 1.0)">gray</option>
+                            <option value="rgba(255, 255, 255, 1.0)">white</option>
+                        </select>
+                    </dd>
+                    <dt><label for="select-grid">grid</label></dt>
+                    <dd>
+                        <select id="select-grid">
+                            <option value="none">none</option>
+                            <option value="rgba(255, 0, 0, 1.0)" selected>red</option>
+                            <option value="rgba(0, 255, 0, 1.0)">green</option>
+                            <option value="rgba(0, 0, 255, 1.0)">blue</option>
+                            <option value="rgba(0, 255, 255, 1.0)">cyan</option>
+                            <option value="rgba(255, 0, 255, 1.0)">magenta</option>
+                            <option value="rgba(255, 255, 0, 1.0)">yellow</option>
+                            <option value="rgba(0, 0, 0, 1.0)">black</option>
+                            <option value="rgba(153, 153, 153, 1.0)">gray</option>
+                            <option value="rgba(255, 255, 255, 1.0)">white</option>
+                        </select>
+                    </dd>
+                    <dt><label for="select-text">text</label></dt>
+                    <dd>
+                        <select id="select-text">
+                            <option value="none">none</option>
+                            <option value="rgba(255, 0, 0, 1.0)">red</option>
+                            <option value="rgba(0, 255, 0, 1.0)">green</option>
+                            <option value="rgba(0, 0, 255, 1.0)">blue</option>
+                            <option value="rgba(0, 255, 255, 1.0)">cyan</option>
+                            <option value="rgba(255, 0, 255, 1.0)">magenta</option>
+                            <option value="rgba(255, 255, 0, 1.0)">yellow</option>
+                            <option value="rgba(0, 0, 0, 1.0)">black</option>
+                            <option value="rgba(153, 153, 153, 1.0)">gray</option>
+                            <option value="rgba(255, 255, 255, 1.0)" selected>white</option>
+                        </select>
+                    </dd>
+                    <dt><label for="select-font-family">font : <span id="output-font-size">13</span> px</label></dt>
+                    <dd>
+                        <select id="select-font-family">
+                            <option value="Arial" selected>Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Helvetica">Helvetica</option>
+                        </select>
+                    </dd>
+                    <dd><input type="range" id="range-font-size" value="13" min="6" max="16" step="1" /></dd>
+                </dl>
+            </section>
+        </section>
