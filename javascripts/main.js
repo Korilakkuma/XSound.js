@@ -19,11 +19,14 @@ $(function() {
                     var script = new Function(element.value);
                     script();
 
-                    CodeMirror.fromTextArea(element, {
+                    var codemirror = CodeMirror.fromTextArea(element, {
                         mode        : 'javascript',
+                        theme       : 'eclipse',
+                        keyMap      : 'sublime',
                         lineNumbers : true,
-                        indentUnit  : 4
-                    }).save();
+                        indentUnit  : 4,
+                        smartIndent : true
+                    });
                 });
 
                 if (location.hash === '') {
