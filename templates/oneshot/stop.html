@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>stop <span class="type">OneshotModule</span></h1>
+                <h1>stop <span class="returns">Returns : <span>OneshotModule</span></span></h1>
                 <hr />
                 <p>
                     This method stops one-shot audio.
@@ -84,20 +84,37 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
+                X(&apos;oneshot&apos;).start(39);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(39);
+                X(&apos;oneshot&apos;).start(43);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(43);
+                X(&apos;oneshot&apos;).start(46);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(46);
 
-            X(&apos;oneshot&apos;).ready(0, 0).start(39).stop(39);  // C
-            X(&apos;oneshot&apos;).ready(0, 0).start(43).stop(43);  // E
-            X(&apos;oneshot&apos;).ready(0, 0).start(46).stop(46);  // G
+                this.textContent = &apos;STOP&apos;;
+            }, false);
 
-        },
-        error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
-        },
-        progress : function(event) {
-            // The 1st argumnet is XMLHttpRequestProgressEvent
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;touchstart&apos;, function() {
+                X(&apos;oneshot&apos;).start(39);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(39);
+                X(&apos;oneshot&apos;).start(43);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(43);
+                X(&apos;oneshot&apos;).start(46);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(46);
+
+                this.textContent = &apos;STOP&apos;;
+            }, false);
+
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;mouseup&apos;, function() {
+                X(&apos;oneshot&apos;).stop(39);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(39);
+                X(&apos;oneshot&apos;).stop(43);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(43);
+                X(&apos;oneshot&apos;).stop(46);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(46);
+
+                this.textContent = &apos;START&apos;;
+            }, false);
+
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;, function() {
+                X(&apos;oneshot&apos;).stop(39);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(39);
+                X(&apos;oneshot&apos;).stop(43);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(43);
+                X(&apos;oneshot&apos;).stop(46);  // or, X(&apos;oneshot&apos;).ready(0, 0).stop(46);
+
+                this.textContent = &apos;START&apos;;
+            }, false);
         }
     });
 } catch (error) {
@@ -105,5 +122,9 @@ try {
     return;
 }
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

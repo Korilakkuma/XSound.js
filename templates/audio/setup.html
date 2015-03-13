@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>setup <span class="type">AudioModule</span></h1>
+                <h1>setup <span class="returns">Returns : <span>AudioModule</span></span></h1>
                 <hr />
                 <p>
                     This method setups callback functions.
@@ -16,19 +16,19 @@
                                 This argument is plain object that has the following properties.
                                 <dl>
                                     <dt>decode <span class="type">function</span></dt>
-                                    <dd>While "decodeAudioData" is invoking, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked while <a href="http://webaudio.github.io/web-audio-api/#widl-AudioContext-decodeAudioData-Promise-AudioBuffer--ArrayBuffer-audioData-DecodeSuccessCallback-successCallback-DecodeErrorCallback-errorCallback" target="_blank">decodeAudioData</a> is invoking.</dd>
                                     <dt>ready <span class="type">function</span></dt>
-                                    <dd>When "decodeAudioData" ended, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when <a href="http://webaudio.github.io/web-audio-api/#widl-AudioContext-decodeAudioData-Promise-AudioBuffer--ArrayBuffer-audioData-DecodeSuccessCallback-successCallback-DecodeErrorCallback-errorCallback" target="_blank">decodeAudioData</a> ended.</dd>
                                     <dt>start <span class="type">function</span></dt>
-                                    <dd>When audio starts, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when audio starts.</dd>
                                     <dt>stop <span class="type">function</span></dt>
-                                    <dd>When audio stopped, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when audio stopped.</dd>
                                     <dt>update <span class="type">function</span></dt>
-                                    <dd>While audio is playing, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked while audio is playing.</dd>
                                     <dt>ended <span class="type">function</span></dt>
-                                    <dd>When audio ended, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when audio ended.</dd>
                                     <dt>error <span class="type">function</span></dt>
-                                    <dd>When "decodeAudioData" failed, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when <a href="http://webaudio.github.io/web-audio-api/#widl-AudioContext-decodeAudioData-Promise-AudioBuffer--ArrayBuffer-audioData-DecodeSuccessCallback-successCallback-DecodeErrorCallback-errorCallback" target="_blank">decodeAudioData</a> failed.</dd>
                                 </dl>
                             </td>
                         </tr>
@@ -62,7 +62,8 @@ X(&apos;audio&apos;).setup({
         // The 1st argument is the instance of AudioBufferSourceNode
         // The 2nd argument is current time in audio
     },
-    error : function() {
+    error : function(error) {
+        // The 1st argument is either Error or null
     }
 });
 </textarea>

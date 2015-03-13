@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>get <span class="type">SoundModule | Array</span></h1>
+                <h1>get <span class="returns">Returns : <span>SoundModule | Array</span></span></h1>
                 <hr />
                 <p>
                     This method gets the instance of SoundNode or the array that contains the instance of SoundNode.
@@ -12,7 +12,7 @@
                         <tr>
                             <th>1st</th>
                             <td><span class="type">number</span></td>
-                            <td>This value is SoundModule index.</td>
+                            <td>This value is SoundModule (OscillatorModule, OneshotModule, AudioModule, MediaModule, StreamModule) index.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -26,10 +26,10 @@ var C = X.clone();
 // Mix sounds
 X(&apos;mixer&apos;).mix([X(&apos;oscillator&apos;), C(&apos;oscillator&apos;)]);
 
-console.dir(X(&apos;mixer&apos;).get(0));  /** {@type OscillatorNode} */
-console.dir(X(&apos;mixer&apos;).get(1));  /** {@type OscillatorNode} */
+console.dir(X(&apos;mixer&apos;).get(0));  /** {@type OscillatorModule} */
+console.dir(X(&apos;mixer&apos;).get(1));  /** {@type OscillatorModule} */
 
-console.dir(X(&apos;mixer&apos;).get());  /** {@type Array.<OscillatorNode>} */
+console.dir(X(&apos;mixer&apos;).get());  /** {@type Array.<OscillatorModule>} */
 </textarea>
             </section>
         </section>

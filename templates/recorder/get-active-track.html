@@ -1,0 +1,22 @@
+        <section>
+            <section>
+                <h1>getActiveTrack <span class="returns">Returns : <span>number</span></span></h1>
+                <hr />
+                <p>
+                    This method gets the selected track number.
+                    If the selected track number does not exists, this method returns -1.
+                </p>
+
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).setup(4);
+
+console.log(X(&apos;oscillator&apos;).module(&apos;recorder&apos;).getActiveTrack());  // -> -1
+
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).ready(0);
+
+console.log(X(&apos;oscillator&apos;).module(&apos;recorder&apos;).getActiveTrack());  // -> 0
+</textarea>
+            </section>
+        </section>

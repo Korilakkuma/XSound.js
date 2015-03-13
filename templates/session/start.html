@@ -1,0 +1,47 @@
+        <section>
+            <section>
+                <h1>start <span class="returns">Returns : <span>Session</span></span></h1>
+                <hr />
+                <p>
+                    This method starts session.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+try {
+    X(&apos;oscillator&apos;).module(&apos;session&apos;).setup({
+        tls  : false,
+        host : &apos;210.152.156.200&apos;,
+        port : &apos;8000&apos;,
+        path : &apos;/home/node/websocket/&apos;,
+        open : function(event, socket) {
+            var isStop = true;
+
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+                if (isStop) {
+                    X(&apos;oscillator&apos;).start(440);
+                    X(&apos;oscillator&apos;).module(&apos;session&apos;).start();
+
+                    this.textContent = &apos;STOP&apos;;
+                } else {
+                    X(&apos;oscillator&apos;).stop();
+
+                    this.textContent = &apos;START&apos;;
+                }
+
+                isStop = !isStop;
+            }, false);
+        }
+    }).state(true);
+} catch (error) {
+    window.alert(error.message);
+}
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Session Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
+            </section>
+        </section>

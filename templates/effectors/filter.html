@@ -1,0 +1,208 @@
+        <section>
+            <section>
+                <h1>filter <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Filter.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>type</th>
+                            <td><span class="type">string</span></td>
+                            <td>&apos;lowpass&apos;, &apos;highpass&apos;, &apos;bandpass&apos;, &apos;lowshelf&apos;, &apos;highshelf&apos;, &apos;peaking&apos;, &apos;notch&apos;, &apos;allpass&apos;</td>
+                            <td>&apos;lowpass&apos;</td>
+                        </tr>
+                        <tr>
+                            <th>frequency</th>
+                            <td><span class="type">number</span></td>
+                            <td>10 &lt;= value &lt;= half the sample-rate</td>
+                            <td>350</td>
+                        </tr>
+                        <tr>
+                            <th>Q</th>
+                            <td><span class="type">number</span></td>
+                            <td>0.0001 &lt;= value &lt;= 1000</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <th>gain</th>
+                            <td><span class="type">number</span></td>
+                            <td>-40 &lt;= value &lt;= 40</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>range</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.1</td>
+                        </tr>
+                        <tr>
+                            <th>attack</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.01</td>
+                        </tr>
+                        <tr>
+                            <th>decay</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.3</td>
+                        </tr>
+                        <tr>
+                            <th>sustain</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>1.0</td>
+                        </tr>
+                        <tr>
+                            <th>release</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+X(&apos;oscillator&apos;, 0).param(&apos;type&apos;, &apos;sawtooth&apos;);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchstart&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mouseup&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+X(&apos;oscillator&apos;).module(&apos;filter&apos;).state(true);
+
+document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).state(this.checked);
+}, false);
+
+document.querySelector(&apos;#select-type&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;type&apos;, this.value);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({type : this.value});
+
+    console.log(X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;type&apos;));
+}, false);
+
+document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;frequency&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({frequency : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-frequency&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;frequency&apos;);
+}, false);
+
+document.querySelector(&apos;#range-q&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;Q&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({Q : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-q&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;Q&apos;);
+}, false);
+
+document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;gain&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({gain : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-gain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;gain&apos;);
+}, false);
+
+document.querySelector(&apos;#range-range&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;range&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({range : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-range&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;range&apos;);
+}, false);
+
+document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;attack&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({attack : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;attack&apos;);
+}, false);
+
+document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;decay&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({decay : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-decay&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;decay&apos;);
+}, false);
+
+document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;sustain&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({sustain : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-sustain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;sustain&apos;);
+}, false);
+
+document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;release&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({release : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-release&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;release&apos;);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Filter</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="select-type">type</label></dt>
+                    <dd>
+                        <select id="select-type">
+                            <option value="lowpass" selected>lowpass</option>
+                            <option value="highpass">highpass</option>
+                            <option value="bandpass">bandpass</option>
+                            <option value="lowshelf">lowshelf</option>
+                            <option value="highshelf">highshelf</option>
+                            <option value="peaking">peaking</option>
+                            <option value="notch">notch</option>
+                            <option value="allpass">allpass</option>
+                        </select>
+                    </dd>
+                    <dt><label for="range-frequency">frequency : <span id="output-frequency">350</span></label></dt>
+                    <dd><input type="range" id="range-frequency" value="350" min="10" max="22050" step="1" /></dd>
+                    <dt><label for="range-q">Q : <span id="output-q">1</span></label></dt>
+                    <dd><input type="range" id="range-q" value="1" min="1" max="20" step="1" /></dd>
+                    <dt><label for="range-gain">gain : <span id="output-gain">0</span></label></dt>
+                    <dd><input type="range" id="range-gain" value="0" min="-40" max="40" step="1" /></dd>
+                    <dt><label for="range-range">range : <span id="output-range">0.1</span></label></dt>
+                    <dd><input type="range" id="range-range" value="0.1" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-attack">attack : <span id="output-attack">0.01</span></label></dt>
+                    <dd><input type="range" id="range-attack" value="0.01" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-decay">decay : <span id="output-decay">0.3</span></label></dt>
+                    <dd><input type="range" id="range-decay" value="0.3" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-sustain">sustain : <span id="output-sustain">1</span></label></dt>
+                    <dd><input type="range" id="range-sustain" value="1" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-release">release : <span id="output-release">1</span></label></dt>
+                    <dd><input type="range" id="range-release" value="1" min="0" max="1" step="0.01" /></dd>
+                </dl>
+            </section>
+        </section>

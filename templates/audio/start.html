@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">AudioModule</span></h1>
+                <h1>start <span class="returns">Returns : <span>AudioModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts audio.
@@ -31,21 +31,25 @@
 <textarea class="codemirror">
 console.log(&quot;X(&apos;audio&apos;).start&quot;);
 
-console.log(&quot;X(&apos;audio&apos;).ready&quot;);
-
 X(&apos;audio&apos;).setup({
-    decode : function(arrayBuffer) {
-        console.log(&apos;decode&apos;);
-        console.dir(arrayBuffer);
-    },
     ready : function(buffer) {
-        console.log(&apos;ready&apos;);
-        console.dir(buffer);
-
-        X(&apos;audio&apos;).start(0);
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
     },
     start : function(source, currentTime) {
         console.log(&apos;start&apos;);
+        console.dir(source);
+        console.dir(currentTime);
+    },
+    stop : function(source, currentTime) {
+        console.log(&apos;stop&apos;);
         console.dir(source);
         console.dir(currentTime);
     },
@@ -58,6 +62,15 @@ X(&apos;audio&apos;).setup({
         console.log(&apos;ended&apos;);
         console.dir(source);
         console.dir(currentTime);
+
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    },
+    error : function(error) {
+        if (error instanceof Error) {
+            window.alert(error.message);
+        } else {
+            window.alert(&apos;Error : decodeAudioData&apos;);
+        }
     }
 });
 
@@ -67,12 +80,12 @@ X.ajax({
     success : function(event, arrayBuffer) {
         // ArrayBuffer -> AudioBuffer
         X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
-    },
-    error : function(event, textStatus) {
-    },
-    progress : function(event) {
     }
 });
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

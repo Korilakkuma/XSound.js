@@ -1,9 +1,9 @@
         <section>
             <section>
-                <h1>ready <span class="type">StreamModule</span></h1>
+                <h1>ready <span class="returns">Returns : <span>StreamModule</span></span></h1>
                 <hr />
                 <p>
-                    This method don't do anything.
+                    This method does not do anything.
                 </p>
             </section>
             <section>
@@ -11,7 +11,8 @@
 console.log(&quot;X(&apos;stream&apos;).ready&quot;);
 
 try {
-    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready();
+    X(&apos;stream&apos;).setup(false, function(){}, function(){});
+    X(&apos;stream&apos;).ready();
 } catch (error) {
     window.alert(error.message);
 }

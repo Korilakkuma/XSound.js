@@ -1,0 +1,35 @@
+        <section>
+            <section>
+                <h1>domain <span class="returns">Returns : <span>TimeAll | Time | FFT</span></span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of TimeALL or Time or FFT.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is one of &apos;time-all-L&apos;, &apos;time-all-R&apos;, &apos;time&apos;, &apos;fft&apos;.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&apos;TimeAll (for Left Channel)&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-L&apos;));
+
+console.log(&apos;TimeAll (for Right Channel)&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-R&apos;));
+
+console.log(&apos;Time&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;));
+
+console.log(&apos;FFT&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;));
+</textarea>
+            </section>
+        </section>

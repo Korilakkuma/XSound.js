@@ -1,0 +1,28 @@
+        <section>
+            <section>
+                <h1>get <span class="returns">Returns : <span>WebSocket</span></span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of WebSocket.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.dir(X(&apos;oscillator&apos;).module(&apos;session&apos;).get());
+
+try {
+    X(&apos;oscillator&apos;).module(&apos;session&apos;).setup({
+        tls  : false,
+        host : &apos;210.152.156.200&apos;,
+        port : &apos;8000&apos;,
+        path : &apos;/home/node/websocket/&apos;,
+        open : function(event, socket) {
+            console.dir(X(&apos;oscillator&apos;).module(&apos;session&apos;).get());
+        }
+    });
+} catch (error) {
+    window.alert(error.message);
+}
+</textarea>
+            </section>
+        </section>

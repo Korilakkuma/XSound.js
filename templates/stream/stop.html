@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>stop <span class="type">StreamModule</span></h1>
+                <h1>stop <span class="returns">Returns : <span>StreamModule</span></span></h1>
                 <hr />
                 <p>
                     This method stops streaming.
@@ -19,10 +19,10 @@ try {
 document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
     if (X(&apos;stream&apos;).isStreaming()) {
         X(&apos;stream&apos;).stop();
-        this.textContent = &apos;STOP&apos;;
+        this.textContent = &apos;START&apos;;
     } else {
         X(&apos;stream&apos;).start();
-        this.textContent = &apos;START&apos;;
+        this.textContent = &apos;STOP&apos;;
     }
 }, false);
 </textarea>

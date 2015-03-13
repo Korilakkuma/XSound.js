@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>get <span class="type">AudioBuffer | Array</span></h1>
+                <h1>get <span class="returns">Returns : <span>AudioBuffer | Array</span></span></h1>
                 <hr />
                 <p>
                     This method gets the instance of AudioBuffer or the array that contains the instance of AudioBuffer.
@@ -84,21 +84,11 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
-
             for (var i = 0, len = urls.length; i &lt; len; i++) {
                 console.dir(X(&apos;oneshot&apos;).get(i));  /** {@type AudioBuffer} */
             }
 
             console.dir(X(&apos;oneshot&apos;).get());  /** {@type Array.<AudioBuffer>} */
-        },
-        error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
-        },
-        progress : function(event) {
-            // The 1st argumnet is XMLHttpRequestProgressEvent
         }
     });
 } catch (error) {

@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>stop <span class="type">AudioModule</span></h1>
+                <h1>stop <span class="returns">Returns : <span>AudioModule</span></span></h1>
                 <hr />
                 <p>
                     This method stops audio.
@@ -11,14 +11,7 @@
 console.log(&quot;X(&apos;audio&apos;).start&quot;);
 
 X(&apos;audio&apos;).setup({
-    decode : function(arrayBuffer) {
-        console.log(&apos;decode&apos;);
-        console.dir(arrayBuffer);
-    },
     ready : function(buffer) {
-        console.log(&apos;ready&apos;);
-        console.dir(buffer);
-
         document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
             if (X(&apos;audio&apos;).isPaused()) {
                 X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
@@ -50,6 +43,13 @@ X(&apos;audio&apos;).setup({
         console.dir(currentTime);
 
         document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    },
+    error : function(error) {
+        if (error instanceof Error) {
+            window.alert(error.message);
+        } else {
+            window.alert(&apos;Error : decodeAudioData&apos;);
+        }
     }
 });
 
@@ -59,10 +59,6 @@ X.ajax({
     success : function(event, arrayBuffer) {
         // ArrayBuffer -> AudioBuffer
         X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
-    },
-    error : function(event, textStatus) {
-    },
-    progress : function(event) {
     }
 });
 </textarea>

@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>setup <span class="type">MML</span></h1>
+                <h1>setup <span class="returns">Returns : <span>MML</span></span></h1>
                 <hr />
                 <p>
                     This method setups callback functions.
@@ -16,13 +16,13 @@
                                 This argument is plain object that has the following properties.
                                 <dl>
                                     <dt>start <span class="type">function</span></dt>
-                                    <dd>When the MML starts, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when the MML starts.</dd>
                                     <dt>stop <span class="type">function</span></dt>
-                                    <dd>When the MML stops, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when the MML stops.</dd>
                                     <dt>ended <span class="type">function</span></dt>
-                                    <dd>When the MML ended, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when the MML ended.</dd>
                                     <dt>error <span class="type">function</span></dt>
-                                    <dd>When the MML is incorrect, this callback function is invoked.</dd>
+                                    <dd>This callback function is invoked when the MML is incorrect.</dd>
                                 </dl>
                             </td>
                         </tr>
@@ -48,12 +48,22 @@ X(&apos;mml&apos;).setup({
         // var pianoIndex = sequence.indexes[index];
     },
     stop : function(sequence, index) {
-        // When the MML stopped, this callback function is executed
+        // The 1st argument is associative array for playing the MML.
+        // This has the following properties.
+        //    sequence.indexes;      // for X(&apos;oneshot&apos;)
+        //    sequence.frequencies;  // for X(&apos;oscillator&apos;)
+        //    sequence.start;        // the start time of notes
+        //    sequence.duration;     // the duration of notes
+        //    sequence.stop;         // the stop time of notes (this is total of &apos;start&apos; and &apos;duration&apos;)
+
+        // The 2nd argument is current index.
+        // For example,
+        // var pianoIndex = sequence.indexes[index];
     },
     ended : function() {
     },
     error : function(error, note) {
-        // The 1st argument is one of 'TEMPO', 'OCTAVE', 'NOTE', 'MML'
+        // The 1st argument is one of &apos;TEMPO&apos;, &apos;OCTAVE&apos;, &apos;NOTE&apos;, &apos;MML&apos;
         // The 2nd argument is invalid MML string
     }
 });

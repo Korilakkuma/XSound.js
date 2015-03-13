@@ -1,0 +1,113 @@
+        <section>
+            <section>
+                <h1>Oscillator#param <span class="returns">Returns : <span>number | string | Oscillator</span></span></h1>
+                <hr />
+                <p>
+                    This method gets or sets parameters of each oscillator.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is key for parameters.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span> or <span class="type">string</span> or <span class="type">undefined</span></td>
+                            <td>This value is value for parameters. If this value is undefined, this method is getter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>or,</p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">Object</span></td>
+                            <td>This value is associative array for parameters.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;oscillator&apos;, 0).param&quot;);
+
+X(&apos;oscillator&apos;).setup(true);
+
+var isStop = true;
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).start(440);
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).stop();
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
+
+document.querySelector(&apos;[name=&quot;form-type&quot;]&apos;).addEventListener(&apos;change&apos;, function() {
+    for (var i = 0, len = this.elements[&apos;radio-type&apos;].length; i < len; i++) {
+        if (this.elements[&apos;radio-type&apos;][i].checked) {
+            X(&apos;oscillator&apos;, 0).param(&apos;type&apos;, this.elements[&apos;radio-type&apos;][i].value);
+            // or,
+            // X(&apos;oscillator&apos;, 0).param({type : this.elements[&apos;radio-type&apos;][i].value});
+
+            break;
+        }
+    }
+}, false);
+
+document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;, 0).param({gain : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-gain&apos;).textContent = X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;);
+}, false);
+
+document.querySelector(&apos;#range-octave&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;, 0).param({octave : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-octave&apos;).textContent = X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;);
+}, false);
+
+document.querySelector(&apos;#range-fine&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;, 0).param({fine : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-fine&apos;).textContent = X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt>type</dt>
+                    <dd>
+                        <form name="form-type">
+                            <label><input type="radio" name="radio-type" value="sine" checked /> sine</label>
+                            <label><input type="radio" name="radio-type" value="square"   /> square</label>
+                            <label><input type="radio" name="radio-type" value="sawtooth" /> sawtooth</label>
+                            <label><input type="radio" name="radio-type" value="triangle" /> triangle</label>
+                        </form>
+                    </dd>
+                    <dt><label for="range-gain">gain : <span id="output-gain">1</span></label></dt>
+                    <dd><input type="range" id="range-gain" value="1" min="0" max="1" step="0.05" /><dd>
+                    <dt><label for="range-octave">octave : <span id="output-octave">0</span></label></dt>
+                    <dd><input type="range" id="range-octave" value="0" min="-4" max="4" step="1" /><dd>
+                        <dt><label for="range-fine">fine : <span id="output-fine">0</span></label></dt>
+                    <dd><input type="range" id="range-fine" value="0" min="-1200" max="1200" step="10" /><dd>
+                </dl>
+            </section>
+        </section>

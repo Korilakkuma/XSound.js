@@ -1,10 +1,27 @@
         <section>
             <section>
-                <h1>param <span class="type">number | OneshotModule</span></h1>
+                <h1>param <span class="returns">Returns : <span>number | OneshotModule</span></span></h1>
                 <hr />
                 <p>
                     This method gets or sets parameters.
                 </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is key for parameters.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span> or <span class="type">undefined</span></td>
+                            <td>This value is value for parameters. If this value is undefined, this method is getter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>or,</p>
                 <table>
                     <caption>Arguments</caption>
                     <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
@@ -84,38 +101,25 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
-
             document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;change&apos;, function() {
-                X(&apos;oneshot&apos;).param({
-                    masterVolume : this.valueAsNumber,
-                    transpose    : X(&apos;oneshot&apos;).param(&apos;transpose&apos;)
-                });
+                X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+                // or,
+                // X(&apos;oneshot&apos;).param({masterVolume : this.valueAsNumber});
 
-                X(&apos;oneshot&apos;).ready(0, 0).start(48);
+                X(&apos;oneshot&apos;).start(48);
 
                 document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;);
             }, false);
 
             document.querySelector(&apos;#range-transpose&apos;).addEventListener(&apos;change&apos;, function() {
-                X(&apos;oneshot&apos;).param({
-                    masterVolume : X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;),
-                    transpose    : this.valueAsNumber
-                });
+                X(&apos;oneshot&apos;).param(&apos;transpose&apos;, this.valueAsNumber);
+                // or,
+                // X(&apos;oneshot&apos;).param({transpose : this.valueAsNumber});
 
-                X(&apos;oneshot&apos;).ready(0, 0).start(48);
+                X(&apos;oneshot&apos;).start(48);
 
                 document.querySelector(&apos;#output-transpose&apos;).textContent = X(&apos;oneshot&apos;).param(&apos;transpose&apos;);
             }, false);
-
-        },
-        error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
-        },
-        progress : function(event) {
-            // The 1st argumnet is XMLHttpRequestProgressEvent
         }
     });
 } catch (error) {
@@ -124,9 +128,9 @@ try {
 }
 </textarea>
                 <dl class="sound-controllers">
-                    <dt><label for="range-master-volume">Master Volume : <span id="output-master-volume">1</span></label></dt>
+                    <dt><label for="range-master-volume">masterVolume : <span id="output-master-volume">1</span></label></dt>
                     <dd><input type="range" id="range-master-volume" value="1" min="0" max="1" step="0.05" /><dd>
-                    <dt><label for="range-transpose">Transpose : <span id="output-transpose">1</span></label></dt>
+                    <dt><label for="range-transpose">transpose : <span id="output-transpose">1</span></label></dt>
                     <dd><input type="range" id="range-transpose" value='1' min='0.05' max="2" step="0.05" /></dd>
                 </dl>
             </section>

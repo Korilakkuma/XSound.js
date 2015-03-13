@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">OneshotModule</span></h1>
+                <h1>start <span class="returns">Returns : <span>OneshotModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts one-shot audio.
@@ -94,20 +94,11 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
-
-            X(&apos;oneshot&apos;).ready(0, 0).start(39);  // C
-            X(&apos;oneshot&apos;).ready(0, 0).start(43);  // E
-            X(&apos;oneshot&apos;).ready(0, 0).start(46);  // G
-
-        },
-        error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
-        },
-        progress : function(event) {
-            // The 1st argumnet is XMLHttpRequestProgressEvent
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+                X(&apos;oneshot&apos;).start(39);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(39);
+                X(&apos;oneshot&apos;).start(43);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(43);
+                X(&apos;oneshot&apos;).start(46);  // or, X(&apos;oneshot&apos;).ready(0, 0).start(46);
+            }, false);
         }
     });
 } catch (error) {
@@ -115,5 +106,9 @@ try {
     return;
 }
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

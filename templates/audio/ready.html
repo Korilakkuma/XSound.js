@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>ready <span class="type">AudioModule</span></h1>
+                <h1>ready <span class="returns">Returns : <span>AudioModule</span></span></h1>
                 <hr />
                 <p>
                     This method decodes the instance of ArrayBuffer.
@@ -29,6 +29,13 @@ X(&apos;audio&apos;).setup({
     ready : function(buffer) {
         console.log(&apos;ready&apos;);
         console.dir(buffer);
+    },
+    error : function(error) {
+        if (error instanceof Error) {
+            window.alert(error.message);
+        } else {
+            window.alert(&apos;Error : decodeAudioData&apos;);
+        }
     }
 });
 
@@ -38,10 +45,6 @@ X.ajax({
     success : function(event, arrayBuffer) {
         // ArrayBuffer -> AudioBuffer
         X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
-    },
-    error : function(event, textStatus) {
-    },
-    progress : function(event) {
     }
 });
 </textarea>

@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">MML</span></h1>
+                <h1>start <span class="returns">Returns : <span>MML</span></span></h1>
                 <hr />
                 <p>
                     This method starts MML.
@@ -35,9 +35,26 @@ X(&apos;oscillator&apos;).setup(true);
 
 var mml = &apos;T74O4C4D4E4F4G4A4B4O5C4&apos;;
 
-X(&apos;mml&apos;).setup().ready(X(&apos;oscillator&apos;), [mml]);
+X(&apos;mml&apos;).setup({
+    ended : function() {
+        X(&apos;mml&apos;).ready(X(&apos;oscillator&apos;), [mml]);
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+}).ready(X(&apos;oscillator&apos;), [mml]);
 
-X(&apos;mml&apos;).start(0);
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (X(&apos;mml&apos;).isPaused()) {
+        X(&apos;mml&apos;).start(0);
+        this.textContent = &apos;PAUSE&apos;;
+    } else {
+        X(&apos;mml&apos;).stop();
+        this.textContent = &apos;START&apos;;
+    }
+}, false);
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">MML Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

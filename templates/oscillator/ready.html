@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>ready <span class="type">OscillatorModule</span></h1>
+                <h1>ready <span class="returns">Returns : <span>OscillatorModule</span></span></h1>
                 <hr />
                 <p>
                     This method sets sound scheduling.
@@ -28,8 +28,16 @@ console.log(&quot;X(&apos;oscillator&apos;).stop&quot;);
 
 X(&apos;oscillator&apos;).setup(true);
 
-// The start after 5 seconds and the stop after 10 seconds
-X(&apos;oscillator&apos;).ready(5, 10).start(440).stop();
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    // The start after 5 seconds and the stop after 10 seconds
+    X(&apos;oscillator&apos;).ready(5, 10).start(440).stop();
+
+    this.textContent = &apos;Wait&apos;;
+}, false);
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

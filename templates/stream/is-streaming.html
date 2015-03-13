@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>isStreaming <span class="type">boolean</span></h1>
+                <h1>isStreaming <span class="returns">Returns : <span>boolean</span></span></h1>
                 <hr />
                 <p>
                     This method is to check streaming.
@@ -21,10 +21,10 @@ document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, f
 
     if (X(&apos;stream&apos;).isStreaming()) {
         X(&apos;stream&apos;).stop();
-        this.textContent = &apos;STOP&apos;;
+        this.textContent = &apos;START&apos;;
     } else {
         X(&apos;stream&apos;).start();
-        this.textContent = &apos;START&apos;;
+        this.textContent = &apos;STOP&apos;;
     }
 }, false);
 </textarea>

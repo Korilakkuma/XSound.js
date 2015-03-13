@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>isMedia <span class="type">boolean</span></h1>
+                <h1>isMedia <span class="returns">Returns : <span>boolean</span></span></h1>
                 <hr />
                 <p>
                     This method is to check for presence or absence of HTMLMediaElement.
@@ -17,20 +17,19 @@ var mediaPlayer = null;
 if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
 } else {
-    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
 try {
     X(&apos;media&apos;).setup({
-        id        : &apos;audio-element&apos;,
-        type      : &apos;audio&apos;,
-        formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
-        callbacks : {}
+        id      : &apos;audio-element&apos;,
+        type    : &apos;audio&apos;,
+        formats : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;]
     });
 
     console.log(X(&apos;media&apos;).isMedia());
 } catch (error) {
-    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    // Cannot use HTMLMediaElement (for example, less than IE9)
     window.alert(error.message);
 }
 </textarea>

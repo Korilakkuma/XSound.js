@@ -1,10 +1,27 @@
         <section>
             <section>
-                <h1>param <span class="type">number | StreamModule</span></h1>
+                <h1>param <span class="returns">Returns : <span>number | StreamModule</span></span></h1>
                 <hr />
                 <p>
                     This method gets or sets parameters.
                 </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is key for parameters.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span> or <span class="type">undefined</span></td>
+                            <td>This value is value for parameters. If this value is undefined, this method is getter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>or,</p>
                 <table>
                     <caption>Arguments</caption>
                     <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
@@ -28,13 +45,15 @@ try {
 }
 
 document.querySelector(&apos;[type=&quot;range&quot;]&apos;).addEventListener(&apos;change&apos;, function() {
-    X(&apos;stream&apos;).param({masterVolume : this.valueAsNumber});
+    X(&apos;stream&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;stream&apos;).param({masterVolume : this.valueAsNumber});
 
     document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;stream&apos;).param(&apos;masterVolume&apos;);
 }, false);
 </textarea>
                 <dl class="sound-controllers">
-                    <dt>Master Volume : <span id="output-master-volume">1</span></dt>
+                    <dt>masterVolume : <span id="output-master-volume">1</span></dt>
                     <dd><input type="range" value="1" min="0" max="1" step="0.05" /><dd>
                 </dl>
             </section>

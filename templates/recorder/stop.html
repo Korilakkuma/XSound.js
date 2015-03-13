@@ -1,0 +1,39 @@
+        <section>
+            <section>
+                <h1>stop <span class="returns">Returns : <span>Recorder</span></span></h1>
+                <hr />
+                <p>
+                    This method stops recording.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).setup(4);
+
+var isStop = true;
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).module(&apos;recorder&apos;).ready(0);
+        X(&apos;oscillator&apos;).module(&apos;recorder&apos;).start();
+        X(&apos;oscillator&apos;).start(440);
+
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).module(&apos;recorder&apos;).stop();
+        X(&apos;oscillator&apos;).stop();
+
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Record Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
+            </section>
+        </section>

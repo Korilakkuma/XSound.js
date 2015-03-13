@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">OscillatorModule</span></h1>
+                <h1>start <span class="returns">Returns : <span>OscillatorModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts sound.
@@ -11,7 +11,7 @@
                     <tbody>
                         <tr>
                             <th>1st</th>
-                            <td><span class="type">Array</span>, <span class="type">number</span></td>
+                            <td><span class="type">Array</span> or <span class="type">number</span></td>
                             <td>This value is sound frequencies.</td>
                         </tr>
                         <tr>
@@ -29,7 +29,7 @@
             </section>
             <section>
 <textarea class="codemirror">
-console.log(&quot;X(&apos;oscillator&apos;).start&quot;);
+console.log(&quot;X(&apos;oscillator&apos;).stop&quot;);
 
 var base = 40;
 
@@ -43,7 +43,7 @@ document.querySelector(&apos;.buttons li:first-child button&apos;).addEventListe
     X(&apos;oscillator&apos;, 3).state(false);
 
     // 440 Hz (A)
-    X(&apos;oscillator&apos;).ready(0, 0).start(440);  // or, X(&apos;oscillator&apos;).start(440);
+    X(&apos;oscillator&apos;).start(440);  // or, X(&apos;oscillator&apos;).ready(0, 0).start(440);
 }, false);
 
 document.querySelector(&apos;.buttons li:first-child + li button&apos;).addEventListener(&apos;click&apos;, function() {
@@ -53,8 +53,8 @@ document.querySelector(&apos;.buttons li:first-child + li button&apos;).addEvent
     X(&apos;oscillator&apos;, 2).state(false);
     X(&apos;oscillator&apos;, 3).state(false);
 
-    // 440 Hz (A) is the 49th in keyboard of piano
-    X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([48]));  // or, X(&apos;oscillator&apos;).start(X.toFrequencies([49]));
+    // 440 Hz (A) is the 48th in keyboard of piano
+    X(&apos;oscillator&apos;).start(X.toFrequencies([48]));  // or, X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([48]));
 }, false);
 
 document.querySelector(&apos;.buttons li:first-child + li + li button&apos;).addEventListener(&apos;click&apos;, function() {
@@ -65,7 +65,8 @@ document.querySelector(&apos;.buttons li:first-child + li + li button&apos;).add
     X(&apos;oscillator&apos;, 3).state(false);
 
     // C major
-    X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 4), (base + 7)]));
+    X(&apos;oscillator&apos;).start(X.toFrequencies([base, (base + 4), (base + 7)]));
+    // or, X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 4), (base + 7)]));
 }, false);
 
 document.querySelector(&apos;.buttons li:first-child + li + li + li button&apos;).addEventListener(&apos;click&apos;, function() {
@@ -76,7 +77,8 @@ document.querySelector(&apos;.buttons li:first-child + li + li + li button&apos;
     X(&apos;oscillator&apos;, 3).state(false);
 
     // C minor
-    X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 3), (base + 7)]));
+    X(&apos;oscillator&apos;).start(X.toFrequencies([base, (base + 3), (base + 7)]));
+    // or, X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 3), (base + 7)]));
 }, false);
 
 document.querySelector(&apos;.buttons li:first-child + li + li + li + li button&apos;).addEventListener(&apos;click&apos;, function() {
@@ -87,7 +89,8 @@ document.querySelector(&apos;.buttons li:first-child + li + li + li + li button&
     X(&apos;oscillator&apos;, 3).state(true);
 
     // C7
-    X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 4), (base + 7), (base + 10)]));
+    X(&apos;oscillator&apos;).start(X.toFrequencies([base, (base + 4), (base + 7), (base + 10)]));
+    // or, X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 4), (base + 7), (base + 10)]));
 }, false);
 
 document.querySelector(&apos;.buttons li:first-child + li + li + li + li + li button&apos;).addEventListener(&apos;click&apos;, function() {
@@ -98,7 +101,8 @@ document.querySelector(&apos;.buttons li:first-child + li + li + li + li + li bu
     X(&apos;oscillator&apos;, 3).state(true);
 
     // Cm7
-    X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 3), (base + 7), (base + 10)]));
+    X(&apos;oscillator&apos;).start(X.toFrequencies([base, (base + 3), (base + 7), (base + 10)]));
+    // or, X(&apos;oscillator&apos;).ready(0, 0).start(X.toFrequencies([base, (base + 3), (base + 7), (base + 10)]));
 }, false);
 
 document.querySelector(&apos;.buttons li:last-child button&apos;).addEventListener(&apos;click&apos;, function() {

@@ -1,10 +1,27 @@
         <section>
             <section>
-                <h1>param <span class="type">number | OscillatorModule</span></h1>
+                <h1>param <span class="returns">Returns : <span>number | OscillatorModule</span></span></h1>
                 <hr />
                 <p>
                     This method gets or sets parameters.
                 </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">string</span></td>
+                            <td>This value is key for parameters.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span> or <span class="type">undefined</span></td>
+                            <td>This value is value for parameters. If this value is undefined, this method is getter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>or,</p>
                 <table>
                     <caption>Arguments</caption>
                     <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
@@ -21,16 +38,34 @@
 <textarea class="codemirror">
 console.log(&quot;X(&apos;oscillator&apos;).param&quot;);
 
-X(&apos;oscillator&apos;).setup(true).start(440);
+X(&apos;oscillator&apos;).setup(true);
+
+var isStop = true;
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).start(440);
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).stop();
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
 
 document.querySelector(&apos;[type=&quot;range&quot;]&apos;).addEventListener(&apos;change&apos;, function() {
-    X(&apos;oscillator&apos;).param({masterVolume : this.valueAsNumber});
+    X(&apos;oscillator&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).param({masterVolume : this.valueAsNumber});
 
     document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;oscillator&apos;).param(&apos;masterVolume&apos;);
 }, false);
 </textarea>
                 <dl class="sound-controllers">
-                    <dt>Master Volume : <span id="output-master-volume">1</span></dt>
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt>masterVolume : <span id="output-master-volume">1</span></dt>
                     <dd><input type="range" value="1" min="0" max="1" step="0.05" /><dd>
                 </dl>
             </section>

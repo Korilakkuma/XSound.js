@@ -1,0 +1,79 @@
+        <section>
+            <section>
+                <h1>create <span class="returns">Returns : <span>string (Data URL or Object URL)</span></span></h1>
+                <hr />
+                <p>
+                    This method creates WAVE file from the recorded sound.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">number</span> or <span class="type">string</span></td>
+                            <td>This value is the target track number. If this value is &apos;all&apos;, the all of tracks are target.</td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">number</span></td>
+                            <td>This value is the number of channels. So, this value is either 1 or 2.</td>
+                        </tr>
+                        <tr>
+                            <td>3rd</td>
+                            <td><span class="type">number</span></td>
+                            <td>This value is quantization bit. So, this value is either 8 (bit) or 16 (bit).</td>
+                        </tr>
+                        <tr>
+                            <td>4th</td>
+                            <td><span class="type">string</span></td>
+                            <td>This value is either &apos;base64&apos; or &apos;blob&apos;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+X(&apos;oscillator&apos;).module(&apos;recorder&apos;).setup(4);
+
+var isStop = true;
+
+document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).module(&apos;recorder&apos;).ready(0).start();
+        X(&apos;oscillator&apos;).start(440);
+
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).module(&apos;recorder&apos;).stop();
+        X(&apos;oscillator&apos;).stop();
+
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
+
+document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;recorder&apos;).stop();
+    X(&apos;oscillator&apos;).stop();
+
+    var wave = X(&apos;oscillator&apos;).module(&apos;recorder&apos;).create(&apos;all&apos;, 2, 16, &apos;base64&apos;);
+
+    if (wave) {
+        document.querySelector(&apos;audio&apos;).setAttribute(&apos;src&apos;, wave);
+    }
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Record Controller</dt>
+                    <dd>
+                        <button type="button">START</button>
+                        <button type="button">CREATE</button>
+                    </dd>
+                    <dd><audio controls></audio></dd>
+                </dl>
+            </section>
+        </section>

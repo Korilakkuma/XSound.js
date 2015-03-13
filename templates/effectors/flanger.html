@@ -1,0 +1,147 @@
+        <section>
+            <section>
+                <h1>flanger <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Flanger.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>time</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>depth</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>rate</th>
+                            <td><span class="type">number</span></td>
+                            <td>value &gt;= 0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>mix</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>tone</th>
+                            <td><span class="type">number</span></td>
+                            <td>10 &lt;= value &lt;= half the sample-rate</td>
+                            <td>350</td>
+                        </tr>
+                        <tr>
+                            <th>feedback</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchstart&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mouseup&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+X(&apos;oscillator&apos;).module(&apos;flanger&apos;).state(true);
+
+document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).state(this.checked);
+}, false);
+
+document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;time&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({time : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-time&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;time&apos;);
+}, false);
+
+document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;depth&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({depth : this.valueAsNumber});
+    document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;depth&apos;);
+}, false);
+
+document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;rate&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({ rate : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-rate&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;rate&apos;);
+}, false);
+
+document.querySelector(&apos;#range-mix&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;mix&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({mix : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-mix&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;mix&apos;);
+}, false);
+
+document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;tone&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({tone : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-tone&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;tone&apos;);
+}, false);
+
+document.querySelector(&apos;#range-feedback&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;feedback&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param({feedback : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-feedback&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;flanger&apos;).param(&apos;feedback&apos;);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Flanger</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="range-time">time : <span id="output-time">0</span></label></dt>
+                    <dd><input type="range" id="range-time" value="0" min="0" max="0.01" step="0.001" /></dd>
+                    <dt><label for="range-depth">depth : <span id="output-depth">0</span></label></dt>
+                    <dd><input type="range" id="range-depth" value="0" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-rate">rate : <span id="output-rate">0</span></label></dt>
+                    <dd><input type="range" id="range-rate" value="0" min="0" max="10" step="0.05" /></dd>
+                    <dt><label for="range-mix">mix : <span id="output-mix">0</span></label></dt>
+                    <dd><input type="range" id="range-mix" value="0" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-tone">tone : <span id="output-tone">350</span></label></dt>
+                    <dd><input type="range" id="range-tone" value="350" min="10" max="8000" step="1" /></dd>
+                    <dt><label for="range-feedback">feedback : <span id="output-feedback">0</span></label></dt>
+                    <dd><input type="range" id="range-feedback" value="0" min="0" max="1" step="0.05" /><dd>
+                </dl>
+            </section>
+        </section>

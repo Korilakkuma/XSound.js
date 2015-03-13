@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">StreamModule</span></h1>
+                <h1>start <span class="returns">Returns : <span>StreamModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts streaming.
@@ -27,7 +27,8 @@
 console.log(&quot;X(&apos;stream&apos;).start&quot;);
 
 try {
-    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready().start();
+    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready();
+    X(&apos;stream&apos;).start();
 } catch (error) {
     window.alert(error.message);
 }

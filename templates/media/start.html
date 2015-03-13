@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>start <span class="type">MediaModule | MediaFallbackModule</span></h1>
+                <h1>start <span class="returns">Returns : <span>MediaModule | MediaFallbackModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts media.
@@ -36,12 +36,24 @@ var mediaPlayer = null;
 if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
 } else {
-    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
 var callbacks = {
     canplaythrough : function(event, media) {
-        X(&apos;media&apos;).start(0);
+        document.querySelector(&apos;button&apos;).onclick = function() {
+            if (X(&apos;media&apos;).isPaused()) {
+                X(&apos;media&apos;).start(X(&apos;media&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;media&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        };
+    },
+    ended          : function(event, media) {
+        X(&apos;media&apos;).param(&apos;currentTime&apos;, 0);
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
     }
 };
 
@@ -51,14 +63,15 @@ try {
         type      : &apos;audio&apos;,
         formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
         callbacks : callbacks
-    });
-
-    X(&apos;media&apos;).ready(&apos;resources/audio/kurenai-twin&apos;);
+    }).ready(&apos;resources/audio/kurenai-twin&apos;);
 } catch (error) {
-    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    // Cannot use HTMLMediaElement (for example, less than IE9)
     window.alert(error.message);
 }
 </textarea>
-                <p><audio id="audio-element"></audio></p>
+                <dl class="sound-controllers">
+                    <dt class="invisibility"><audio id="audio-element"></audio></dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

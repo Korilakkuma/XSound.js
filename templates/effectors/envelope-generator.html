@@ -1,0 +1,108 @@
+        <section>
+            <section>
+                <h1>eg <span class="applicable">Applicable : <span>OscillatorModule | OneshotModule</span></span></h1>
+                <hr />
+                <p>
+                    This module is Envelope Generator.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>attack</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.01</td>
+                        </tr>
+                        <tr>
+                            <th>decay</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.3</td>
+                        </tr>
+                        <tr>
+                            <th>sustain</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0.5</td>
+                        </tr>
+                        <tr>
+                            <th>release</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;oscillator&apos;).setup(true);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchstart&apos;, function() {
+    X(&apos;oscillator&apos;).start(440);
+    this.textContent = &apos;STOP&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;mouseup&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;, function() {
+    X(&apos;oscillator&apos;).stop();
+    this.textContent = &apos;START&apos;;
+}, false);
+
+document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;attack&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({attack : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;attack&apos;);
+}, false);
+
+document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;decay&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({decay : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-decay&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;decay&apos;);
+}, false);
+
+document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;sustain&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({sustain : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-sustain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;sustain&apos;);
+}, false);
+
+document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;change&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;release&apos;, this.valueAsNumber);
+    // or,
+    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({release : this.valueAsNumber});
+
+    document.querySelector(&apos;#output-release&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;release&apos;);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label for="range-attack">attack : <span id="output-attack">0.01</span></label></dt>
+                    <dd><input type="range" id="range-attack" value="0.01" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-decay">decay : <span id="output-decay">0.3</span></label></dt>
+                    <dd><input type="range" id="range-decay" value="0.3" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-sustain">sustain : <span id="output-sustain">0.5</span></label></dt>
+                    <dd><input type="range" id="range-sustain" value="0.5" min="0" max="1" step="0.01" /></dd>
+                    <dt><label for="range-release">release : <span id="output-release">1</span></label></dt>
+                    <dd><input type="range" id="range-release" value="1" min="0" max="1" step="0.01" /></dd>
+                </dl>
+            </section>
+        </section>

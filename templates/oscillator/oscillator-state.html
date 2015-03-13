@@ -1,0 +1,53 @@
+        <section>
+            <section>
+                <h1>Oscillator#state <span class="returns">Returns : <span>boolean | Oscillator</span></span></h1>
+                <hr />
+                <p>
+                    This method gets or sets state of each oscillator.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">boolean</span> or <span class="type">undefined</span></td>
+                            <td>This value is to determine oscillator state. If this value is undefined, this method is getter.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;oscillator&apos;, 0).state&quot;);
+
+X(&apos;oscillator&apos;).setup(true);
+
+var isStop = true;
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).start(440);
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).stop();
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
+
+document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+    X(&apos;oscillator&apos;, 0).state(this.checked);
+    console.log(X(&apos;oscillator&apos;, 0).state());
+
+    X(&apos;oscillator&apos;).stop().start(440);
+}, false);
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dd><label><input type="checkbox" checked /> State</label><dd>
+                </dl>
+            </section>
+        </section>

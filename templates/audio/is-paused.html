@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>isPaused <span class="type">boolean</span></h1>
+                <h1>isPaused <span class="returns">Returns : <span>boolean</span></span></h1>
                 <hr />
                 <p>
                     This method is to check pause.
@@ -11,9 +11,10 @@
 console.log(&quot;X(&apos;audio&apos;).isPaused&quot;);
 
 X(&apos;audio&apos;).setup({
-    decode : function(arrayBuffer) {
-    },
     ready : function(buffer) {
+        console.log(&apos;ready&apos;);
+        console.log(X(&apos;audio&apos;).isPaused());
+
         document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
             if (X(&apos;audio&apos;).isPaused()) {
                 X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
@@ -50,10 +51,6 @@ X.ajax({
     success : function(event, arrayBuffer) {
         // ArrayBuffer -> AudioBuffer
         X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
-    },
-    error : function(event, textStatus) {
-    },
-    progress : function(event) {
     }
 });
 </textarea>

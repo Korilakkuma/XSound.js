@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>fullscreen <span class="type">MediaModule | MediaFallbackModule</span></h1>
+                <h1>fullscreen <span class="returns">Returns : <span>MediaModule | MediaFallbackModule</span></span></h1>
                 <hr />
                 <p>
                     This method changes video screen to full screen.
@@ -15,7 +15,7 @@ var mediaPlayer = null;
 if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
 } else {
-    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
 var callbacks = {
@@ -55,11 +55,9 @@ try {
         type      : &apos;video&apos;,
         formats   : [&apos;mp4&apos;, &apos;webm&apos;, &apos;ogv&apos;],
         callbacks : callbacks
-    });
-
-    X(&apos;media&apos;).ready(&apos;http://curtaincall.weblike.jp/portfolio-music-v/video/kurenai-twin&apos;);
+    }).ready(&apos;http://curtaincall.weblike.jp/portfolio-music-v/video/kurenai-twin&apos;);
 } catch (error) {
-    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    // Cannot use HTMLMediaElement (for example, less than IE9)
     window.alert(error.message);
 }
 </textarea>

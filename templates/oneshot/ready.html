@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>ready <span class="type">OneshotModule</span></h1>
+                <h1>ready <span class="returns">Returns : <span>OneshotModule</span></span></h1>
                 <hr />
                 <p>
                     This method sets sound scheduling.
@@ -89,18 +89,12 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
+            document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+                // The start after 5 seconds and the stop after 10 seconds
+                X(&apos;oneshot&apos;).ready(5, 10).start(48).stop(48);
 
-            // The start after 5 seconds and the stop after 10 seconds
-            X(&apos;oneshot&apos;).ready(5, 10).start(48).stop(48);
-        },
-        error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
-        },
-        progress : function(event) {
-            // The 1st argumnet is XMLHttpRequestProgressEvent
+                this.textContent = &apos;Wait&apos;;
+            }, false);
         }
     });
 } catch (error) {
@@ -108,5 +102,9 @@ try {
     return;
 }
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

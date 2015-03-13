@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>isSource <span class="type">boolean</span></h1>
+                <h1>isSource <span class="returns">Returns : <span>boolean</span></span></h1>
                 <hr />
                 <p>
                     This method is to check for presence or absence of AudioBuffer and AudioBufferSourceNode.
@@ -21,7 +21,15 @@ X(&apos;audio&apos;).setup({
         console.log(&apos;ready&apos;);
         console.log(X(&apos;audio&apos;).isSource());
 
-        X(&apos;audio&apos;).start(0);
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
     },
     start : function(source, currentTime) {
         console.log(&apos;start&apos;);
@@ -35,12 +43,12 @@ X.ajax({
     success : function(event, arrayBuffer) {
         // ArrayBuffer -> AudioBuffer
         X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
-    },
-    error : function(event, textStatus) {
-    },
-    progress : function(event) {
     }
 });
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>

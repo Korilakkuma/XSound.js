@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>toggle <span class="type">StreamModule</span></h1>
+                <h1>toggle <span class="returns">Returns : <span>StreamModule</span></span></h1>
                 <hr />
                 <p>
                     This method starts or stops streaming.
@@ -34,9 +34,9 @@ try {
 
 document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
     if (X(&apos;stream&apos;).isStreaming()) {
-        this.textContent = &apos;STOP&apos;;
-    } else {
         this.textContent = &apos;START&apos;;
+    } else {
+        this.textContent = &apos;STOP&apos;;
     }
 
     X(&apos;stream&apos;).toggle();

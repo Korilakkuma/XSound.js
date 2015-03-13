@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>isSource <span class="type">boolean</span></h1>
+                <h1>isSource <span class="returns">Returns : <span>boolean</span></span></h1>
                 <hr />
                 <p>
                     This method is to check for presence or absence of MediaElementAudioSourceNode.
@@ -17,7 +17,7 @@ var mediaPlayer = null;
 if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Use Web Audio API (MediaElementAudioSourceNode)
 } else {
-    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by MediaElement)
+    mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
 var callbacks = {
@@ -37,7 +37,7 @@ try {
 
     console.log(X(&apos;media&apos;).isSource());
 } catch (error) {
-    // Cannot use HTML5 MediaElement (for example, less than IE9)
+    // Cannot use HTMLMediaElement (for example, less than IE9)
     window.alert(error.message);
 }
 </textarea>

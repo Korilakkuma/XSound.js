@@ -1,0 +1,88 @@
+        <section>
+            <section>
+                <h1>autopanner <span class="applicable">Applicable : <span>*</span></span></h1>
+                <hr />
+                <p>
+                    This module is Auto Panner.
+                </p>
+                <table>
+                    <caption>Parameters</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Default</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>depth</th>
+                            <td><span class="type">number</span></td>
+                            <td>0 &lt;= value &lt;= 1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <th>rate</th>
+                            <td><span class="type">number</span></td>
+                            <td>value &gt;= 0</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+X(&apos;audio&apos;).setup({
+    ready : function(buffer) {
+        document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+            if (X(&apos;audio&apos;).isPaused()) {
+                X(&apos;audio&apos;).start(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
+                this.textContent = &apos;PAUSE&apos;;
+            } else {
+                X(&apos;audio&apos;).stop();
+                this.textContent = &apos;START&apos;;
+            }
+        }, false);
+
+        X(&apos;audio&apos;).module(&apos;autopanner&apos;).state(true);
+
+        document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener(&apos;click&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;autopanner&apos;).state(this.checked);
+        }, false);
+
+        document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;depth&apos;, this.valueAsNumber);
+            // or,
+            // X(&apos;audio&apos;).module(&apos;autopanner&apos;).param({depth : this.valueAsNumber});
+
+            document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;depth&apos;);
+        }, false);
+
+        document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+            X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;rate&apos;, this.valueAsNumber);
+            // or,
+            // X(&apos;audio&apos;).module(&apos;autopanner&apos;).param({rate : this.valueAsNumber});
+
+            document.querySelector(&apos;#output-rate&apos;).textContent = X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;rate&apos;);
+        }, false);
+    },
+    ended : function(source, currentTime) {
+        document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
+    }
+});
+
+X.ajax({
+    url     : &apos;resources/audio/kurenai-twin.wav&apos;,
+    timeout : 60000,
+    success : function(event, arrayBuffer) {
+        // ArrayBuffer -> AudioBuffer
+        X(&apos;audio&apos;).ready.call(X(&apos;audio&apos;), arrayBuffer);
+    }
+});
+</textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Audio Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                    <dt><label><input type="checkbox" checked /> Auto Panner</label></dt>
+                    <dd class="invisibility"></dd>
+                    <dt><label for="range-depth">depth : <span id="output-depth">0</span></label></dt>
+                    <dd><input type="range" id="range-depth" value="0" min="0" max="1" step="0.05" /></dd>
+                    <dt><label for="range-rate">rate : <span id="output-rate">0</span></label></dt>
+                    <dd><input type="range" id="range-rate" value="0" min="0" max="1" step="0.05" /></dd>
+                </dl>
+            </section>
+        </section>

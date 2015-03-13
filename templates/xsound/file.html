@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>file <span class="type">File (extends Blob)</span></h1>
+                <h1>file <span class="returns">Returns : <span>File (extends Blob)</span></span></h1>
                 <hr />
                 <p>
                     This method gets the instance of File (extends Blob) and reads this.
@@ -57,7 +57,7 @@ document.querySelector(&apos;[type=&quot;file&quot;]&apos;).addEventListener('ch
                 console.dir(error);
             },
             progress : function(event) {
-                // The 1st argument is XMLHttpRequestProgressEvent
+                // The 1st argument is ProgressEvent
 
                 console.log(&apos;progress&apos;);
                 console.dir(event);
@@ -110,7 +110,7 @@ dropArea.addEventListener(&apos;drop&apos;, function(event) {
                 console.dir(error);
             },
             progress : function(event) {
-                // The 1st argument is XMLHttpRequestProgressEvent
+                // The 1st argument is ProgressEvent
 
                 console.log(&apos;progress&apos;);
                 console.dir(event);

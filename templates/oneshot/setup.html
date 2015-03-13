@@ -1,9 +1,9 @@
         <section>
             <section>
-                <h1>setup <span class="type">OneshotModule</span></h1>
+                <h1>setup <span class="returns">Returns : <span>OneshotModule</span></span></h1>
                 <hr />
                 <p>
-                    This method setups one-shot audios
+                    This method setups one-shot audios.
                 </p>
                 <table>
                     <caption>Arguments</caption>
@@ -101,15 +101,15 @@ try {
         timeout   : 60000,
         success   : function(event, buffers) {
             // The 1st argument is XMLHttpRequestProgressEvent
-            // The 2nd argument is the instances of AudioBuffer
+            // The 2nd argument is the array that contains AudioBuffers
 
             console.log(&apos;success&apos;);
             console.dir(event);
             console.dir(buffers);
         },
         error : function(event, textStatus) {
-            // The 1st argument is one of XMLHttpRequestProgressEvent, &apos;onerror&apos; event object in FileReader, null
-            // The 2nd argument is one of &apos;error&apos;, &apos;timeout&apos;, &apos;decode&apos;, error code in FileReader
+            // The 1st argument is one of XMLHttpRequestProgressEvent, Error, null
+            // The 2nd argument is either &apos;error&apos; or &apos;timeout&apos;
 
             console.log(&apos;error&apos;);
             console.dir(event);

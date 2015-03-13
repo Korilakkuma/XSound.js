@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>mix <span class="type">MixerModule</span></h1>
+                <h1>mix <span class="returns">Returns : <span>MixerModule</span></span></h1>
                 <hr />
                 <p>
                     This method mixes sound sources.
@@ -23,14 +23,36 @@ console.log(&quot;X(&apos;mixer&apos;).mix&quot;);
 
 var C = X.clone();
 
-X(&apos;oscillator&apos;).setup(true).ready(0, 0).start(220);
-C(&apos;oscillator&apos;).setup(true).ready(0, 0).start(440);
+X(&apos;oscillator&apos;).setup(true);
+C(&apos;oscillator&apos;).setup(true);
 
 X(&apos;oscillator&apos;, 0).param({type : &apos;sawtooth&apos;, gain : 0.3});
 C(&apos;oscillator&apos;, 0).param({type : &apos;sawtooth&apos;, gain : 0.7});
 
-// Mix sounds
-X(&apos;mixer&apos;).mix([X(&apos;oscillator&apos;), C(&apos;oscillator&apos;)]);
+var isStop = true;
+
+document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
+    if (isStop) {
+        X(&apos;oscillator&apos;).start(220);
+        C(&apos;oscillator&apos;).start(440);
+
+        // Mix sounds
+        X(&apos;mixer&apos;).mix([X(&apos;oscillator&apos;), C(&apos;oscillator&apos;)]);
+
+        this.textContent = &apos;STOP&apos;;
+    } else {
+        X(&apos;oscillator&apos;).stop();
+        C(&apos;oscillator&apos;).stop();
+
+        this.textContent = &apos;START&apos;;
+    }
+
+    isStop = !isStop;
+}, false);
 </textarea>
+                <dl class="sound-controllers">
+                    <dt class="invisibility">Sound Controller</dt>
+                    <dd><button type="button">START</button></dd>
+                </dl>
             </section>
         </section>
