@@ -81,16 +81,10 @@ h2 {
 }
 
 h1 {
-    .type {
-        display:none;
-        float:right;
-        margin-top:1rem;
-        font-size:50%;
-        font-style:italic;
-        color:rgba($accentColor1, 1.0);
-    }
-
+    .type,
+    .returns,
     .applicable {
+        display:none;
         float:right;
         margin-top:1rem;
         font-size:50%;
@@ -218,6 +212,10 @@ h1 {
             dd {
                 margin:1rem 0rem;
                 font-size:1rem;
+
+                a:hover {
+                    text-decoration:underline;
+                }
             }
         }
     }
@@ -436,6 +434,7 @@ button {
 
 .buttons {
     margin:2rem 0rem 0rem 2rem;
+    @extend .clearfix;
 
     li {
         display:block;
@@ -484,7 +483,9 @@ a {
     }
 
     h1 {
-        .type {
+        .type,
+        .returns,
+        .applicable {
             display:block;
         }
     }
@@ -546,7 +547,9 @@ a {
     }
 
     h1 {
-        .type {
+        .type,
+        .returns,
+        .applicable {
             display:block;
         }
     }
