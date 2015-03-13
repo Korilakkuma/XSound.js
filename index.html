@@ -70,7 +70,7 @@
                     <dt>Properties</dt>
                     <dd><a href="#xsound-buffer-size">BUFFER_SIZE</a></dd>
                     <dd><a href="#xsound-error-mode">ERROR_MODE</a></dd>
-                    <dd><a href="#xsound-full-mode">FULL_MODE</a></dd>
+                    <!--<dd><a href="#xsound-full-mode">FULL_MODE</a></dd>-->
                     <dd><a href="#xsound-is-xsound">IS_XSOUND</a></dd>
                     <dd><a href="#xsound-num-input">NUM_INPUT</a></dd>
                     <dd><a href="#xsound-num-output">NUM_OUTPUT</a></dd>
@@ -102,9 +102,8 @@
                     <dd><a href="#oscillator-to-json">toJSON</a></dd>
                     <dd><a href="#oscillator-get">get</a></dd>
                     <dd><a href="#oscillator-length">length</a></dd>
-                    <dt>Each Oscillator</dt>
-                    <dd><a href="#oscillator-each-param">param</a></dd>
-                    <dd><a href="#oscillator-each-state">state</a></dd>
+                    <dd><a href="#oscillator-oscillator-param">Oscillator#param</a></dd>
+                    <dd><a href="#oscillator-oscillator-state">Oscillator#state</a></dd>
                 </dl>
             </section>
             <section>
@@ -198,52 +197,67 @@
                 </dl>
             </section>
             <section>
-                <h2><a href="#" id="modules-api">Modules</a></h2>
+                <h2><a href="#" id="analyser-api">Analyser</a></h2>
                 <dl>
-                    <dt>Effectors</dt>
-                    <dd><a href="#modules-effectors-autopanner">autopanner</a></dd>
-                    <dd><a href="#modules-effectors-chorus">chorus</a></dd>
-                    <dd><a href="#modules-effectors-compressor">compressor</a></dd>
-                    <dd><a href="#modules-effectors-delay">delay</a></dd>
-                    <dd><a href="#modules-effectors-distortion">distortion</a></dd>
-                    <dd><a href="#modules-effectors-envelope-generator">eg</a></dd>
-                    <dd><a href="#modules-effectors-equalizer">equalizer</a></dd>
-                    <dd><a href="#modules-effectors-filter">filter</a></dd>
-                    <dd><a href="#modules-effectors-flanger">flanger</a></dd>
-                    <dd><a href="#modules-effectors-glide">glide</a></dd>
-                    <dd><a href="#modules-effectors-noisegate">noisegate</a></dd>
-                    <dd><a href="#modules-effectors-phaser">phaser</a></dd>
-                    <dd><a href="#modules-effectors-reverb">reverb</a></dd>
-                    <dd><a href="#modules-effectors-ringmodulator">ringmodulator</a></dd>
-                    <dd><a href="#modules-effectors-tremolo">tremolo</a></dd>
-                    <dd><a href="#modules-effectors-vocalcanceler">vocalcanceler</a></dd>
-                    <dd><a href="#modules-effectors-wah">wah</a></dd>
-                    <dt>Session</dt>
-                    <dd><a href="#modules-session-setup">setup</a></dd>
-                    <dd><a href="#modules-session-start">start</a></dd>
-                    <dd><a href="#modules-session-close">close</a></dd>
-                    <dd><a href="#modules-session-get">get</a></dd>
-                    <dd><a href="#modules-session-is-connected">isConnected</a></dd>
-                    <dd><a href="#modules-session-state">state</a></dd>
-                    <dt>Recorder</dt>
-                    <dd><a href="#modules-recorder-setup">setup</a></dd>
-                    <dd><a href="#modules-recorder-ready">ready</a></dd>
-                    <dd><a href="#modules-recorder-start">start</a></dd>
-                    <dd><a href="#modules-recorder-stop">stop</a></dd>
-                    <dd><a href="#modules-recorder-param">param</a></dd>
-                    <dd><a href="#modules-recorder-clear">clear</a></dd>
-                    <dd><a href="#modules-recorder-create">create</a></dd>
-                    <dd><a href="#modules-recorder-get-active-track">getActiveTrack</a></dd>
-                    <dt>Analyser</dt>
-                    <dd><a href="#modules-analyser-domain">domain</a></dd>
-                    <dd><a href="#modules-analyser-param">param</a></dd>
-                    <dd><a href="#modules-analyser-get">get</a></dd>
-                    <dd><a href="#modules-analyser-domain-setup">domain#setup</a></dd>
-                    <dd><a href="#modules-analyser-domain-param">domain#param</a></dd>
-                    <dd><a href="#modules-analyser-domain-state">domain#state</a></dd>
-                    <dd><a href="#modules-analyser-domain-download">domain#download</a></dd>
-                    <dd><a href="#modules-analyser-time-all-update">TimeAll#update</a></dd>
-                    <dd><a href="#modules-analyser-time-all-drag">TimeAll#drag</a></dd>
+                    <dt>Methods</dt>
+                    <dd><a href="#analyser-domain">domain</a></dd>
+                    <dd><a href="#analyser-param">param</a></dd>
+                    <dd><a href="#analyser-get">get</a></dd>
+                    <dd><a href="#analyser-domain-setup">domain#setup</a></dd>
+                    <dd><a href="#analyser-domain-param">domain#param</a></dd>
+                    <dd><a href="#analyser-domain-state">domain#state</a></dd>
+                    <dd><a href="#analyser-domain-download">domain#download</a></dd>
+                    <dd><a href="#analyser-time-all-update">TimeAll#update</a></dd>
+                    <dd><a href="#analyser-time-all-drag">TimeAll#drag</a></dd>
+                </dl>
+            </section>
+            <section>
+                <h2><a href="#" id="recorder-api">Recorder</a></h2>
+                <dl>
+                    <dt>Methods</dt>
+                    <dd><a href="#recorder-setup">setup</a></dd>
+                    <dd><a href="#recorder-ready">ready</a></dd>
+                    <dd><a href="#recorder-start">start</a></dd>
+                    <dd><a href="#recorder-stop">stop</a></dd>
+                    <dd><a href="#recorder-param">param</a></dd>
+                    <dd><a href="#recorder-clear">clear</a></dd>
+                    <dd><a href="#recorder-create">create</a></dd>
+                    <dd><a href="#recorder-get-active-track">getActiveTrack</a></dd>
+                </dl>
+            </section>
+            <section>
+                <h2><a href="#" id="session-api">Session</a></h2>
+                <dl>
+                    <dt>Methods</dt>
+                    <dd><a href="#session-setup">setup</a></dd>
+                    <dd><a href="#session-start">start</a></dd>
+                    <dd><a href="#session-close">close</a></dd>
+                    <dd><a href="#session-get">get</a></dd>
+                    <dd><a href="#session-is-connected">isConnected</a></dd>
+                    <dd><a href="#session-state">state</a></dd>
+                </dl>
+            </section>
+            <section>
+                <h2><a href="#" id="effectors-api">Effectors</a></h2>
+                <dl>
+                    <dt>Modules</dt>
+                    <dd><a href="#effectors-autopanner">autopanner</a></dd>
+                    <dd><a href="#effectors-chorus">chorus</a></dd>
+                    <dd><a href="#effectors-compressor">compressor</a></dd>
+                    <dd><a href="#effectors-delay">delay</a></dd>
+                    <dd><a href="#effectors-distortion">distortion</a></dd>
+                    <dd><a href="#effectors-envelope-generator">eg</a></dd>
+                    <dd><a href="#effectors-equalizer">equalizer</a></dd>
+                    <dd><a href="#effectors-filter">filter</a></dd>
+                    <dd><a href="#effectors-flanger">flanger</a></dd>
+                    <dd><a href="#effectors-glide">glide</a></dd>
+                    <dd><a href="#effectors-noisegate">noisegate</a></dd>
+                    <dd><a href="#effectors-phaser">phaser</a></dd>
+                    <dd><a href="#effectors-reverb">reverb</a></dd>
+                    <dd><a href="#effectors-ringmodulator">ringmodulator</a></dd>
+                    <dd><a href="#effectors-tremolo">tremolo</a></dd>
+                    <dd><a href="#effectors-vocalcanceler">vocalcanceler</a></dd>
+                    <dd><a href="#effectors-wah">wah</a></dd>
                 </dl>
             </section>
         </nav>
