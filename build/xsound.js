@@ -16,7 +16,6 @@
 
     // Global constant value for the determination that Web Audio API is either enabled or disabled.
     var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
-    var FULL_MODE = global.webkitAudioContext ? true : false;  // for Firefox
 
     /** 
      * This interface is in order to manage state of module that implements this interface.
@@ -203,13 +202,6 @@
         // Create the instance of XMLHttpRequest
         var xhr = new XMLHttpRequest();
 
-        if ((FULL_MODE === undefined) || FULL_MODE) {
-            // XMLHttpRequest Level 2
-            xhr.responseType = 'arraybuffer';
-        } else {
-            xhr.overrideMimeType('text/plain; charset=x-user-defined');
-        }
-
         var t = parseInt(timeout);
 
         // Timeout
@@ -238,58 +230,16 @@
         // Success
         xhr.onload = function(event) {
             if (xhr.status === 200) {
-                var arrayBuffer = null;
+                var arrayBuffer = xhr.response;
 
-                if ((FULL_MODE === undefined) || FULL_MODE) {
-                    arrayBuffer = xhr.response;
-
-                    if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
-                        successCallback(event, arrayBuffer);
-                    }
-                } else {
-                    var binary = xhr.responseText;
-                    var buffer = [];
-
-                    for (var i = 0, len = binary.length; i < len; i++) {
-                        buffer.push(binary.charCodeAt(i) & 0xFF);
-                    }
-
-                    var ext    = url.slice(-3);
-                    var mime   = 'audio/' + ext;
-                    var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
-                    var reader = new FileReader();
-
-                    reader.readAsArrayBuffer(blob);
-
-                    reader.onerror = function(event) {
-                        if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                            var error = '';
-
-                            switch (reader.error.code) {
-                                case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
-                                case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
-                                case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
-                                case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
-                                case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
-                                default                            : error = 'ERR';              break;
-                            }
-
-                            errorCallback(event, error);
-                        }
-                    };
-
-                    reader.onload = function() {
-                        arrayBuffer = reader.result;
-
-                        if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
-                            successCallback(event, arrayBuffer);
-                        }
-                    };
+                if ((arrayBuffer instanceof ArrayBuffer) && (Object.prototype.toString.call(successCallback) === '[object Function]')) {
+                    successCallback(event, arrayBuffer);
                 }
             }
         };
 
         xhr.open('GET', url, true);
+        xhr.responseType = 'arraybuffer';  // XMLHttpRequest Level 2
         xhr.send(null);
     };
 
@@ -3415,7 +3365,7 @@
                         self.trackRs[self.activeTrack].push(recordRs);
                     } else {
                         this.disconnect(0);
-                        this.onaudioprocess = null;  // for Firefox
+                        this.onaudioprocess = null;
                     }
                 };
             }
@@ -3431,7 +3381,7 @@
             this.activeTrack = -1;  // Flag becomes inactive
             this.paused      = true;
             this.processor.disconnect(0);  // Stop onaudioprocess event
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
             return this;
         };
 
@@ -3951,7 +3901,6 @@
             this.receiver.disconnect(0);
             this.sender.disconnect(0);
 
-            // for Firefox
             this.receiver.onaudioprocess = null;
             this.sender.onaudioprocess   = null;
 
@@ -5290,7 +5239,7 @@
             if (this.isActive) {
                 // Stop onaudioprocess event
                 this.processor.disconnect(0);
-                this.processor.onaudioprocess = null;  // for Firefox
+                this.processor.onaudioprocess = null;
 
                 // Connect nodes again
                 this.lfo.connect(this.depth);
@@ -6614,13 +6563,6 @@
             var load = function(url, index) {
                 var xhr = new XMLHttpRequest();
 
-                if ((FULL_MODE === undefined) || FULL_MODE) {
-                    // XMLHttpRequest Level 2
-                    xhr.responseType = 'arraybuffer';
-                } else {
-                    xhr.overrideMimeType('text/plain; charset=x-user-defined');
-                }
-
                 // Timeout
                 xhr.timeout = (t > 0) ? t : 60000;
 
@@ -6653,8 +6595,6 @@
                 // Success
                 xhr.onload = function(event) {
                     if (xhr.status === 200) {
-                        var arrayBuffer = null;
-
                         var decodeArrayBuffer = function(arrayBuffer) {
                             if (!(arrayBuffer instanceof ArrayBuffer)) {
                                 return;
@@ -6675,9 +6615,9 @@
                                 }
                             };
 
-                            var decodeErrorCallback = function() {
+                            var decodeErrorCallback = function(error) {
                                 if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                    errorCallback(null, ERROR_DECODE);
+                                    errorCallback(error, ERROR_DECODE);
                                 }
                             };
 
@@ -6685,50 +6625,13 @@
                             self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
                         };
 
-                        if ((FULL_MODE === undefined) || FULL_MODE) {
-                            arrayBuffer = xhr.response;
-                            decodeArrayBuffer.call(self, arrayBuffer);
-                        } else {
-                            var binary = xhr.responseText;
-                            var buffer = [];
-
-                            for (var i = 0, len = binary.length; i < len; i++) {
-                                buffer.push(binary.charCodeAt(i) & 0xFF);
-                            }
-
-                            var ext    = url.slice(-3);
-                            var mime   = 'audio/' + ext;
-                            var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
-                            var reader = new FileReader();
-
-                            reader.readAsArrayBuffer(blob);
-
-                            reader.onerror = function(event) {
-                                if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                    var error = '';
-
-                                    switch (reader.error.code) {
-                                        case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
-                                        case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
-                                        case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
-                                        case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
-                                        case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
-                                        default                            : error = 'ERR';              break;
-                                    }
-
-                                    errorCallback(event, error);
-                                }
-                            };
-
-                            reader.onload = function() {
-                                arrayBuffer = reader.result;
-                                decodeArrayBuffer.call(self, arrayBuffer);
-                            };
-                        }
+                        var arrayBuffer = xhr.response;
+                        decodeArrayBuffer.call(self, arrayBuffer);
                     }
                 };
 
                 xhr.open('GET', url, true);
+                xhr.responseType = 'arraybuffer';  // XMLHttpRequest Level 2
                 xhr.send(null);
             };
 
@@ -7262,7 +7165,7 @@
 
         /** @override */
         EnvelopeGenerator.prototype.toString = function() {
-            return '[OscillatorModule EnvelopeGenerator]';
+            return '[SoundModule EnvelopeGenerator]';
         };
 
         // Create the instances of private class
@@ -8102,7 +8005,7 @@
         // Clear previous
         this.eg.clear();
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  // for Firefox
+        this.processor.onaudioprocess = null;
 
         // (... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
@@ -8188,28 +8091,6 @@
 
         var self = this;
 
-        if (!((FULL_MODE === undefined) || FULL_MODE)) {
-            global.setTimeout(function() {
-                var stopTime = self.context.currentTime;
-
-                for (var i = 0, len = self.sources.length; i < len; i++) {
-                    self.sources[i].stop(stopTime);
-                }
-
-                // Stop Effectors
-                self.off(stopTime);
-
-                // Stop drawing sound wave
-                self.analyser.stop('time');
-                self.analyser.stop('fft');
-                self.isAnalyser = false;
-
-                // Stop onaudioprocess event
-                self.processor.disconnect(0);
-                self.processor.onaudioprocess = null;  // for Firefox
-            }, ((this.times.stop + this.eg.release) * 1000));
-        }
-
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
             this.processor.onaudioprocess = processCallback;
         } else {
@@ -8241,7 +8122,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  // for Firefox
+                    this.onaudioprocess = null;
                 } else {
                     // Release
                 }
@@ -8434,13 +8315,6 @@
         var load = function(url, index) {
             var xhr = new XMLHttpRequest();
 
-            if ((FULL_MODE === undefined) || FULL_MODE) {
-                // XMLHttpRequest Level 2
-                xhr.responseType = 'arraybuffer';
-            } else {
-                xhr.overrideMimeType('text/plain; charset=x-user-defined');
-            }
-
             // Timeout
             xhr.timeout = (t > 0) ? t : 60000;
 
@@ -8473,8 +8347,6 @@
             // Success
             xhr.onload = function(event) {
                 if (xhr.status === 200) {
-                    var arrayBuffer = null;
-
                     var decodeArrayBuffer = function(arrayBuffer) {
                         if (!(arrayBuffer instanceof ArrayBuffer)) {
                             return;
@@ -8495,9 +8367,9 @@
                             }
                         };
 
-                        var decodeErrorCallback = function() {
+                        var decodeErrorCallback = function(error) {
                             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                errorCallback(null, ERROR_DECODE);
+                                errorCallback(error, ERROR_DECODE);
                             }
                         };
 
@@ -8505,50 +8377,13 @@
                         self.context.decodeAudioData(arrayBuffer, decodeSuccessCallback, decodeErrorCallback);
                     };
 
-                    if ((FULL_MODE === undefined) || FULL_MODE) {
-                        arrayBuffer = xhr.response;
-                        decodeArrayBuffer.call(self, arrayBuffer);
-                    } else {
-                        var binary = xhr.responseText;
-                        var buffer = [];
-
-                        for (var i = 0, len = binary.length; i < len; i++) {
-                            buffer.push(binary.charCodeAt(i) & 0xFF);
-                        }
-
-                        var ext    = url.slice(-3);
-                        var mime   = 'audio/' + ext;
-                        var blob   = new Blob([new Uint8Array(buffer)], {type : mime});
-                        var reader = new FileReader();
-
-                        reader.readAsArrayBuffer(blob);
-
-                        reader.onerror = function(event) {
-                            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                var error = '';
-
-                                switch (reader.error.code) {
-                                    case reader.error.NOT_FOUND_ERR    : error = 'NOT_FOUND_ERR';    break;
-                                    case reader.error.SECURITY_ERR     : error = 'SECURITY_ERR';     break;
-                                    case reader.error.ABORT_ERR        : error = 'ABORT_ERR';        break;
-                                    case reader.error.NOT_READABLE_ERR : error = 'NOT_READABLE_ERR'; break;
-                                    case reader.error.ENCODING_ERR     : error = 'ENCODING_ERR' ;    break;
-                                    default                            : error = 'ERR';              break;
-                                }
-
-                                errorCallback(event, error);
-                            }
-                        };
-
-                        reader.onload = function() {
-                            arrayBuffer = reader.result;
-                            decodeArrayBuffer.call(self, arrayBuffer);
-                        };
-                    }
+                    var arrayBuffer = xhr.response;
+                    decodeArrayBuffer.call(self, arrayBuffer);
                 }
             };
 
             xhr.open('GET', url, true);
+            xhr.responseType = 'arraybuffer';  // XMLHttpRequest Level 2
             xhr.send(null);
         };
 
@@ -8744,7 +8579,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  // for Firefox
+                    this.onaudioprocess = null;
                 } else {
                     var inputLs  = event.inputBuffer.getChannelData(0);
                     var inputRs  = event.inputBuffer.getChannelData(1);
@@ -9098,14 +8933,9 @@
             this.source.playbackRate.value = playbackRate;
             this.source.loop               = loop;
 
-            if ((FULL_MODE === undefined) || FULL_MODE) {
-                // AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
-                this.source.connect(this.processor);
-                this.connect(this.processor, connects);
-            } else {
-                // AudioBufferSourceNode (input) -> ... -> AudioDestinationNode (output)
-                this.connect(this.source, connects);
-            }
+            // AudioBufferSourceNode (input) -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
+            this.source.connect(this.processor);
+            this.connect(this.processor, connects);
 
             this.source.start(startTime, pos, (this.buffer.duration - pos));
 
@@ -9185,7 +9015,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
             this.paused = true;
             this.callbacks.stop(this.source, this.currentTime);
         }
@@ -9397,7 +9227,7 @@
 
             // Stop onaudioprocess event
             self.processor.disconnect(0);
-            self.processor.onaudioprocess = null;  // for Firefox
+            self.processor.onaudioprocess = null;
 
             if ('ended' in self.callbacks) {
                 self.callbacks.ended(event, this);
@@ -9615,7 +9445,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
         }
 
         return this;
@@ -9978,7 +9808,7 @@
 
         // Stop onaudioprocess event
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  // for Firefox
+        this.processor.onaudioprocess = null;
 
         this.isStop = true;
 
@@ -10150,7 +9980,7 @@
 
                 // Stop onaudioprocess event
                 this.disconnect(0);
-                this.onaudioprocess = null;  // for Firefox
+                this.onaudioprocess = null;
             } else {
                 outputLs.set(inputLs);
                 outputRs.set(inputRs);
@@ -10849,7 +10679,6 @@
 
     // Static properties
     XSound.IS_XSOUND   = IS_XSOUND;
-    XSound.FULL_MODE   = FULL_MODE;
     XSound.SAMPLE_RATE = sound.SAMPLE_RATE;
     XSound.BUFFER_SIZE = sound.BUFFER_SIZE;
     XSound.NUM_INPUT   = sound.NUM_INPUT;
