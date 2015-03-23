@@ -397,8 +397,8 @@ For example, the following 12 one-shot audios are corresponded to 88 keyboards o
                 // "buffers" is the instances of AudioBuffer
             },
             error : function(event, textStatus) {
-                // "event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
-                // "textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+                // "event" is one of XMLHttpRequestProgressEvent, Error, null
+                // "textStatus" is one of 'error', 'timeout', 'decode'
             },
             progress : function(event) {
                 // "event" is XMLHttpRequestProgressEvent
@@ -545,8 +545,8 @@ It is required to create the instance of AudioBuffer in order to to play the aud
             X('audio').ready.call(X('audio'), arrayBuffer);
         },
         error : function(event, textStatus) {
-            // "event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
-            // "textStatus" is one of 'error', 'timeout', error code of FileReader
+            // "event" is XMLHttpRequestProgressEvent
+            // "textStatus" is either 'error' or 'timeout'
         },
         progress : function(event) {
             // "event" is XMLHttpRequestProgressEvent
@@ -653,7 +653,7 @@ Get node object of HTMLMediaElement and select media format and register callbac
     if (X.IS_XSOUND) {
         mediaPlayer = X('media');  // Use Web Audio API (MediaElementAudioSourceNode)
     } else {
-        mediaPlayer = X('media');  // Not use Web Audio API (Fallback by MediaElement)
+        mediaPlayer = X('media');  // Not use Web Audio API (Fallback by HTMLMediaElement)
     }
 
     // ....
@@ -670,7 +670,7 @@ Get node object of HTMLMediaElement and select media format and register callbac
             callbacks : callbacks
         });
     } catch (error) {
-        // Cannot use HTML5 MediaElement (for example, less than IE9)
+        // Cannot use HTMLMediaElement (for example, less than IE9)
         window.alert(error.message);
         return;
     }
@@ -1087,7 +1087,7 @@ However, this is omitted the following.
     params.range     = X(source).module('filter').param('range');      // The default value is 0.1 (10 %)
     params.attack    = X(source).module('filter').param('attack');     // The default value is 0.01
     params.decay     = X(source).module('filter').param('decay');      // The default value is 0.3
-    params.sustain   = X(source).module('filter').param('sustain');    // The default value is 0.5
+    params.sustain   = X(source).module('filter').param('sustain');    // The default value is 1
     params.release   = X(source).module('filter').param('release');    // The default value is 1
 
     // Setter
@@ -1364,8 +1364,8 @@ Reverb effect requires ArrayBuffer of impulse response.
             X(source).module('reverb').start.call(X(source).module('reverb'), arrayBuffer);
         },
         error : function(event, textStatus) {
-            // "event" is either XMLHttpRequestProgressEvent or "onerror" event object in FileReader
-            // "textStatus" is one of 'error', 'timeout', error code of FileReader
+            // "event" is XMLHttpRequestProgressEvent
+            // "textStatus" is either of 'error' or 'timeout'
         },
         progress : function(event) {
             // "event" is XMLHttpRequestProgressEvent
@@ -1388,6 +1388,7 @@ Reverb effect requires ArrayBuffer of impulse response.
                 },
                 error : function(event, error) {
                     // "event" is "onerror" event object in the instance of FileReader
+                    // "error" is error code of FileReader
                 },
                 progress : function(event) {
                     // "event" is "onprogress" event object in the instance of FileReader
@@ -1424,8 +1425,8 @@ If application requires many impulse responses, this library defines better meth
             // "rirs" is the instances of AudioBuffer for impulse response
         },
         error : function(event, textStatus) {
-            // "event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
-            // "textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+            // "event" is one of XMLHttpRequestProgressEvent, Error, null
+            // "textStatus" is one of 'error', 'timeout', 'decode'
         },
         progress : function(event) {
             // "event" is XMLHttpRequestProgressEvent
@@ -1446,13 +1447,17 @@ or,
                 if (reverbs.length === rirs.length) {
                     X(source).module('reverb').preset(reverbs);
                 }
-            }, function() {
+            }, function(error) {
                 // "decodeAudioData" method encountered an error.
-                window.alert('Decode error !!');
+                if (error instanceof Error) {
+                    window.alert(error.message);
+                } else {
+                    window.alert('Decode error');
+                }
             });
         }, function(event, textStatus) {
-            // "event" is one of XMLHttpRequestProgressEvent, "onerror" event object in FileReader, null
-            // "textStatus" is one of 'error', 'timeout', 'decode', error code in FileReader
+            // "event" is XMLHttpRequestProgressEvent
+            // "textStatus" is either of 'error' or 'timeout'
         });
     }
 
@@ -1489,9 +1494,9 @@ If customized effector module is used, the module should be defined the followin
     function MyEffector(context) {
         /* "context" is the instance of AudioContext */
 
-        this.isActive;         // Boolean type from Effector class
-        this.lfo;              // the instance of OscillatorNode from Effector class
-        this.depth;            // the instance of GainNode from Effector class
+        this.isActive;  // Boolean type from Effector class
+        this.lfo;       // the instance of OscillatorNode from Effector class
+        this.depth;     // the instance of GainNode from Effector class
 
         // It is necessary to connection from "input" and to "output"
         // (The properties of "input" and "output" are inherited from Effector class)
