@@ -1445,7 +1445,7 @@
              * This method creates string for Data URL or HTML for the drawn figure.
              * @return {string|Visualizer} This is returned as Data URL or HTML string. If "setup" method has not been executed, this is returned for method chain.
              */
-            Visualizer.prototype.download = function() {
+            Visualizer.prototype.create = function() {
                 switch (this.drawType) {
                     case 'canvas' : return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
                     case 'svg'    : return this.svgParent.innerHTML;
@@ -8258,6 +8258,14 @@
             return this;
         };
 
+        /**
+         * This method gets the instance of OscillatorNode.
+         * @return {OscillatorNode} This is returned as the instance of OscillatorNode.
+         */
+        Oscillator.prototype.get = function() {
+            return this.source;
+        };
+
         /** @override */
         Oscillator.prototype.toString = function() {
             return '[OscillatorModule Oscillator]';
@@ -8474,22 +8482,16 @@
     /** 
      * This method gets the instance of OscillatorNode that is used in OscillatorModule.
      * @param {number} index This argument is required in the case of designating OscillatorNode.
-     * @return {Array.<OscillatorNode>|OscillatorNode}
+     * @return {Array.<Oscillator>|Oscillator}
      * @override
      */
     OscillatorModule.prototype.get = function(index) {
         var i = parseInt(index);
 
         if ((i >= 0) && (i < this.sources.length)) {
-            return this.sources[i].source;
+            return this.sources[i];
         } else {
-            var oscillators = new Array(this.sources.length);
-
-            for (var j = 0, len = this.sources.length; j < len; j++) {
-                oscillators[j] = this.sources[j].source;
-            }
-
-            return oscillators;
+            return this.sources;
         }
     };
 
@@ -10976,7 +10978,7 @@
      * @param {string} mml This argument is MML string.
      * @return {string} This is returned as text file that writes MML.
      */
-    MML.prototype.download = function(mml) {
+    MML.prototype.create = function(mml) {
         var toAscii = function(string) {
             var converted = '';
 
