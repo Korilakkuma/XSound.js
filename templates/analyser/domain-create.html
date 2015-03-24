@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>domain#download <span class="returns">Returns : <span>string (Data URL | HTML)</span></span></h1>
+                <h1>domain#create <span class="returns">Returns : <span>string (Data URL | HTML)</span></span></h1>
                 <hr />
                 <p>
                     This method captures the drawn wave.
@@ -36,7 +36,7 @@ document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;touchend
 }, false);
 
 document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&apos;, function() {
-    var capturedWave = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).download();
+    var capturedWave = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).create();
     document.querySelector(&apos;#captured-wave&apos;).setAttribute(&apos;src&apos;, capturedWave);
 }, false);
 </textarea>
@@ -52,7 +52,7 @@ document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&ap
                     <dt class="invisibility">Analyser Controller</dt>
                     <dd>
                         <button type="button">START</button>
-                        <button type="button">DL</button>
+                        <button type="button">CREATE</button>
                     </dd>
                     <dd><img id="captured-wave" /></dd>
                 </dl>
