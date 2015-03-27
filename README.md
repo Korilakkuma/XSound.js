@@ -51,6 +51,14 @@ Now, I'm creating website for Web Audio API. Please use the following site for u
   
 * [XSound.js Download & API Document](http://korilakkuma.github.io/XSound/)
   
+## Installation
+  
+    $ npm install --save-dev xsound
+  
+or,
+  
+    $ bower install --save-dev xsound
+  
 ## Usage
   
     <script type="text/javascript" src="xsound.min.js"></script>
