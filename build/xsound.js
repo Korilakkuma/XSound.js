@@ -1310,7 +1310,7 @@
              * This method creates string for Data URL or HTML for the drawn figure.
              * @return {string|Visualizer} This is returned as Data URL or HTML string. If "setup" method has not been executed, this is returned for method chain.
              */
-            Visualizer.prototype.download = function() {
+            Visualizer.prototype.create = function() {
                 switch (this.drawType) {
                     case 'canvas' : return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
                     case 'svg'    : return this.svgParent.innerHTML;
@@ -3365,7 +3365,7 @@
                         self.trackRs[self.activeTrack].push(recordRs);
                     } else {
                         this.disconnect(0);
-                        this.onaudioprocess = null;
+                        this.onaudioprocess = null;  // for Firefox
                     }
                 };
             }
@@ -3381,7 +3381,7 @@
             this.activeTrack = -1;  // Flag becomes inactive
             this.paused      = true;
             this.processor.disconnect(0);  // Stop onaudioprocess event
-            this.processor.onaudioprocess = null;
+            this.processor.onaudioprocess = null;  // for Firefox
             return this;
         };
 
@@ -3901,6 +3901,7 @@
             this.receiver.disconnect(0);
             this.sender.disconnect(0);
 
+            // for Firefox
             this.receiver.onaudioprocess = null;
             this.sender.onaudioprocess   = null;
 
@@ -5239,7 +5240,7 @@
             if (this.isActive) {
                 // Stop onaudioprocess event
                 this.processor.disconnect(0);
-                this.processor.onaudioprocess = null;
+                this.processor.onaudioprocess = null;  // for Firefox
 
                 // Connect nodes again
                 this.lfo.connect(this.depth);
@@ -7919,6 +7920,14 @@
             return this;
         };
 
+        /**
+         * This method gets the instance of OscillatorNode.
+         * @return {OscillatorNode} This is returned as the instance of OscillatorNode.
+         */
+        Oscillator.prototype.get = function() {
+            return this.source;
+        };
+
         /** @override */
         Oscillator.prototype.toString = function() {
             return '[OscillatorModule Oscillator]';
@@ -8005,7 +8014,7 @@
         // Clear previous
         this.eg.clear();
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;
+        this.processor.onaudioprocess = null;  // for Firefox
 
         // (... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
@@ -8122,7 +8131,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;
+                    this.onaudioprocess = null;  // for Firefox
                 } else {
                     // Release
                 }
@@ -8135,22 +8144,16 @@
     /** 
      * This method gets the instance of OscillatorNode that is used in OscillatorModule.
      * @param {number} index This argument is required in the case of designating OscillatorNode.
-     * @return {Array.<OscillatorNode>|OscillatorNode}
+     * @return {Array.<Oscillator>|Oscillator}
      * @override
      */
     OscillatorModule.prototype.get = function(index) {
         var i = parseInt(index);
 
         if ((i >= 0) && (i < this.sources.length)) {
-            return this.sources[i].source;
+            return this.sources[i];
         } else {
-            var oscillators = new Array(this.sources.length);
-
-            for (var j = 0, len = this.sources.length; j < len; j++) {
-                oscillators[j] = this.sources[j].source;
-            }
-
-            return oscillators;
+            return this.sources;
         }
     };
 
@@ -8579,7 +8582,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;
+                    this.onaudioprocess = null;  // for Firefox
                 } else {
                     var inputLs  = event.inputBuffer.getChannelData(0);
                     var inputRs  = event.inputBuffer.getChannelData(1);
@@ -9015,7 +9018,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;
+            this.processor.onaudioprocess = null;  // for Firefox
             this.paused = true;
             this.callbacks.stop(this.source, this.currentTime);
         }
@@ -9227,7 +9230,7 @@
 
             // Stop onaudioprocess event
             self.processor.disconnect(0);
-            self.processor.onaudioprocess = null;
+            self.processor.onaudioprocess = null;  // for Firefox
 
             if ('ended' in self.callbacks) {
                 self.callbacks.ended(event, this);
@@ -9445,7 +9448,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;
+            this.processor.onaudioprocess = null;  // for Firefox
         }
 
         return this;
@@ -9808,7 +9811,7 @@
 
         // Stop onaudioprocess event
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;
+        this.processor.onaudioprocess = null;  // for Firefox
 
         this.isStop = true;
 
@@ -9980,7 +9983,7 @@
 
                 // Stop onaudioprocess event
                 this.disconnect(0);
-                this.onaudioprocess = null;
+                this.onaudioprocess = null;  // for Firefox
             } else {
                 outputLs.set(inputLs);
                 outputRs.set(inputRs);
@@ -10586,7 +10589,7 @@
      * @param {string} mml This argument is MML string.
      * @return {string} This is returned as text file that writes MML.
      */
-    MML.prototype.download = function(mml) {
+    MML.prototype.create = function(mml) {
         var toAscii = function(string) {
             var converted = '';
 
