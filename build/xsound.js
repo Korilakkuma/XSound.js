@@ -7831,12 +7831,11 @@
         };
 
         /** 
-         * This method starts sound.
+         * This method connects nodes.
          * @param {AudioNode} output This argument is the instance of AudioNode as output.
-         * @param {number} startTime This argument is the start time.
          * @return {Oscillator} This is returned for method chain.
          */
-        Oscillator.prototype.start = function(output, startTime) {
+        Oscillator.prototype.ready = function(output) {
             if (this.isActive) {
                 // for keeping value
                 var params = {
@@ -7874,9 +7873,19 @@
                 // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume)
                 //    -> ScriptProcessorNode (composite oscillators) (-> ... -> AudioDestinationNode (output))
                 this.volume.connect(output);
+            }
 
+            return this;
+        };
+
+        /** 
+         * This method starts sound.
+         * @param {number} startTime This argument is the start time.
+         * @return {Oscillator} This is returned for method chain.
+         */
+        Oscillator.prototype.start = function(startTime) {
+            if (this.isActive) {
                 this.source.start(startTime);
-
                 this.isStop = false;
             } else {
                 if (!this.isStop) {
@@ -8027,14 +8036,16 @@
             var oscillator = this.sources[i];
             var frequency  = frequencies[i];
 
-            // Start sound
-            oscillator.start(this.processor, startTime);
+            // Connect nodes
+            oscillator.ready(this.processor);
 
             // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume) (-> ...)
             this.eg.ready(i, oscillator.source, oscillator.volume);
 
             // Ready Glide -> Start Glide
             this.glide.ready(frequency).start(oscillator.source, startTime);
+
+            oscillator.start(startTime);
         }
 
         // Attack -> Decay -> Sustain
