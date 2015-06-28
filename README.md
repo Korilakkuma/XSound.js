@@ -59,6 +59,18 @@ or,
   
     $ bower install --save-dev xsound
   
+In the case of using WebSocket,
+  
+    $ npm install -g websocket
+  
+or,
+  
+    $ npm install -g ws
+  
+And, set NODE_PATH,
+  
+    $ echo "export NODE_PATH='/usr/local/lib/node_modules/'" >> ~/.bashrc
+  
 ## Usage
   
     <script type="text/javascript" src="xsound.min.js"></script>
@@ -69,26 +81,21 @@ In the case of displaying error message for development,
   
 In the case of using WebSocket,
   
-    $ node xsound-server-session-websocket.js  // Use "websocket" module
+    $ node xsound-server-session-websocket.js
   
 or,
   
-    $ node xsound-server-session-ws.js  // Use "ws" module
+    $ node xsound-server-session-ws.js
   
 Default port number is 8000.  
 This port number can be changed by designating argument.  
 For example,
   
-    $ node xsound-server-session-websocket.js 8080  // Listen by 8080 ...
+    $ node xsound-server-session-websocket.js 8080
   
-If path to module does not exist, module path must be designated by the 2nd argument.  
-For exmaple,
+In the case of recording log, the path of log file must be designated by the 2nd argument.
   
-    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket
-  
-In the case of recording log, the path of log file must be designated by the 3rd argument.
-  
-    $ node xsound-server-session-websocket.js 8080 /usr/local/lib/node_modules/websocket websocket.log
+    $ node xsound-server-session-websocket.js 8080 websocket.log
   
 ## Global Objects
   
