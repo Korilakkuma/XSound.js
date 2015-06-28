@@ -21,16 +21,10 @@ if (process.argv.length >= 3) {
     }
 }
 
-var path = 'ws';
-
-if (process.argv.length >= 4) {
-    path = process.argv[3];
-}
-
 var log = '';
 
-if (process.argv.length >= 5) {
-    log = process.argv[4];
+if (process.argv.length >= 4) {
+    log = process.argv[3];
 }
 
 var fs = require('fs');
@@ -62,13 +56,8 @@ var appendLog = function(message, line) {
     });
 };
 
-if (!fs.existsSync(path)) {
-    process.stderr.write('The designated module (' + path + ') does not exist !!\n');
-    process.exit(1);
-}
-
 // Create the instance of WebSocketServer
-var WebSocketServer = require(path).Server;
+var WebSocketServer = require('ws').Server;
 var http            = require('http');
 var httpd           = http.createServer();
 var ws              = new WebSocketServer({server : httpd});
