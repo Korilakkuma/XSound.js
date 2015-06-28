@@ -32,7 +32,7 @@
      * @param {string} message This argument is error message.
      */
     var _debug = function(message) {
-        switch (ERROR_MODE) {
+        switch (XSound.ERROR_MODE) {
             case ERROR_MODES.ALERT :
                 console.trace();
                 global.alert(message);
@@ -7265,7 +7265,7 @@
          * @constructor
          */
         function EnvelopeGenerator(context) {
-            this.context   = context;
+            this.context = context;
 
             /** @type {Array.<GainNode>} */
             this.generators = [];
@@ -7439,6 +7439,33 @@
                 // Release : gain.value gradually decreases to 0 during of Release time (t4) from assigned time (t3)
                 this.generators[activeIndex].gain.setTargetAtTime(0, t3, t4);
             }
+
+            return this;
+        };
+
+        /** 
+         * This method gets the instance of GainNode for Envelope Generator.
+         * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
+         * @return {GainNode} This is returned as the instance of GainNode for Envelope Generator.
+         */
+        EnvelopeGenerator.prototype.getGenerator = function(index) {
+            var i = (parseInt(index) >= 0) ? parseInt(index) : 0;
+
+            return this.generators[i];
+        };
+
+        /** 
+         * This method sets the instance of GainNode for Envelope Generator.
+         * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
+         * @return {EnvelopeGenerator} This is returned for method chain.
+         */
+        EnvelopeGenerator.prototype.setGenerator = function(index) {
+            var i = (parseInt(index) >= 0) ? parseInt(index) : 0;
+
+            this.generators[i] = this.context.createGain();
+
+            // for legacy browsers
+            this.generators[i].gain.setTargetAtTime = this.generators[i].gain.setTargetAtTime || this.generators[i].gain.setTargetValueAtTime;
 
             return this;
         };
@@ -8169,12 +8196,11 @@
         };
 
         /** 
-         * This method starts sound.
+         * This method connects nodes.
          * @param {AudioNode} output This argument is the instance of AudioNode as output.
-         * @param {number} startTime This argument is the start time.
          * @return {Oscillator} This is returned for method chain.
          */
-        Oscillator.prototype.start = function(output, startTime) {
+        Oscillator.prototype.ready = function(output) {
             if (this.isActive) {
                 // for keeping value
                 var params = {
@@ -8212,9 +8238,19 @@
                 // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume)
                 //    -> ScriptProcessorNode (composite oscillators) (-> ... -> AudioDestinationNode (output))
                 this.volume.connect(output);
+            }
 
+            return this;
+        };
+
+        /** 
+         * This method starts sound.
+         * @param {number} startTime This argument is the start time.
+         * @return {Oscillator} This is returned for method chain.
+         */
+        Oscillator.prototype.start = function(startTime) {
+            if (this.isActive) {
                 this.source.start(startTime);
-
                 this.isStop = false;
             } else {
                 if (!this.isStop) {
@@ -8277,11 +8313,8 @@
 
         // Create the instances of private class and the instances of GainNode for Envelope Generator
         for (var i = 0, len = states.length ; i < len; i++) {
-            this.sources[i]       = new Oscillator(this.context, Boolean(states[i]));
-            this.eg.generators[i] = this.context.createGain();
-
-            // for legacy browsers
-            this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
+            this.sources[i] = new Oscillator(this.context, Boolean(states[i]));
+            this.eg.setGenerator(i);
         }
 
         return this;
@@ -8365,14 +8398,16 @@
             var oscillator = this.sources[i];
             var frequency  = frequencies[i];
 
-            // Start sound
-            oscillator.start(this.processor, startTime);
+            // Connect nodes
+            oscillator.ready(this.processor);
 
             // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume) (-> ...)
             this.eg.ready(i, oscillator.source, oscillator.volume);
 
             // Ready Glide -> Start Glide
             this.glide.ready(frequency).start(oscillator.source, startTime);
+
+            oscillator.start(startTime);
         }
 
         // Attack -> Decay -> Sustain
@@ -8629,17 +8664,12 @@
             settings[i].end    = (('end'    in settings[i]) && (settings[i].end   >= 0))                              ? parseFloat(settings[i].end)    : 0;
             settings[i].volume = (('volume' in settings[i]) && (settings[i].volume >=0) && (settings[i].volume <= 1)) ? parseFloat(settings[i].volume) : 1;
 
-            for (var i = 0, len = settings.length; i < len; i++) {
-                this.isStops[i]       = true;
-                this.volumes[i]       = this.context.createGain();
-                this.eg.generators[i] = this.context.createGain();
-
-                // for legacy browsers
-                this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
-            }
-
-            this.settings = settings;
+            this.isStops[i] = true;
+            this.volumes[i] = this.context.createGain();
+            this.eg.setGenerator(i);
         }
+
+        this.settings = settings;
 
         // for errorCallback
         var ERROR_AJAX         = 'error';
@@ -10418,7 +10448,7 @@
     }
 
     /**
-     * static properties
+     * Static properties
      */
     MML.ONE_MINUTES       = 60;  // sec
     MML.EQUAL_TEMPERAMENT = 12;
@@ -10501,6 +10531,47 @@
             mmls = [mmls];
         }
 
+        var computeIndex = function(octave, frequency) {
+            var index = 0;
+
+            switch (frequency) {
+                case 'C' : index =  3; break;
+                case 'D' : index =  5; break;
+                case 'E' : index =  7; break;
+                case 'F' : index =  8; break;
+                case 'G' : index = 10; break;
+                case 'A' : index = 12; break;
+                case 'B' : index = 14; break;
+                case 'R' : return 'R';
+                default  : break;
+            }
+
+            var computedIndex = (MML.EQUAL_TEMPERAMENT * (octave - 1)) + index;
+
+            if (computedIndex >= 0) {
+                return computedIndex;
+            } else {
+                return -1;
+            }
+        };
+
+        var computeFrequency = function(index) {
+            // The 12 equal temperament
+            //
+            // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
+            //
+            // A * 1.059463 -> A# (half up)
+
+            var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
+            var MIN_A           = 27.5;
+
+            if (index >= 0) {
+                return MIN_A * Math.pow(FREQUENCY_RATIO, index);
+            } else {
+                return -1;
+            }
+        };
+
         while (mmls.length > 0) {
             var mml = String(mmls.shift());
 
@@ -10515,47 +10586,6 @@
             }
 
             var currentTime = 0;
-
-            var computeIndex = function(octave, frequency) {
-                var index = 0;
-
-                switch (frequency) {
-                    case 'C' : index =  3; break;
-                    case 'D' : index =  5; break;
-                    case 'E' : index =  7; break;
-                    case 'F' : index =  8; break;
-                    case 'G' : index = 10; break;
-                    case 'A' : index = 12; break;
-                    case 'B' : index = 14; break;
-                    case 'R' : return 'R';
-                    default  : break;
-                }
-
-                var computedIndex = (MML.EQUAL_TEMPERAMENT * (octave - 1)) + index;
-
-                if (computedIndex >= 0) {
-                    return computedIndex;
-                } else {
-                    return -1;
-                }
-            };
-
-            var computeFrequency = function(index) {
-                // The 12 equal temperament
-                //
-                // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
-                //
-                // A * 1.059463 -> A# (half up)
-
-                var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
-                var MIN_A           = 27.5;
-
-                if (index >= 0) {
-                    return MIN_A * Math.pow(FREQUENCY_RATIO, index);
-                } else {
-                    return -1;
-                }
-            };
 
             while (notes.length > 0) {
                 var note = notes.shift().trim();
@@ -10593,7 +10623,7 @@
 
                     for (var i = 0, len = chord.length; i < len; i++) {
                         var name  = chord.charAt(i);
-                        var index = computeIndex.call(this, octave, name.toUpperCase());
+                        var index = computeIndex(octave, name.toUpperCase());
 
                         // Half up or Half down (Sharp or Flat) ?
                         switch (chord.charAt(i + 1)) {
@@ -10630,7 +10660,7 @@
                     var frequencies = [];
 
                     for (var i = 0, len = indexes.length; i < len; i++) {
-                        var frequency = (indexes[i] !== 'R') ? computeFrequency.call(this, indexes[i], note) : 0;
+                        var frequency = (indexes[i] !== 'R') ? computeFrequency(indexes[i]) : 0;
 
                         // Validation
                         if (frequency === -1) {
