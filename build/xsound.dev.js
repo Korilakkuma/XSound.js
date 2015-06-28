@@ -7265,7 +7265,7 @@
          * @constructor
          */
         function EnvelopeGenerator(context) {
-            this.context   = context;
+            this.context = context;
 
             /** @type {Array.<GainNode>} */
             this.generators = [];
@@ -7439,6 +7439,33 @@
                 // Release : gain.value gradually decreases to 0 during of Release time (t4) from assigned time (t3)
                 this.generators[activeIndex].gain.setTargetAtTime(0, t3, t4);
             }
+
+            return this;
+        };
+
+        /** 
+         * This method gets the instance of GainNode for Envelope Generator.
+         * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
+         * @return {GainNode} This is returned as the instance of GainNode for Envelope Generator.
+         */
+        EnvelopeGenerator.prototype.getGenerator = function(index) {
+            var i = (parseInt(index) >= 0) ? parseInt(index) : 0;
+
+            return this.generators[i];
+        };
+
+        /** 
+         * This method sets the instance of GainNode for Envelope Generator.
+         * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
+         * @return {EnvelopeGenerator} This is returned for method chain.
+         */
+        EnvelopeGenerator.prototype.setGenerator = function(index) {
+            var i = (parseInt(index) >= 0) ? parseInt(index) : 0;
+
+            this.generators[i] = this.context.createGain();
+
+            // for legacy browsers
+            this.generators[i].gain.setTargetAtTime = this.generators[i].gain.setTargetAtTime || this.generators[i].gain.setTargetValueAtTime;
 
             return this;
         };
@@ -8286,11 +8313,8 @@
 
         // Create the instances of private class and the instances of GainNode for Envelope Generator
         for (var i = 0, len = states.length ; i < len; i++) {
-            this.sources[i]       = new Oscillator(this.context, Boolean(states[i]));
-            this.eg.generators[i] = this.context.createGain();
-
-            // for legacy browsers
-            this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
+            this.sources[i] = new Oscillator(this.context, Boolean(states[i]));
+            this.eg.setGenerator(i);
         }
 
         return this;
@@ -8641,12 +8665,9 @@
             settings[i].volume = (('volume' in settings[i]) && (settings[i].volume >=0) && (settings[i].volume <= 1)) ? parseFloat(settings[i].volume) : 1;
 
             for (var i = 0, len = settings.length; i < len; i++) {
-                this.isStops[i]       = true;
-                this.volumes[i]       = this.context.createGain();
-                this.eg.generators[i] = this.context.createGain();
-
-                // for legacy browsers
-                this.eg.generators[i].gain.setTargetAtTime = this.eg.generators[i].gain.setTargetAtTime || this.eg.generators[i].gain.setTargetValueAtTime;
+                this.isStops[i] = true;
+                this.volumes[i] = this.context.createGain();
+                this.eg.setGenerator(i);
             }
 
             this.settings = settings;
