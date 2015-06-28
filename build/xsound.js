@@ -8324,14 +8324,12 @@
             settings[i].end    = (('end'    in settings[i]) && (settings[i].end   >= 0))                              ? parseFloat(settings[i].end)    : 0;
             settings[i].volume = (('volume' in settings[i]) && (settings[i].volume >=0) && (settings[i].volume <= 1)) ? parseFloat(settings[i].volume) : 1;
 
-            for (var i = 0, len = settings.length; i < len; i++) {
-                this.isStops[i] = true;
-                this.volumes[i] = this.context.createGain();
-                this.eg.setGenerator(i);
-            }
-
-            this.settings = settings;
+            this.isStops[i] = true;
+            this.volumes[i] = this.context.createGain();
+            this.eg.setGenerator(i);
         }
+
+        this.settings = settings;
 
         // for errorCallback
         var ERROR_AJAX         = 'error';
