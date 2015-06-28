@@ -32,7 +32,7 @@
      * @param {string} message This argument is error message.
      */
     var _debug = function(message) {
-        switch (ERROR_MODE) {
+        switch (XSound.ERROR_MODE) {
             case ERROR_MODES.ALERT :
                 console.trace();
                 global.alert(message);
