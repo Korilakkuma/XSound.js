@@ -10450,7 +10450,7 @@
     }
 
     /**
-     * static properties
+     * Static properties
      */
     MML.ONE_MINUTES       = 60;  // sec
     MML.EQUAL_TEMPERAMENT = 12;
@@ -10533,6 +10533,47 @@
             mmls = [mmls];
         }
 
+        var computeIndex = function(octave, frequency) {
+            var index = 0;
+
+            switch (frequency) {
+                case 'C' : index =  3; break;
+                case 'D' : index =  5; break;
+                case 'E' : index =  7; break;
+                case 'F' : index =  8; break;
+                case 'G' : index = 10; break;
+                case 'A' : index = 12; break;
+                case 'B' : index = 14; break;
+                case 'R' : return 'R';
+                default  : break;
+            }
+
+            var computedIndex = (MML.EQUAL_TEMPERAMENT * (octave - 1)) + index;
+
+            if (computedIndex >= 0) {
+                return computedIndex;
+            } else {
+                return -1;
+            }
+        };
+
+        var computeFrequency = function(index) {
+            // The 12 equal temperament
+            //
+            // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
+            //
+            // A * 1.059463 -> A# (half up)
+
+            var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
+            var MIN_A           = 27.5;
+
+            if (index >= 0) {
+                return MIN_A * Math.pow(FREQUENCY_RATIO, index);
+            } else {
+                return -1;
+            }
+        };
+
         while (mmls.length > 0) {
             var mml = String(mmls.shift());
 
@@ -10547,47 +10588,6 @@
             }
 
             var currentTime = 0;
-
-            var computeIndex = function(octave, frequency) {
-                var index = 0;
-
-                switch (frequency) {
-                    case 'C' : index =  3; break;
-                    case 'D' : index =  5; break;
-                    case 'E' : index =  7; break;
-                    case 'F' : index =  8; break;
-                    case 'G' : index = 10; break;
-                    case 'A' : index = 12; break;
-                    case 'B' : index = 14; break;
-                    case 'R' : return 'R';
-                    default  : break;
-                }
-
-                var computedIndex = (MML.EQUAL_TEMPERAMENT * (octave - 1)) + index;
-
-                if (computedIndex >= 0) {
-                    return computedIndex;
-                } else {
-                    return -1;
-                }
-            };
-
-            var computeFrequency = function(index) {
-                // The 12 equal temperament
-                //
-                // Min -> 27.5 Hz (A), Max -> 4186 Hz (C)
-                //
-                // A * 1.059463 -> A# (half up)
-
-                var FREQUENCY_RATIO = Math.pow(2, (1 / 12));  // about 1.059463
-                var MIN_A           = 27.5;
-
-                if (index >= 0) {
-                    return MIN_A * Math.pow(FREQUENCY_RATIO, index);
-                } else {
-                    return -1;
-                }
-            };
 
             while (notes.length > 0) {
                 var note = notes.shift().trim();
@@ -10625,7 +10625,7 @@
 
                     for (var i = 0, len = chord.length; i < len; i++) {
                         var name  = chord.charAt(i);
-                        var index = computeIndex.call(this, octave, name.toUpperCase());
+                        var index = computeIndex(octave, name.toUpperCase());
 
                         // Half up or Half down (Sharp or Flat) ?
                         switch (chord.charAt(i + 1)) {
@@ -10662,7 +10662,7 @@
                     var frequencies = [];
 
                     for (var i = 0, len = indexes.length; i < len; i++) {
-                        var frequency = (indexes[i] !== 'R') ? computeFrequency.call(this, indexes[i], note) : 0;
+                        var frequency = (indexes[i] !== 'R') ? computeFrequency(indexes[i]) : 0;
 
                         // Validation
                         if (frequency === -1) {
