@@ -7612,7 +7612,7 @@
      * @return {SoundModule} This is returned for method chain.
      */
     SoundModule.prototype.resize = function(bufferSize) {
-        SoundModule.call(this, audiocontext, bufferSize);
+        SoundModule.call(this, this.context, bufferSize);
         return this;
     };
 
@@ -7795,8 +7795,8 @@
      */
     SoundModule.prototype.install = function(effector, CustomizedEffector) {
         if (Object.prototype.toString.call(CustomizedEffector) === '[object Function]') {
-            CustomizedEffector.prototype = new this.Effector(audiocontext, this.BUFFER_SIZE);
-            this.plugins.push({name : String(effector).toLowerCase(), plugin : new CustomizedEffector(audiocontext)});
+            CustomizedEffector.prototype = new this.Effector(this.context, this.BUFFER_SIZE);
+            this.plugins.push({name : String(effector).toLowerCase(), plugin : new CustomizedEffector(this.context)});
         } else {
             _debug(this + ' install() : The 1st argument is class (function) for created effector.');
         }
