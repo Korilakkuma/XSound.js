@@ -1,8 +1,8 @@
-/** 
+/**
  * xsound.js
  * @fileoverview Web Audio API Library
  *
- * Copyright 2012, 2013, 2014@Tomohiro IKEDA
+ * Copyright (c) 2012, 2013, 2014 Tomohiro IKEDA (Korilakkuma)
  * Released under the MIT license
  */
  
@@ -17,14 +17,14 @@
     // Global constant value for the determination that Web Audio API is either enabled or disabled.
     var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
 
-    /** 
+    /**
      * This interface is in order to manage state of module that implements this interface.
      * @constructor
      */
     function Statable() {
     }
 
-    /** 
+    /**
      * This method gets or sets module's state.
      * @param {string|boolean} value If this argument is undefined, this method returns state as getter.
      *     If this argument is 'toggle', this method changes state according to current state. Otherwise, this method sets state.
@@ -36,7 +36,7 @@
 
     // These functions are static methods for "XSound".
 
-    /** 
+    /**
      * This static method reads file of audio or text.
      * @param {Blob} file This argument is the instance of Blob. This is entity of file.
      * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
@@ -114,7 +114,7 @@
         }
     };
 
-    /** 
+    /**
      * This static method gets the instance of File (extends Blob).
      * @param {Event} event This argument is the instance of Event by Drag & Drop or "<input type="file">".
      * @param {string} type This argument is one of 'ArrayBuffer', 'DataURL', 'Text'.
@@ -144,7 +144,7 @@
 
         if (event.type === 'drop') {
             // Drag & Drop
-            event.stopImmediatePropagation();
+            event.stopPropagation();
             event.preventDefault();
 
             file = /*('items' in event.dataTransfer) ? event.dataTransfer.items[0].getAsFile() : */event.dataTransfer.files[0];
@@ -175,7 +175,7 @@
         }
     };
 
-    /** 
+    /**
      * This static method gets audio data as ArrayBuffer by Ajax.
      * @param {string} url This argument is URL for audio resource.
      * @param {number} timeout This argument is timeout of Ajax. The default value is 60000 msec (1 minutes).
@@ -243,7 +243,7 @@
         xhr.send(null);
     };
 
-    /** 
+    /**
      * This static method creates the instance of AudioBuffer from ArrayBuffer.
      * @param {AudioContext} context This argument is the instance of AudioContext for "decodeAudioData" method.
      * @param {ArrayBuffer} arrayBuffer This argument is converted to the instance of AudioBuffer
@@ -271,7 +271,7 @@
         context.decodeAudioData(arrayBuffer, successCallback, errorCallback);
     };
 
-    /** 
+    /**
      * This static method calculates frequency from the index that corresponds to the 12 equal temperament.
      * @param {Array.<number>} indexes This argument is array of index that corresponds to the 12 equal temperament.
      *     For example, This value is between 0 and 88 in the case of piano.
@@ -302,7 +302,7 @@
         return frequencies;
     };
 
-    /** 
+    /**
      * This static method calculates minutes and seconds from the designated time in seconds.
      * @param {number} time This argument is the time in seconds.
      * @return {object} This is returned as associative array that has "minutes", "seconds" and "milliseconds" keys.
@@ -323,7 +323,44 @@
         }
     };
 
-    /** 
+    /**
+     * This static method shows the designated HTMLElement in full screen.
+     * @param {HTMLElement} element This argument is the instance of HTMLElement that is target of full screen.
+     */
+    var fullscreen = function(element) {
+        if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        } else if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else {
+            throw new Error('Cannot change to full screen.');
+        }
+    };
+
+    /**
+     * This method shows HTMLElement in original size from full screen.
+     */
+    var exitFullscreen = function() {
+        if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else {
+            throw new Error('Cannot exit from full screen.');
+        }
+    };
+
+    /**
      *  This static method removes one of the global objects or both of the global objects.
      * @param {boolean} deep This argument is in order to select whether removing both of global objects.
      *     If this value is true, both of global objects are removed.
@@ -342,7 +379,7 @@
         return XSound;
     };
 
-    /** 
+    /**
      * This class is fallback for MediaModule.
      * Namely, even if browser cannot use MediaElementAudioSourceNode, HTMLMediaElement can be used by the same methods of MediaModule.
      * Therefore, it is not necessary that the users of this class consider to use either Web Audio API or HTMLMediaElement.
@@ -362,44 +399,50 @@
         // The keys are the event interfaces that are defined by HTMLMediaElement.
         // For example, "loadstart", "loadedmetadata", "loadeddata", "canplay", "canplaythrough", "timeupdate", "ended" ...etc
         this.callbacks = {};
-    };
+    }
 
-    /** 
+    /**
+     * Class (Static) properties
+     */
+    MediaFallbackModule.TYPES       = {};
+    MediaFallbackModule.TYPES.AUDIO = 'audio';
+    MediaFallbackModule.TYPES.VIDEO = 'video';
+
+    /**
      * This method gets HTMLMediaElement and selects media format. In addition, this method sets event handlers that are defined by HTMLMediaElement.
-     * @param {string} id This argument is id attribute of HTMLMediaElement.
-     *     If new HTMLMediaElement is created, either null or empty string must be designated to this method.
-     * @param {string} type This argument is either 'audio' or 'video'. The default value is 'audio'.
+     * @param {HTMLAudioElement|HTMLVideoElement} media This argument is either HTMLAudioElement or HTMLVideoElement.
      * @param {Array.<string>|string} formats This argument is usable media format. For example, 'wav', 'ogg', 'webm', 'mp4' ...etc.
      * @param {object} callbacks This argument is event handlers that are defined by HTMLMediaElement.
      * @return {MediaFallbackModule} This is returned for method chain.
      */
-    MediaFallbackModule.prototype.setup = function(id, type, formats, callbacks) {
+    MediaFallbackModule.prototype.setup = function(media, formats, callbacks) {
         // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
-            if ('id'        in properties) {id        = properties.id;}
-            if ('type'      in properties) {type      = properties.type;}
+            if ('media'     in properties) {media     = properties.media;}
             if ('formats'   in properties) {formats   = properties.formats;}
             if ('callbacks' in properties) {callbacks = properties.callbacks;}
         }
 
-        var elementId = String(id);
-        var mediaType = (String(type).toLowerCase() !== 'video') ? 'audio' : 'video';
+        var type = '';
 
-        this.media = ((id !== null) && (elementId !=='')) ? document.getElementById(elementId) : document.createElement(mediaType);
-
-        if (!(this.media instanceof HTMLMediaElement)) {
-            this.media = null;
-            return;
+        if (media instanceof HTMLAudioElement) {
+            type = MediaFallbackModule.TYPES.AUDIO;
+        } else if (media instanceof HTMLVideoElement) {
+            type = MediaFallbackModule.TYPES.VIDEO;
+        } else {
+            return this;
         }
+
+        this.media = media;
 
         if (!Array.isArray(formats)) {
             formats = [formats];
         }
 
         for (var i = 0, len = formats.length; i < len; i++) {
-            var format = mediaType + '/' + String(formats[i]).toLowerCase();
+            var format = type + '/' + String(formats[i]).toLowerCase();
 
             if (/^(?:maybe|probably)/.test(this.media.canPlayType(format))) {
                 this.ext = formats[i];
@@ -436,8 +479,8 @@
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -554,7 +597,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method prepares for playing the media anytime after loading the media resource.
      * @param {string} source This argument is path name or Data URL or Object URL for the media resource.
      * @return {MediaFallbackModule} This is returned for method chain.
@@ -576,7 +619,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts media from the designated time.
      * @param {number} position This argument is the time that media is started at. The default value is 0.
      * @return {MediaFallbackModule} This is returned for method chain.
@@ -597,7 +640,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops media.
      * @return {MediaFallbackModule} This is returned for method chain.
      */
@@ -609,7 +652,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts or stops media according to media state.
      * @param {number} position This argument is time that media is started at.
      * @return {MediaFallbackModule} This is returned for method chain.
@@ -626,7 +669,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the HTMLMediaElement that is used in MediaFallbackModule.
      * @return {HTMLMediaElement}
      */
@@ -634,7 +677,7 @@
         return this.media;
     };
 
-    /** 
+    /**
      * This method determines whether the HTMLMediaElement exists.
      * @return {boolean} If the HTMLMediaElement already exists, this value is true. Otherwise, this value is false.
      */
@@ -642,7 +685,7 @@
         return (this.media instanceof HTMLMediaElement) ? true : false;
     };
 
-    /** 
+    /**
      * This method is the same as "isMedia" method. This method is defined in order to use the same interface that is defined by MediaModule
      * @return {boolean} If the HTMLMediaElement already exists, this value is true. Otherwise, this value is false.
      */
@@ -650,56 +693,12 @@
         return this.isMedia();
     };
 
-    /** 
+    /**
      * This method determines whether the media is paused.
      * @return {boolean} If the media is paused, this value is true. Otherwise, this value is false.
      */
     MediaFallbackModule.prototype.isPaused = function() {
         return (this.media instanceof HTMLMediaElement) ? this.media.paused : true;
-    };
-
-    /** 
-     * This method shows video in full screen.
-     * @return {MediaFallbackModule} This is returned for method chain.
-     */
-    MediaFallbackModule.prototype.fullscreen = function() {
-        if (this.media instanceof HTMLVideoElement) {
-            if (this.media.webkitRequestFullscreen) {
-                // Chrome Safari
-                this.media.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            } else if (this.media.mozRequestFullScreen) {
-                // Firefox
-                this.media.mozRequestFullScreen();
-            } else if (this.media.requestFullscreen) {
-                // Opera
-                this.media.requestFullscreen();
-            } else {
-                throw new Error('Cannot change to full screen.');
-            }
-        }
-
-        return this;
-    };
-
-    /** 
-     * This method shows video in original size from full screen.
-     * @return {MediaFallbackModule} This is returned for method chain.
-     */
-    MediaFallbackModule.prototype.exitFullscreen = function() {
-        if (document.webkitExitFullscreen) {
-            // Chrome Safari
-            document.webkitExitFullscreen();
-        } else if (document.mozCancelFullscreen) {
-            // Firefox
-            document.mozCancelFullscreen();
-        } else if (document.exitFullscreen) {
-            // Opera
-            document.exitFullscreen();
-        } else {
-            throw new Error('Cannot exit from full screen.');
-        }
-
-        return this;
     };
 
     /** @override */
@@ -715,7 +714,7 @@
         // Create instance
         var media = new MediaFallbackModule();
 
-        /** 
+        /**
          * This function is global object for getting the instance of MediaFallbackModule.
          * @return {MediaFallbackModule}
          */
@@ -723,25 +722,27 @@
             return media;
         };
 
-        // Static properties
+        // Class (Static) properties
         XSound.IS_XSOUND   = IS_XSOUND;
         XSound.SAMPLE_RATE = null;
         XSound.BUFFER_SIZE = null;
         XSound.NUM_INPUT   = null;
         XSound.NUM_OUTPUT  = null;
 
-        // Static methods
+        // Class (Static) methods
         XSound.read           = read;
         XSound.file           = file;
         XSound.ajax           = ajax;
         XSound.decode         = decode;
         XSound.toFrequencies  = toFrequencies;
         XSound.convertTime    = convertTime;
+        XSound.fullscreen     = fullscreen;
+        XSound.exitFullscreen = exitFullscreen;
         XSound.noConflict     = noConflict;
         XSound.get            = function() {return null;};  // for defining the same interface
         XSound.getCurrentTime = function() {return 0;};     // for defining the same interface
 
-        /** 
+        /**
          * This static method returns function as closure for getter of cloned module.
          * @return {function} This is returned as closure for getter of cloned module.
          */
@@ -779,7 +780,7 @@
     audiocontext.createDelay           = audiocontext.createDelay           || audiocontext.createDelayNode;
     audiocontext.createPeriodicWave    = audiocontext.createPeriodicWave    || audiocontext.createWaveTable;
 
-    /** 
+    /**
      * This class is superclass that is the top in "xsound.js".
      * This library's users do not create the instance of SoundModule.
      * This class is used for inherit in subclass (OscillatorModule, OneshotModule, AudioModule, MediaModule, StreamModule, MixerModule).
@@ -833,7 +834,7 @@
             this.BUFFER_SIZE = 16384;  // Otherwise
         }
 
-        this.masterVolume = context.createGain();
+        this.mastervolume = context.createGain();
         this.processor    = context.createScriptProcessor(this.BUFFER_SIZE, this.NUM_INPUT, this.NUM_OUTPUT);
 
         /** @implements {Statable} */
@@ -844,41 +845,43 @@
         Effector.prototype.constructor = Effector;
 
         /** @extends {Effector} */
-        Compressor.prototype    = Object.create(Effector.prototype);
-        Distortion.prototype    = Object.create(Effector.prototype);
-        Wah.prototype           = Object.create(Effector.prototype);
-        Equalizer.prototype     = Object.create(Effector.prototype);
-        Filter.prototype        = Object.create(Effector.prototype);
-        Tremolo.prototype       = Object.create(Effector.prototype);
-        Ringmodulator.prototype = Object.create(Effector.prototype);
-        Autopanner.prototype    = Object.create(Effector.prototype);
-        Phaser.prototype        = Object.create(Effector.prototype);
-        Flanger.prototype       = Object.create(Effector.prototype);
-        Chorus.prototype        = Object.create(Effector.prototype);
-        Delay.prototype         = Object.create(Effector.prototype);
-        Reverb.prototype        = Object.create(Effector.prototype);
-        Panner.prototype        = Object.create(Effector.prototype);
+        Compressor.prototype         = Object.create(Effector.prototype);
+        Distortion.prototype         = Object.create(Effector.prototype);
+        Wah.prototype                = Object.create(Effector.prototype);
+        Equalizer.prototype          = Object.create(Effector.prototype);
+        Filter.prototype             = Object.create(Effector.prototype);
+        Tremolo.prototype            = Object.create(Effector.prototype);
+        Ringmodulator.prototype      = Object.create(Effector.prototype);
+        Autopanner.prototype         = Object.create(Effector.prototype);
+        AutopannerFallback.prototype = Object.create(Effector.prototype);
+        Phaser.prototype             = Object.create(Effector.prototype);
+        Flanger.prototype            = Object.create(Effector.prototype);
+        Chorus.prototype             = Object.create(Effector.prototype);
+        Delay.prototype              = Object.create(Effector.prototype);
+        Reverb.prototype             = Object.create(Effector.prototype);
+        Panner.prototype             = Object.create(Effector.prototype);
 
-        Compressor.prototype.constructor    = Compressor;
-        Distortion.prototype.constructor    = Distortion;
-        Wah.prototype.constructor           = Wah;
-        Equalizer.prototype.constructor     = Equalizer;
-        Filter.prototype.constructor        = Filter;
-        Tremolo.prototype.constructor       = Tremolo;
-        Ringmodulator.prototype.constructor = Ringmodulator;
-        Autopanner.prototype.constructor    = Autopanner;
-        Phaser.prototype.constructor        = Phaser;
-        Flanger.prototype.constructor       = Flanger;
-        Chorus.prototype.constructor        = Chorus;
-        Delay.prototype.constructor         = Delay;
-        Reverb.prototype.constructor        = Reverb;
-        Panner.prototype.constructor        = Panner;
+        Compressor.prototype.constructor         = Compressor;
+        Distortion.prototype.constructor         = Distortion;
+        Wah.prototype.constructor                = Wah;
+        Equalizer.prototype.constructor          = Equalizer;
+        Filter.prototype.constructor             = Filter;
+        Tremolo.prototype.constructor            = Tremolo;
+        Ringmodulator.prototype.constructor      = Ringmodulator;
+        Autopanner.prototype.constructor         = Autopanner;
+        AutopannerFallback.prototype.constructor = AutopannerFallback;
+        Phaser.prototype.constructor             = Phaser;
+        Flanger.prototype.constructor            = Flanger;
+        Chorus.prototype.constructor             = Chorus;
+        Delay.prototype.constructor              = Delay;
+        Reverb.prototype.constructor             = Reverb;
+        Panner.prototype.constructor             = Panner;
 
         // for modules that user creates
         this.Effector = Effector;
         this.plugins  = [];
 
-        /** 
+        /**
          * This private class defines property for audio listener.
          * These properties relate to properties of PannerNode.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
@@ -889,8 +892,8 @@
             this.listener = context.listener;
 
             // Set default value
-            this.dopplerFactor = 1;
-            this.speedOfSound  = 343.3;
+            this.listener.dopplerFactor = 1;
+            this.listener.speedOfSound  = 343.3;
 
             this.positions  = {x : 0, y : 0, z : 0};
             this.fronts     = {x : 0, y : 0, z : -1};
@@ -902,8 +905,8 @@
             this.listener.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
         };
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -1021,7 +1024,7 @@
          */
         Listener.prototype.params = function() {
             var params = {
-                dopplerfactor : this.listener.dopplerfactor,
+                dopplerFactor : this.listener.dopplerFactor,
                 speedOfSound  : this.listener.speedOfSound,
                 positions     : this.positions,
                 fronts        : this.fronts,
@@ -1045,22 +1048,22 @@
             return '[SoundModule Listener]';
         };
 
-        /** 
-         * This private class manages 4 private classes (Visualizer, TimeAll, Time, FFT) for drawing sound wave.
+        /**
+         * This private class manages 4 private classes (Visualizer, TimeOverview, Time, FFT) for drawing sound wave.
          * @param {AudioContext} context This argument is This argument is in order to use the interfaces of Web Audio API.
          * @constructor
          */
         function Analyser(context) {
-            global.requestAnimationFrame = global.requestAnimationFrame ||
+            global.requestAnimationFrame = global.requestAnimationFrame       ||
                                            global.webkitRequestAnimationFrame ||
-                                           global.mozRequestAnimationFrame ||
+                                           global.mozRequestAnimationFrame    ||
                                            function(callback) {
                                                global.setTimeout(callback, (1000 / 60));
                                            };
 
-            global.cancelAnimationFrame = global.cancelAnimationFrame ||
+            global.cancelAnimationFrame = global.cancelAnimationFrame       ||
                                           global.webkitCancelAnimationFrame ||
-                                          global.mozCancelAnimationFrame ||
+                                          global.mozCancelAnimationFrame    ||
                                           global.clearTimeout;
 
             this.analyser = context.createAnalyser();
@@ -1076,19 +1079,13 @@
             Visualizer.prototype.constructor = Visualizer;
 
             /** @extends {Visualizer} */
-            TimeAll.prototype = Object.create(Visualizer.prototype);  // The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
-            Time.prototype    = Object.create(Visualizer.prototype);
-            FFT.prototype     = Object.create(Visualizer.prototype);
+            TimeOverview.prototype = Object.create(Visualizer.prototype);  // The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
+            Time.prototype         = Object.create(Visualizer.prototype);
+            FFT.prototype          = Object.create(Visualizer.prototype);
 
-            TimeAll.prototype.constructor = TimeAll;
-            Time.prototype.constructor    = Time;
-            FFT.prototype.constructor     = FFT;
-
-            // Create the instances of Visualizer's subclass
-            this.timeAllL = new TimeAll(context.sampleRate);
-            this.timeAllR = new TimeAll(context.sampleRate);
-            this.time     = new Time(context.sampleRate);
-            this.fft      = new FFT(context.sampleRate);
+            TimeOverview.prototype.constructor = TimeOverview;
+            Time.prototype.constructor         = Time;
+            FFT.prototype.constructor          = FFT;
 
             // Set default value
             this.analyser.fftSize               = 2048;
@@ -1096,8 +1093,8 @@
             this.analyser.maxDecibels           = -30;
             this.analyser.smoothingTimeConstant = 0.8;
 
-            /** 
-             * This private class defines the properties that subclasses (TimeAll, Time, FFT) require.
+            /**
+             * This private class defines the properties that subclasses (TimeOverview, Time, FFT) require.
              * @param {number} sampleRate This argument is sampling rate.
              * @constructor
              * @implements {Statable}
@@ -1118,8 +1115,7 @@
                 this.context = null;
 
                 // In the case of using HTML5 SVG
-                this.svg       = null;
-                this.svgParent = null;
+                this.svg = null;
 
                 // for timer
                 this.interval = 1000;
@@ -1127,59 +1123,67 @@
 
                 this.styles = {
                     shape  : 'line',
-                    grad   : [{offset : 0, color : 'rgba(0, 128, 255, 1.0)'}, {offset : 1, color : 'rgba(0, 0, 255, 1.0)'}],
+                    grad   : [
+                        {offset : 0, color : 'rgba(0, 128, 255, 1.0)'},
+                        {offset : 1, color : 'rgba(0,   0, 255, 1.0)'}
+                    ],
                     wave   : 'rgba(0, 0, 255, 1.0)',
                     grid   : 'rgba(255, 0, 0, 1.0)',
                     text   : 'rgba(255, 255, 255, 1.0)',
-                    font   : '13px Arial',
+                    font   : {
+                        family : 'Arial',
+                        size   : '13px',
+                        style  : 'normal',
+                        weight : 'normal'
+                    },
                     width  : 1.5,
                     cap    : 'round',
                     join   : 'miter',
                     top    : 15,
-                    right  : 15,
+                    right  : 30,
                     bottom : 15,
-                    left   : 15
+                    left   : 30
                 };
             }
 
-            /** 
+            /**
+             * Class (Static) properties
+             */
+            Visualizer.DRAW_TYPES        = {};
+            Visualizer.DRAW_TYPES.CANVAS = 'canvas';
+            Visualizer.DRAW_TYPES.SVG    = 'svg';
+
+            Visualizer.XMLNS = 'http://www.w3.org/2000/svg';
+            Visualizer.XLINK = 'http://www.w3.org/1999/xlink';
+
+            Visualizer.SVG_LINEAR_GRADIENT_IDS               = {};
+            Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW = 'svg-linear-gradient-time-overview';
+            Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME          = 'svg-linear-gradient-time';
+            Visualizer.SVG_LINEAR_GRADIENT_IDS.FFT           = 'svg-linear-gradient-fft';
+
+            /**
              * This method creates Canvas node object and Canvas context or creates SVG node object.
-             * @param {string} type This argument is API for drawing. This value is either 'canvas' or 'svg'.
-             * @param {string} id This argument is id attribute of HTMLCanvasElement or SVGElement.
-             * @param {string} parentid This argument is required in the case of using SVG.
+             * @param {HTMLCanvasElement|SVGElement} element This argument is either HTMLCanvasElement or SVGElement.
              * @return {Visualizer} This is returned for method chain.
              */
-            Visualizer.prototype.setup = function(type, id, parentid) {
-                switch (String(type).toLowerCase()) {
-                    case 'canvas' :
-                        this.drawType = 'canvas';
+            Visualizer.prototype.setup = function(element) {
+                if (element instanceof HTMLCanvasElement) {
+                    this.drawType = Visualizer.DRAW_TYPES.CANVAS;
+                    this.canvas   = element;
+                    this.context  = this.canvas.getContext('2d');
+                } else if (element instanceof SVGElement) {
+                    this.drawType = Visualizer.DRAW_TYPES.SVG;
+                    this.svg      = element;
 
-                        this.canvas = document.getElementById(String(id));
-
-                        if (this.canvas instanceof HTMLCanvasElement) {
-                            this.context = this.canvas.getContext('2d');
-                        }
-
-                        break;
-                    case 'svg' :
-                        this.drawType = 'svg';
-
-                        this.svg = document.getElementById(String(id));
-
-                        if (this.svg instanceof SVGElement) {
-                            this.svgParent = document.getElementById(String(parentid));
-                        }
-
-                        break;
-                    default :
-                        break;
+                    this.svg.setAttribute('xmlns',       Visualizer.XMLNS);
+                    this.svg.setAttribute('xmlns:xlink', Visualizer.XLINK);
                 }
 
                 return this;
             };
 
-            /** 
-             * This method is getter or setter for parameters
+            /**
+             * This method is getter or setter for parameters.
              * @param {string|object} key This argument is property name in the case of string type.
              *     This argument is pair of property and value in the case of associative array.
              * @param {string|number|Array.<object>} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -1249,10 +1253,23 @@
                         }
 
                         break;
+                    case 'font' :
+                        if (value === undefined) {
+                            return this.styles[k];  // Getter
+                        } else {
+                            if (Object.prototype.toString.call(value) === '[object Object]') {
+                                for (var prop in value) {
+                                    if (/family|size|style|weight/i.test(prop)) {
+                                        this.styles['font'][prop] = String(value[prop]);  // Setter
+                                    }
+                                }
+                            }
+                        }
+
+                        break;
                     case 'wave' :
                     case 'grid' :
                     case 'text' :
-                    case 'font' :
                     case 'cap'  :
                     case 'join' :
                         if (value === undefined) {
@@ -1263,7 +1280,7 @@
                                     this.styles.shape = 'rect';
                                 }
 
-                                this.styles[k] = (k === 'font') ? value : value.toLowerCase();  // Setter
+                                this.styles[k] = value.toLowerCase();  // Setter
                             }
                         }
 
@@ -1289,31 +1306,31 @@
                 }
             };
 
-            /** 
+            /**
              * This method draws sound wave to Canvas or SVG. This method conceals difference of API for drawing.
-             * @param {Uint8Array|Float32Array} datas This argument is data for drawing.
+             * @param {Uint8Array|Float32Array} data This argument is data for drawing.
              * @param {number} minDecibels This argument is parameter for spectrum. The default value is -100 dB.
              * @param {number} maxDecibels This argument is parameter for spectrum. The default value is -30 dB.
              * @return {Visualizer} This is returned for method chain.
              */
-            Visualizer.prototype.start = function(datas, minDecibels, maxDecibels) {
+            Visualizer.prototype.start = function(data, minDecibels, maxDecibels) {
                 switch (this.drawType) {
-                    case 'canvas' : this.drawToCanvas(datas, minDecibels, maxDecibels); break;
-                    case 'svg'    : this.drawToSVG(datas, minDecibels, maxDecibels);    break;
+                    case Visualizer.DRAW_TYPES.CANVAS : this.drawToCanvas(data, minDecibels, maxDecibels); break;
+                    case Visualizer.DRAW_TYPES.SVG    : this.drawToSVG(data, minDecibels, maxDecibels);    break;
                     default       : break;
                 }
 
                 return this;
             };
 
-            /** 
+            /**
              * This method creates string for Data URL or HTML for the drawn figure.
              * @return {string|Visualizer} This is returned as Data URL or HTML string. If "setup" method has not been executed, this is returned for method chain.
              */
             Visualizer.prototype.create = function() {
                 switch (this.drawType) {
-                    case 'canvas' : return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-                    case 'svg'    : return this.svgParent.innerHTML;
+                    case Visualizer.DRAW_TYPES.CANVAS : return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+                    case Visualizer.DRAW_TYPES.SVG    : return this.svg.outerHTML;
                     default       : return this;
                 }
             };
@@ -1332,22 +1349,22 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws time domain data of Float32Array to Canvas.
              * @param {CanvasRenderingContext2D} context This argument is the instance of CanvasRenderingContext2D
-             * @param {Float32Array} datas This argument is time domain data.
+             * @param {Float32Array} data This argument is time domain data.
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
              * @param {number} middle This argument is the middle of drawn area.
              * @param {number} nPlotinterval This argument is the interval of drawing.
              * @return {Visualizer} This is returned for method chain.
              */
-            Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, datas, innerWidth, innerHeight, middle, nPlotinterval) {
+            Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotinterval) {
                 if (!(context instanceof CanvasRenderingContext2D)) {
                     return this;
                 }
 
-                if (!(datas instanceof Float32Array)) {
+                if (!(data instanceof Float32Array)) {
                     return this;
                 }
 
@@ -1374,13 +1391,13 @@
                         // Draw wave
                         context.beginPath();
 
-                        for (var i = 0, len = datas.length; i < len; i++) {
+                        for (var i = 0, len = data.length; i < len; i++) {
                             if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
-                                y = Math.floor((1 - datas[i]) * (h / 2)) + this.styles.top;
+                                y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
                                 if (i === 0) {
-                                    context.moveTo(x, y);
+                                    context.moveTo((x + (this.styles.width / 2)),  y);
                                 } else {
                                     context.lineTo(x, y);
                                 }
@@ -1397,10 +1414,10 @@
                        }
 
                         // Draw wave
-                        for (var i = 0, len = datas.length; i < len; i++) {
+                        for (var i = 0, len = data.length; i < len; i++) {
                             if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
-                                y = -1 * Math.floor(datas[i] * (h / 2));
+                                y = -1 * Math.floor(data[i] * (h / 2));
 
                                // Set style
                                if (this.styles.wave === 'gradient') {
@@ -1428,17 +1445,17 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws time domain data of Float32Array to SVG.
-             * @param {string} waveStyle This argument is string that is part of SVG for wave style.
-             * @param {Float32Array} datas This argument is time domain data.
+             * @param {Float32Array} data This argument is time domain data.
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
              * @param {number} middle This argument is the middle of drawn area.
              * @param {number} nPlotinterval This argument is the interval of drawing.
-             * @return {string} This is returned for SVG string.
+             * @param {string} linearGradientId This argument is id attribute for SVGLinearGradientElement.
+             * @return {SVGPathElement|SVGGElement} This is returned as SVGElement.
              */
-            Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(waveStyle, datas, innerWidth, innerHeight, middle, nPlotinterval) {
+            Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotinterval, linearGradientId) {
                 var svg = '';
 
                 var x = 0;
@@ -1455,81 +1472,152 @@
                 switch (this.styles.shape) {
                     case 'line' :
                         // Draw wave
-                        svg += '<path style="' + waveStyle + '" d="';
+                        var path = document.createElementNS(Visualizer.XMLNS, 'path');
 
-                        for (var i = 0, len = datas.length; i < len; i++) {
+                        var d = '';
+
+                        for (var i = 0, len = data.length; i < len; i++) {
                             if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
-                                y = Math.floor((1 - datas[i]) * (h / 2)) + this.styles.top;
+                                y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
                                 if (i === 0) {
-                                    svg += 'M' + x + ' ' + y;
+                                    d += 'M' + (x + (this.styles.width / 2)) + ' ' + y;
                                 } else {
-                                    svg += ' ';
-                                    svg += 'L' + x + ' ' + y;
+                                    d += ' ';
+                                    d += 'L' + x + ' ' + y;
                                 }
                             }
                         }
 
-                        // <path d="..." />
-                        svg += '" />';
+                        path.setAttribute('d', d);
 
-                        break;
+                        path.setAttribute('stroke',          this.styles.wave);
+                        path.setAttribute('fill',            'none');
+                        path.setAttribute('stroke-width',    this.styles.width);
+                        path.setAttribute('stroke-linecap',  this.styles.cap);
+                        path.setAttribute('stroke-linejoin', this.styles.join);
+
+                        return path;
                     case 'rect' :
-                        // Draw wave
-                        for (var i = 0, len = datas.length; i < len; i++) {
-                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
-                                x = Math.floor((i / len) * w) + this.styles.left;
-                                y = Math.floor(datas[i] * (innerHeight / 2));
+                        var defs = null;
 
-                                svg += (y < 0) ?
-                                    '<rect style="' + waveStyle + '" x="' + x + '" y="' + m + '" width="' + this.styles.width + '" height="' + (-y) + '" />' :
-                                    '<rect style="' + waveStyle + '" x="' + x + '" y="' + m + '" width="' + this.styles.width + '" height="' + y + '" transform="translate(' + this.styles.width + ' 0) rotate(180 ' + x + ' ' + m + ')" />';
+                        if (this.styles.wave === 'gradient') {
+                            defs = this.createSVGLinearGradient(linearGradientId);
+                        }
+
+                        // Draw wave
+                        var g = document.createElementNS(Visualizer.XMLNS, 'g');
+
+                        if (defs !== null) {
+                            g.appendChild(defs);
+                        }
+
+                        for (var i = 0, len = data.length; i < len; i++) {
+                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                                var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                x = Math.floor((i / len) * w) + this.styles.left;
+                                y = Math.floor(data[i] * (innerHeight / 2));
+
+                                rect.setAttribute('x',     x);
+                                rect.setAttribute('y',     m);
+                                rect.setAttribute('width', this.styles.width);
+
+                                if (y < 0) {
+                                    rect.setAttribute('height', -y);
+                                } else {
+                                    rect.setAttribute('height',    y);
+                                    rect.setAttribute('transform', 'rotate(180 ' + (x + (this.styles.width / 2)) + ' ' + m + ')');
+                                }
+
+                                rect.setAttribute('stroke', 'none');
+                                rect.setAttribute('fill',   (defs === null) ? this.styles.wave : ('url(#' + linearGradientId + ')'));
+
+                                g.appendChild(rect);
                             }
                         }
 
-                        break;
+                        return g;
                     default :
-                        break;
+                        return null;
+                }
+            };
+
+            /**
+             * This method creates elements for SVG linear gradient.
+             * @param {string} linearGradientId This argument is id attribute for SVGLinearGradientElement.
+             * @return {SVGDefsElement} This is returned as the instance of SVGDefsElement.
+             */
+            Visualizer.prototype.createSVGLinearGradient = function(linearGradientId) {
+                var defs           = document.createElementNS(Visualizer.XMLNS, 'defs');
+                var linearGradient = document.createElementNS(Visualizer.XMLNS, 'linearGradient');
+
+                linearGradient.setAttribute('id', String(linearGradientId));
+                linearGradient.setAttribute('x1', '0%');
+                linearGradient.setAttribute('y1', '0%');
+                linearGradient.setAttribute('x2', '0%');
+                linearGradient.setAttribute('y2', '100%');
+
+                for (var i = 0, len = this.styles.grad.length; i < len; i++) {
+                    var stop      = document.createElementNS(Visualizer.XMLNS, 'stop');
+                    var gradients = this.styles.grad[i];
+
+                    stop.setAttribute('offset',     gradients.offset);
+                    stop.setAttribute('stop-color', gradients.color);
+
+                    linearGradient.appendChild(stop);
                 }
 
-                return svg;
+                defs.appendChild(linearGradient);
+
+                return defs;
+            };
+
+            /**
+             * This method creates string for font.
+             * @return {string} This is returned as string for font.
+             */
+            Visualizer.prototype.createFontString = function() {
+                var font = this.styles.font.size + ' ' + this.styles.font.style + ' ' + this.styles.font.weight + ' "' + this.styles.font.family + '"';
+
+                return font;
             };
 
             /** @abstract */
-            Visualizer.prototype.drawToCanvas = function(datas) {
+            Visualizer.prototype.drawToCanvas = function(data) {
             };
 
             /** @abstract */
-            Visualizer.prototype.drawToSVG = function(datas) {
+            Visualizer.prototype.drawToSVG = function(data) {
             };
 
             /** @override */
             Visualizer.prototype.toString = function() {
-                return '[SoundModule Visualizer]';
+                return '[SoundModule Analyser Visualizer]';
             };
 
-            /** 
-             * This private class defines properties for drawing audio wave in entire of time domain.
+            /**
+             * This private class defines properties for drawing audio wave in overview of time domain.
              * @param {number} sampleRate This argument is sampling rate.
              * @constructor
              * @extends {Visualizer}
              */
-            function TimeAll(sampleRate) {
+            function TimeOverview(sampleRate) {
                 // Call superclass constructor
                 Visualizer.call(this, sampleRate);
 
-                // for update(), drag()
+                // for TimeOverview.prototype.update, TimeOverview.prototype.drag
                 this.savedImage = null;
                 this.length     = 0;
 
                 this.currentTime  = 'rgba(255, 255, 255, 1.0)';  // This style is used for the rectangle that displays current time of audio
-                this.plotinterval = 0.0625;                      // Draw wave at intervals of this value [sec]
-                this.textinterval = 60;                          // Draw text at intervals of this value [sec]
+                this.plotInterval = 0.0625;                      // Draw wave at intervals of this value [sec]
+                this.textInterval = 60;                          // Draw text at intervals of this value [sec]
             }
 
             /** @override */
-            TimeAll.prototype.param = function(key, value) {
+            TimeOverview.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
                     // Associative array
                     for (var k in arguments[0]) {
@@ -1549,21 +1637,19 @@
                                 if (value === undefined) {
                                     return this.currentTime;  // Getter
                                 } else {
-                                    if (Object.prototype.toString.call(value) === '[object String]') {
-                                        this.currentTime = value.toLowerCase();  // Setter
-                                    }
+                                    this.currentTime = String(value).toLowerCase();  // Setter
                                 }
 
                                 break;
                             case 'plotinterval' :
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this[k]; // Getter
+                                    return this[k.replace('interval', 'Interval')]; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this[k] = v;  // Setter
+                                        this[k.replace('interval', 'Interval')] = v;  // Setter
                                     }
                                 }
 
@@ -1577,13 +1663,13 @@
                 return this;
             };
 
-            /** 
-             * This method draws audio wave in entire of time domain to Canvas.
-             * @param {Float32Array} datas This argument is data for drawing.
-             * @return {TimeAll} This is returned for method chain.
+            /**
+             * This method draws audio wave in overview of time domain to Canvas.
+             * @param {Float32Array} data This argument is data for drawing.
+             * @return {TimeOverview} This is returned for method chain.
              * @override
              */
-            TimeAll.prototype.drawToCanvas = function(datas) {
+            TimeOverview.prototype.drawToCanvas = function(data) {
                 if (!((this.canvas instanceof HTMLCanvasElement) && this.isActive)) {
                     return this;
                 }
@@ -1600,24 +1686,24 @@
                 var y = 0;
                 var t = '';
 
-                // Draw wave at intervals of "this.plotinterval" [sec]
-                var nPlotinterval = Math.floor(this.plotinterval * this.SAMPLE_RATE);
+                // Draw wave at intervals of "this.plotInterval"
+                var nPlotinterval = Math.floor(this.plotInterval * this.SAMPLE_RATE);
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval * this.SAMPLE_RATE);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
                 // Begin drawing
-                this.drawTimeDomainFloat32ArrayToCanvas(context, datas, innerWidth, innerHeight, middle, nPlotinterval);
+                this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle, nPlotinterval);
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
-                    for (var i = 0, len = datas.length; i < len; i++) {
+                    for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                            t = Math.floor(i / this.SAMPLE_RATE) + ' min';
+                            t = Math.floor((i / this.SAMPLE_RATE) / 60) + ' min';
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
@@ -1628,8 +1714,8 @@
                             // Draw text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
-                                context.font      = this.styles.font;
-                                context.fillText(t, (x - (context.measureText(t).width / 2)), height);
+                                context.font      = this.createFontString();
+                                context.fillText(t, (x - (context.measureText(t).width / 2)), (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
                             }
                         }
                     }
@@ -1639,7 +1725,7 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = Math.floor(width - context.measureText(t).width);
+                        x = Math.floor(this.styles.left - context.measureText(t).width);
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
                         // Draw grid
@@ -1648,20 +1734,20 @@
                             context.fillRect(this.styles.left, y, innerWidth, 1);
                         }
 
-                        y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
+                        y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                         // Draw text
                         if (this.styles.text !== 'none') {
                             context.fillStyle = this.styles.text;
-                            context.font      = this.styles.font;
+                            context.font      = this.createFontString();
                             context.fillText(t, x, y);
                         }
                     }
                 }
 
-                // for update(), drag()
+                // for TimeOverview.prototype.update, TimeOverview.prototype.drag
                 this.savedImage = context.getImageData(0, 0, width, height);
-                this.length     = datas.length;
+                this.length     = data.length;
 
                 // This rectangle displays current time of audio
                 context.fillStyle = this.currentTime;
@@ -1670,21 +1756,21 @@
                 return this;
             };
 
-            /** 
-             * This method draws audio wave in entire of time domain to SVG.
-             * @param {Float32Array} datas This argument is data for drawing.
-             * @return {TimeAll} This is returned for method chain.
+            /**
+             * This method draws audio wave in overview of time domain to SVG.
+             * @param {Float32Array} data This argument is data for drawing.
+             * @return {TimeOverview} This is returned for method chain.
              * @override
              */
-            TimeAll.prototype.drawToSVG = function(datas) {
-                if (!((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive)) {
+            TimeOverview.prototype.drawToSVG = function(data) {
+                if (!((this.svg instanceof SVGElement) && this.isActive)) {
                     return this;
                 }
 
-                var svg = this.svgParent.innerHTML.match(/(<svg[^<>]*>).*<\/svg>/)[1] + '</svg>';
+                var svg = this.svg;
 
-                var width       = this.svg.getAttribute('width');
-                var height      = this.svg.getAttribute('height');
+                var width       = parseInt(this.svg.getAttribute('width'));
+                var height      = parseInt(this.svg.getAttribute('height'));
                 var innerWidth  = width  - (this.styles.left + this.styles.right);
                 var innerHeight = height - (this.styles.top  + this.styles.bottom);
                 var middle      = Math.floor(innerHeight / 2) + this.styles.top;
@@ -1693,101 +1779,58 @@
                 var y = 0;
                 var t = '';
 
-                // Draw wave at intervals of "this.plotinterval" [sec]
-                var nPlotinterval = Math.floor(this.plotinterval * this.SAMPLE_RATE);
+                // Draw wave at intervals of "this.plotInterval"
+                var nPlotinterval = Math.floor(this.plotInterval * this.SAMPLE_RATE);
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
-
-                // Set style
-                var waveStyle = '';
-
-                switch (this.styles.shape) {
-                    case 'line' :
-                        waveStyle += 'stroke : ' + this.styles.wave + '; ';
-                        waveStyle += 'fill : none; ';
-                        waveStyle += 'stroke-width : ' + this.styles.width + '; ';
-                        waveStyle += 'stroke-linecap : ' + this.styles.cap + '; ';
-                        waveStyle += 'stroke-linejoin : ' + this.styles.join + ';';
-                    case 'rect' :
-                        if (this.styles.wave === 'gradient') {
-                            var gradient = '';
-
-                            gradient += '<defs>';
-                            gradient += '<linearGradient id="svg-linear-gradient" x1="0%" y1="0%" x2="0%" y2="100%">';
-
-                            for (var i = 0, len = this.styles.grad.length; i < len; i++) {
-                                var gradients = this.styles.grad[i];
-
-                                gradient += '<stop offset="' + gradients.offset + '" stop-color="' + gradients.color + '" />';
-                            }
-
-                            gradient += '</linearGradient>';
-                            gradient += '</defs>';
-
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : url(#svg-linear-gradient); ';
-                            waveStyle += 'stroke-width : 0;';
-                        } else {
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : ' + this.styles.wave + '; ';
-                            waveStyle += 'stroke-width : 0;';
-                        }
-
-                        break;
-                    default :
-                        break;
-                }
-
-                var gridStyle = '';
-                gridStyle += 'stroke : none; ';
-                gridStyle += 'fill : ' + this.styles.grid + '; ';
-                gridStyle += 'stroke-width : 0;';
-
-                var matches = this.styles.font.match(/\s*(\d+)px (.*)/);
-                var family  = matches[2];
-                var size    = matches[1];
-
-                var textStyle = '';
-                textStyle += 'stroke : none; ';
-                textStyle += 'fill : ' + this.styles.text + '; ';
-                textStyle += 'font-family : ' + family + '; ';
-                textStyle += 'font-size : ' + size + ';';
-
-                var offsetStyle = '';
-                offsetStyle += 'stroke : none; ';
-                offsetStyle += 'fill : ' + this.currentTime + '; ';
-                offsetStyle += 'stroke-width : 0;';
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval * this.SAMPLE_RATE);
 
                 // Erase previous wave
-                this.svgParent.innerHTML = svg;
+                svg.innerHTML = '';
 
                 // Begin drawing
-                svg = this.svgParent.innerHTML.replace('</svg>', '');
-
-                // Gradient ?
-                if (this.styles.wave === 'gradient') {
-                    svg += gradient;
-                }
-
-                // Begin drawing
-                svg += this.drawTimeDomainFloat32ArrayToSVG(waveStyle, datas, innerWidth, innerHeight, middle, nPlotinterval);
+                svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, nPlotinterval, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW));
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
-                    for (var i = 0, len = datas.length; i < len; i++) {
+                    for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                            t = Math.floor(i / this.SAMPLE_RATE) + ' min';
+                            t = Math.floor((i / this.SAMPLE_RATE) / 60) + ' min';
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
-                                svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
+                                var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                rect.setAttribute('x',      x);
+                                rect.setAttribute('y',      this.styles.top);
+                                rect.setAttribute('width',  1);
+                                rect.setAttribute('height', innerHeight);
+
+                                rect.setAttribute('stroke', 'none');
+                                rect.setAttribute('fill',   this.styles.grid);
+
+                                svg.appendChild(rect);
                             }
 
                             // Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
+                                var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                                text.textContent = t;
+
+                                text.setAttribute('x', x);
+                                text.setAttribute('y', (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
+
+                                text.setAttribute('text-anchor', 'middle');
+                                text.setAttribute('stroke',      'none');
+                                text.setAttribute('fill',        this.styles.text);
+                                text.setAttribute('font-family', this.styles.font.family);
+                                text.setAttribute('font-size',   this.styles.font.size);
+                                text.setAttribute('font-style',  this.styles.font.style);
+                                text.setAttribute('font-weight', this.styles.font.weight);
+
+                                svg.appendChild(text);
                             }
                         }
                     }
@@ -1797,61 +1840,75 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = width; 
+                        x = this.styles.left;
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
                         // Draw grid
                         if (this.styles.grid !== 'none') {
-                            svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
+                            var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                            rect.setAttribute('x',      x);
+                            rect.setAttribute('y',      y);
+                            rect.setAttribute('width',  innerWidth);
+                            rect.setAttribute('height', 1);
+
+                            rect.setAttribute('stroke', 'none');
+                            rect.setAttribute('fill',   this.styles.grid);
+
+                            svg.appendChild(rect);
                         }
 
-                        y -= Math.floor(parseInt(size) / 4);
+                        y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                         // Draw text
                         if (this.styles.text !== 'none') {
-                            svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                            var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                            text.textContent = t;
+
+                            text.setAttribute('x', x);
+                            text.setAttribute('y', y);
+
+                            text.setAttribute('text-anchor', 'end');
+                            text.setAttribute('stroke',      'none');
+                            text.setAttribute('fill',        this.styles.text);
+                            text.setAttribute('font-family', this.styles.font.family);
+                            text.setAttribute('font-size',   this.styles.font.size);
+                            text.setAttribute('font-style',  this.styles.font.style);
+                            text.setAttribute('font-weight', this.styles.font.weight);
+
+                            svg.appendChild(text);
                         }
                     }
                 }
 
                 // This rectangle displays current time of audio
-                svg += '<rect class="svg-current-time" style="' + offsetStyle + '" x="' + this.styles.left + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
+                var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
 
-                // End tag
-                svg += '</svg>';
+                rect.setAttribute('class',  'svg-current-time');
+                rect.setAttribute('x',      this.styles.left);
+                rect.setAttribute('y',      this.styles.top);
+                rect.setAttribute('width',  1);
+                rect.setAttribute('height', innerHeight);
 
-                this.svgParent.innerHTML = svg;
+                rect.setAttribute('stroke', 'none');
+                rect.setAttribute('fill',   this.currentTime);
 
-                // for update(), drag()
+                svg.appendChild(rect);
+
+                // for TimeOverview.prototype.update, TimeOverview.prototype.drag
                 this.savedImage = svg;
-                this.length     = datas.length;
+                this.length     = data.length;
 
                 return this;
             };
 
-            /** 
+            /**
              * This method draws current time of audio on Canvas or SVG.
              * @param {number} time This argument is current time.
-             * @return {TimeAll} This is returned for method chain.
+             * @return {TimeOverview} This is returned for method chain.
              */
-            TimeAll.prototype.update = function(time) {
-                switch (this.drawType) {
-                    case 'canvas' :
-                        if ((this.canvas instanceof HTMLCanvasElement) && this.isActive) {
-                            break;
-                        } else {
-                            return;
-                        }
-                    case 'svg' :
-                        if ((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive) {
-                            break;
-                        } else {
-                            return;
-                        }
-                    default :
-                        break;
-                }
-
+            TimeOverview.prototype.update = function(time) {
                 var t = parseFloat(time);
 
                 if (isNaN(t) || (t < 0)) {
@@ -1865,7 +1922,7 @@
                 var x           = 0;
 
                 switch (this.drawType) {
-                    case 'canvas' :
+                    case Visualizer.DRAW_TYPES.CANVAS :
                         if (this.savedImage instanceof ImageData) {
                             var context = this.context;
 
@@ -1883,12 +1940,12 @@
                         }
 
                         break;
-                    case 'svg' :
-                        var svg = this.svgParent.querySelector('.svg-current-time');
+                    case Visualizer.DRAW_TYPES.SVG :
+                        var svg = this.svg.querySelector('.svg-current-time');
 
                         if (svg instanceof SVGElement) {
-                            width       = this.svg.getAttribute('width');
-                            height      = this.svg.getAttribute('height');
+                            width       = parseInt(this.svg.getAttribute('width'));
+                            height      = parseInt(this.svg.getAttribute('height'));
                             innerWidth  = width  - (this.styles.left + this.styles.right);
                             innerHeight = height - (this.styles.top  + this.styles.bottom);
                             x           = Math.floor(((t * this.SAMPLE_RATE) / this.length) * innerWidth);
@@ -1904,35 +1961,14 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method registers event listener for setting current time by Drag.
              * @param {function} callback This argument is executed when current time is changed.
-             * @return {TimeAll} This is returned for method chain.
+             * @return {TimeOverview} This is returned for method chain.
              */
-            TimeAll.prototype.drag = function(callback) {
-                var drawNode  = null;
-                var isCapture = true;
-
-                switch (this.drawType) {
-                    case 'canvas' :
-                        if ((this.canvas instanceof HTMLCanvasElement) && this.isActive) {
-                            drawNode  = this.canvas;
-                            // isCapture = true;
-                            break;
-                        } else {
-                            return;
-                        }
-                    case 'svg' :
-                        if ((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive) {
-                            drawNode  = this.svgParent;
-                            // isCapture = false;
-                            break;
-                        } else {
-                            return;
-                        }
-                    default :
-                        break;
-                }
+            TimeOverview.prototype.drag = function(callback) {
+                var drawNode = null;
+                var self     = this;
 
                 var start = '';
                 var move  = '';
@@ -1949,41 +1985,54 @@
                     end   = 'mouseup';
                 }
 
-                var draw = function(eventX) {
-                    var offset = 0;
-                    var width  = 0;
+                switch (this.drawType) {
+                    case Visualizer.DRAW_TYPES.CANVAS :
+                        drawNode = this.canvas;
+                        break;
+                    case Visualizer.DRAW_TYPES.SVG :
+                        drawNode = this.svg;
+                        break;
+                    default :
+                        return;
+                }
 
-                    switch (this.drawType) {
-                        case 'canvas' :
-                            offset = this.canvas.offsetLeft;
-                            width  = this.canvas.width;
+                var draw = function(offsetX) {
+                    var offsetLeft = 0;
+                    var width      = 0;
+
+                    switch (self.drawType) {
+                        case Visualizer.DRAW_TYPES.CANVAS :
+                            drawNode   = self.canvas;
+                            offsetLeft = self.canvas.offsetLeft;
+                            width      = self.canvas.width;
                             break;
-                        case 'svg' :
-                            offset = this.svgParent.offsetLeft;
-                            width  = this.svg.getAttribute('width');
+                        case Visualizer.DRAW_TYPES.SVG :
+                            drawNode   = self.svg;
+                            offsetLeft = self.svg.offsetLeft;
+                            width      = parseInt(self.svg.getAttribute('width'));
                             break;
                         default :
                             break;
                     }
 
-                    var x     = eventX - (offset + this.styles.left);
-                    var width = width  - (this.styles.left + this.styles.right);
+                    var x     = offsetX - (offsetLeft + self.styles.left);
+                    var width = width   - (self.styles.left + self.styles.right);
 
                     // Exceed ?
                     if (x < 0)     {x = 0;}
                     if (x > width) {x = width;}
 
-                    var plot = (x / width) * this.length;
-                    var time = plot / this.SAMPLE_RATE;
+                    var plot = (x / width) * self.length;
+                    var time = plot / self.SAMPLE_RATE;
 
-                    this.update(time);
+                    self.update(time);
 
                     if (Object.prototype.toString.call(callback) === '[object Function]') {
                         callback(time);
                     }
                 };
 
-                var getX = function(event) {
+                var getOffsetX = function(event) {
                     if (event.pageX) {
                         return event.pageX;
                     } else if (event.touches[0]) {
@@ -1992,22 +2041,18 @@
                 };
 
                 var isDown = false;
-                var self   = this;
 
                 drawNode.addEventListener(start, function(event) {
-                    if (self.savedImage !== null) {
-                        draw.call(self, getX(event));
-                        isDown = true;
-                    }
-                }, isCapture);
+                    draw(getOffsetX(event));
+                    isDown = true;
+                }, true);
 
                 drawNode.addEventListener(move, function(event) {
-                    event.preventDefault();  // for Touch Panel
-
-                    if (isDown && (self.savedImage !== null)) {
-                        draw.call(self, getX(event));
+                    if (isDown) {
+                        event.preventDefault();  // for Touch Panel
+                        draw(getOffsetX(event));
                     }
-                }, isCapture);
+                }, true);
 
                 global.addEventListener(end, function(event) {
                     if (isDown) {
@@ -2019,11 +2064,11 @@
             };
 
             /** @override */
-            TimeAll.prototype.toString = function() {
-                return '[SoundModule Analyser TimeAll]';
+            TimeOverview.prototype.toString = function() {
+                return '[SoundModule Analyser TimeOverview]';
             };
 
-            /** 
+            /**
              * This private class defines properties for drawing sound wave in time domain.
              * @param {number} sampleRate This argument is sampling rate.
              * @constructor
@@ -2034,8 +2079,15 @@
                 Visualizer.call(this, sampleRate);
 
                 this.type         = 'uint';  // unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
-                this.textinterval = 0.005;  // Draw text at intervals this value [sec]
+                this.textInterval = 0.005;   // Draw text at intervals this value [sec]
             }
+
+            /**
+             * Class (Static) properties
+             */
+            Time.TYPES       = {};
+            Time.TYPES.UINT  = 'uint';
+            Time.TYPES.FLOAT = 'float';
 
             /** @override */
             Time.prototype.param = function(key, value) {
@@ -2060,7 +2112,7 @@
                                 } else {
                                     var v = String(value).toLowerCase();
 
-                                    if ((v === 'uint') || (v === 'float')) {
+                                    if ((v === Time.TYPES.UINT) || (v === Time.TYPES.FLOAT)) {
                                         this.type = v;  // Setter
                                     }
                                 }
@@ -2068,12 +2120,12 @@
                                 break;
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this.textinterval; // Getter
+                                    return this.textInterval; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this.textinterval = v;  // Setter
+                                        this.textInterval = v;  // Setter
                                     }
                                 }
 
@@ -2087,21 +2139,16 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws sound wave in time domain to Canvas.
-             * @param {Uint8Array} datas This argument is data for drawing.
+             * @param {Uint8Array} data This argument is data for drawing.
              * @return {Time} This is returned for method chain.
              * @override
              */
-            Time.prototype.drawToCanvas = function(datas, minDecibels, maxDecibels) {
+            Time.prototype.drawToCanvas = function(data, minDecibels, maxDecibels) {
                 if (!((this.canvas instanceof HTMLCanvasElement) && this.isActive)) {
                     return this;
                 }
-
-                var mindB = parseFloat(minDecibels);
-                var maxdB = parseFloat(maxDecibels);
-
-                var range = maxdB - mindB;
 
                 var context = this.context;
 
@@ -2115,18 +2162,18 @@
                 var y = 0;
                 var t = '';
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval * this.SAMPLE_RATE);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
-                        this.drawTimeDomainFloat32ArrayToCanvas(context, datas, innerWidth, innerHeight, middle);
+                    case Time.TYPES.FLOAT :
+                        this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle);
                         break;
-                    case 'uint' :
+                    case Time.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -2139,12 +2186,12 @@
                                 // Draw wave
                                 context.beginPath();
 
-                                for (var i = 0, len = datas.length; i < len; i++) {
+                                for (var i = 0, len = data.length; i < len; i++) {
                                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                                    y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
+                                    y = Math.floor((1 - (data[i] / 255)) * innerHeight) + this.styles.top;
 
                                     if (i === 0) {
-                                        context.moveTo(x, y);
+                                        context.moveTo((x + (this.styles.width / 2)), y);
                                     } else {
                                         context.lineTo(x, y);
                                     }
@@ -2160,9 +2207,9 @@
                                }
 
                                 // Draw wave
-                                for (var i = 0, len = datas.length; i < len; i++) {
+                                for (var i = 0, len = data.length; i < len; i++) {
                                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                                    y = Math.floor((0.5 - (datas[i] / 255)) * innerHeight);
+                                    y = Math.floor((0.5 - (data[i] / 255)) * innerHeight);
 
                                    // Set style
                                    if (this.styles.wave === 'gradient') {
@@ -2191,7 +2238,7 @@
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
-                    for (var i = 0, len = datas.length; i < len; i++) {
+                    for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.SAMPLE_RATE) * 1000) + ' ms';
@@ -2205,8 +2252,8 @@
                             // Draw text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
-                                context.font      = this.styles.font;
-                                context.fillText(t, (x - (context.measureText(t).width / 2)), height);
+                                context.font      = this.createFontString();
+                                context.fillText(t, (x - (context.measureText(t).width / 2)), (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
                             }
                         }
                     }
@@ -2216,7 +2263,7 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = Math.floor(width - context.measureText(t).width); 
+                        x = Math.floor(this.styles.left - context.measureText(t).width);
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
                         // Draw grid
@@ -2225,12 +2272,12 @@
                             context.fillRect(this.styles.left, y, innerWidth, 1);
                         }
 
-                        y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
+                        y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                         // Draw text
                         if (this.styles.text !== 'none') {
                             context.fillStyle = this.styles.text;
-                            context.font      = this.styles.font;
+                            context.font      = this.createFontString();
                             context.fillText(t, x, y);
                         }
                     }
@@ -2239,21 +2286,21 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws sound wave in time domain to SVG.
-             * @param {Uint8Array} datas This argument is data for drawing.
+             * @param {Uint8Array} data This argument is data for drawing.
              * @return {Time} This is returned for method chain.
              * @override
              */
-            Time.prototype.drawToSVG = function(datas) {
-                if (!((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive)) {
+            Time.prototype.drawToSVG = function(data) {
+                if (!((this.svg instanceof SVGElement) && this.isActive)) {
                     return this;
                 }
 
-                var svg = this.svgParent.innerHTML.match(/(<svg[^<>]*>).*<\/svg>/)[1] + '</svg>';
+                var svg = this.svg;
 
-                var width       = this.svg.getAttribute('width');
-                var height      = this.svg.getAttribute('height');
+                var width       = parseInt(this.svg.getAttribute('width'));
+                var height      = parseInt(this.svg.getAttribute('height'));
                 var innerWidth  = width  - (this.styles.left + this.styles.right);
                 var innerHeight = height - (this.styles.top  + this.styles.bottom);
                 var middle      = Math.floor(innerHeight / 2) + this.styles.top;
@@ -2262,115 +2309,87 @@
                 var y = 0;
                 var t = '';
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval * this.SAMPLE_RATE);
-
-                // Set style
-                var waveStyle = '';
-
-                switch (this.styles.shape) {
-                    case 'line' :
-                        waveStyle += 'stroke : ' + this.styles.wave + '; ';
-                        waveStyle += 'fill : none; ';
-                        waveStyle += 'stroke-width : ' + this.styles.width + '; ';
-                        waveStyle += 'stroke-linecap : ' + this.styles.cap + '; ';
-                        waveStyle += 'stroke-linejoin : ' + this.styles.join + ';';
-
-                        break;
-                    case 'rect' :
-                        if (this.styles.wave === 'gradient') {
-                            var gradient = '';
-
-                            gradient += '<defs>';
-                            gradient += '<linearGradient id="svg-linear-gradient" x1="0%" y1="0%" x2="0%" y2="100%">';
-
-                            for (var i = 0, len = this.styles.grad.length; i < len; i++) {
-                                var gradients = this.styles.grad[i];
-
-                                gradient += '<stop offset="' + gradients.offset + '" stop-color="' + gradients.color + '" />';
-                            }
-
-                            gradient += '</linearGradient>';
-                            gradient += '</defs>';
-
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : url(#svg-linear-gradient); ';
-                            waveStyle += 'stroke-width : 0;';
-                        } else {
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : ' + this.styles.wave + '; ';
-                            waveStyle += 'stroke-width : 0;';
-                        }
-
-                        break;
-                    default :
-                        break;
-                }
-
-                var gridStyle = '';
-                gridStyle += 'stroke : none; ';
-                gridStyle += 'fill : ' + this.styles.grid + '; ';
-                gridStyle += 'stroke-width : 0;';
-
-                var matches = this.styles.font.match(/\s*(\d+)px (.*)/);
-                var family  = matches[2];
-                var size    = matches[1];
-
-                var textStyle = '';
-                textStyle += 'stroke : none; ';
-                textStyle += 'fill : ' + this.styles.text + '; ';
-                textStyle += 'font-family : ' + family + '; ';
-                textStyle += 'font-size : ' + size + ';';
-
-                // Erase previous wave
-                this.svgParent.innerHTML = svg;
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval * this.SAMPLE_RATE);
 
                 // Begin drawing
-                svg = this.svgParent.innerHTML.replace('</svg>', '');
-
-                // Gradient ?
-                if (this.styles.wave === 'gradient') {
-                    svg += gradient;
-                }
+                svg.innerHTML = '';
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
-                        svg += this.drawTimeDomainFloat32ArrayToSVG(waveStyle, datas, innerWidth, innerHeight, middle);
+                    case Time.TYPES.FLOAT :
+                        svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
                         break;
-                    case 'uint' :
+                    case Time.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
                                 // Draw wave
-                                svg += '<path style="' + waveStyle + '" d="';
+                                var path = document.createElementNS(Visualizer.XMLNS, 'path');
 
-                                for (var i = 0, len = datas.length; i < len; i++) {
+                                var d = '';
+
+                                for (var i = 0, len = data.length; i < len; i++) {
                                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                                    y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
+                                    y = Math.floor((1 - (data[i] / 255)) * innerHeight) + this.styles.top;
 
                                     if (i === 0) {
-                                        svg += 'M' + x + ' ' + y;
+                                        d += 'M' + (x + (this.styles.width / 2)) + ' ' + y;
                                     } else {
-                                        svg += ' ';
-                                        svg += 'L' + x + ' ' + y;
+                                        d += ' ';
+                                        d += 'L' + x + ' ' + y;
                                     }
                                 }
 
-                                // <path d="..." />
-                                svg += '" />';
+                                path.setAttribute('d', d);
+
+                                path.setAttribute('stroke',          this.styles.wave);
+                                path.setAttribute('fill',            'none');
+                                path.setAttribute('stroke-width',    this.styles.width);
+                                path.setAttribute('stroke-linecap',  this.styles.cap);
+                                path.setAttribute('stroke-linejoin', this.styles.join);
+
+                                svg.appendChild(path);
 
                                 break;
                             case 'rect' :
-                                // Draw wave
-                                for (var i = 0, len = datas.length; i < len; i++) {
-                                    x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                                    y = Math.floor(((datas[i] / 255) - 0.5) * innerHeight);
+                                var defs = null;
 
-                                    svg += (y < 0) ?
-                                        '<rect style="' + waveStyle + '" x="' + x + '" y="' + middle + '" width="' + this.styles.width + '" height="' + (-y) + '" />' :
-                                        '<rect style="' + waveStyle + '" x="' + x + '" y="' + middle + '" width="' + this.styles.width + '" height="' + y + '" transform="translate(' + this.styles.width + ' 0) rotate(180 ' + x + ' ' + middle + ')" />';
+                                if (this.styles.wave === 'gradient') {
+                                    defs = this.createSVGLinearGradient(Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME);
                                 }
+
+                                // Draw wave
+                                var g = document.createElementNS(Visualizer.XMLNS, 'g');
+
+                                if (defs !== null) {
+                                    g.appendChild(defs);
+                                }
+
+                                for (var i = 0, len = data.length; i < len; i++) {
+                                    var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                    x = Math.floor((i / len) * innerWidth) + this.styles.left;
+                                    y = Math.floor(((data[i] / 255) - 0.5) * innerHeight);
+
+                                    rect.setAttribute('x',     x);
+                                    rect.setAttribute('y',     middle);
+                                    rect.setAttribute('width', this.styles.width);
+
+                                    if (y < 0) {
+                                        rect.setAttribute('height', -y);
+                                    } else {
+                                        rect.setAttribute('height',    y);
+                                        rect.setAttribute('transform', 'rotate(180 ' + (x + (this.styles.width / 2)) + ' ' + middle + ')');
+                                    }
+
+                                    rect.setAttribute('stroke', 'none');
+                                    rect.setAttribute('fill',   (defs === null) ? this.styles.wave : ('url(#' + Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME + ')'));
+
+                                    g.appendChild(rect);
+                                }
+
+                                svg.appendChild(g);
 
                                 break;
                             default :
@@ -2382,19 +2401,44 @@
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
-                    for (var i = 0, len = datas.length; i < len; i++) {
+                    for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.SAMPLE_RATE) * 1000) + ' ms';
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
-                                svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
+                                var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                rect.setAttribute('x',      x);
+                                rect.setAttribute('y',      this.styles.top);
+                                rect.setAttribute('width',  1);
+                                rect.setAttribute('height', innerHeight);
+
+                                rect.setAttribute('stroke', 'none');
+                                rect.setAttribute('fill',   this.styles.grid);
+
+                                svg.appendChild(rect);
                             }
 
                             // Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
+                                var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                                text.textContent = t;
+
+                                text.setAttribute('x', x);
+                                text.setAttribute('y', (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
+
+                                text.setAttribute('text-anchor', 'middle');
+                                text.setAttribute('stroke',      'none');
+                                text.setAttribute('fill',        this.styles.text);
+                                text.setAttribute('font-family', this.styles.font.family);
+                                text.setAttribute('font-size',   this.styles.font.size);
+                                text.setAttribute('font-style',  this.styles.font.style);
+                                text.setAttribute('font-weight', this.styles.font.weight);
+
+                                svg.appendChild(text);
                             }
                         }
                     }
@@ -2404,27 +2448,47 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = width; 
+                        x = this.styles.left;
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
                         // Draw grid
                         if (this.styles.grid !== 'none') {
-                            svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
+                            var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                            rect.setAttribute('x',      x);
+                            rect.setAttribute('y',      y);
+                            rect.setAttribute('width',  innerWidth);
+                            rect.setAttribute('height', 1);
+
+                            rect.setAttribute('stroke', 'none');
+                            rect.setAttribute('fill',   this.styles.grid);
+
+                            svg.appendChild(rect);
                         }
 
-                        y -= Math.floor(parseInt(size) / 4);
+                        y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                         // Draw text
                         if (this.styles.text !== 'none') {
-                            svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                            var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                            text.textContent = t;
+
+                            text.setAttribute('x', x);
+                            text.setAttribute('y', y);
+
+                            text.setAttribute('text-anchor', 'end');
+                            text.setAttribute('stroke',      'none');
+                            text.setAttribute('fill',        this.styles.text);
+                            text.setAttribute('font-family', this.styles.font.family);
+                            text.setAttribute('font-size',   this.styles.font.size);
+                            text.setAttribute('font-style',  this.styles.font.style);
+                            text.setAttribute('font-weight', this.styles.font.weight);
+
+                            svg.appendChild(text);
                         }
                     }
                 }
-
-                // End tag
-                svg += '</svg>';
-
-                this.svgParent.innerHTML = svg;
 
                 return this;
             };
@@ -2434,7 +2498,7 @@
                 return '[SoundModule Analyser Time]';
             };
 
-            /** 
+            /**
              * This private class defines properties for drawing sound wave in frequency domain (spectrum).
              * @param {number} sampleRate This argument is sampling rate.
              * @constructor
@@ -2446,8 +2510,15 @@
 
                 this.type         = 'uint';  // unsigned int 8 bit (Uint8Array) or float 32 bit (Float32Array)
                 this.size         = 256;     // Range for drawing
-                this.textinterval = 1000;    // Draw text at intervals of this value [Hz]
+                this.textInterval = 1000;    // Draw text at intervals of this value [Hz]
             }
+
+            /**
+             * Class (Static) properties
+             */
+            FFT.TYPES       = {};
+            FFT.TYPES.UINT  = 'uint';
+            FFT.TYPES.FLOAT = 'float';
 
             /** @override */
             FFT.prototype.param = function(key, value) {
@@ -2472,7 +2543,7 @@
                                 } else {
                                     var v = String(value).toLowerCase();
 
-                                    if ((v === 'uint') || (v === 'float')) {
+                                    if ((v === FFT.TYPES.UINT) || (v === FFT.TYPES.FLOAT)) {
                                         this.type = v;  // Setter
                                     }
                                 }
@@ -2482,11 +2553,11 @@
                                 if (value === undefined) {
                                     return this.size; // Getter
                                 } else {
-                                    var v   = parseFloat(value);
+                                    var v   = parseInt(value);
                                     var min = 0;
                                     var max = 1024;  // AnalyserNode fftSize max 2048 -> half 1024
 
-                                    if ((v >= 0) && (v <= max)) {
+                                    if ((v > 0) && (v <= max)) {
                                         this.size = v;  // Setter
                                     }
                                 }
@@ -2494,12 +2565,12 @@
                                 break;
                             case 'textinterval' :
                                 if (value === undefined) {
-                                    return this.textinterval; // Getter
+                                    return this.textInterval; // Getter
                                 } else {
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
-                                        this.textinterval = v;  // Setter
+                                        this.textInterval = v;  // Setter
                                     }
                                 }
 
@@ -2513,15 +2584,15 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws sound wave in frequency domain (spectrum) to Canvas.
-             * @param {Uint8Array|Float32Array} datas This argument is data for drawing.
+             * @param {Uint8Array|Float32Array} data This argument is data for drawing.
              * @param {number} minDecibels This argument is in order to determine the range of drawing. The default value is -100 dB.
              * @param {number} maxDecibels This argument is in order to determine the range of drawing. The default value is -30 dB.
              * @return {FFT} This is returned for method chain.
              * @override
              */
-            FFT.prototype.drawToCanvas = function(datas, minDecibels, maxDecibels) {
+            FFT.prototype.drawToCanvas = function(data, minDecibels, maxDecibels) {
                 if (!((this.canvas instanceof HTMLCanvasElement) && this.isActive)) {
                     return this;
                 }
@@ -2542,35 +2613,35 @@
                 var y = 0;
                 var t = '';
 
-                var drawnSize = (this.size > datas.length) ? datas.length : this.size;
+                var drawnSize = (this.size > data.length) ? data.length : this.size;
 
                 // Frequency resolution (Sampling rate / FFT size)
-                var fsDivN = this.SAMPLE_RATE / (2 * datas.length);
+                var fsDivN = this.SAMPLE_RATE / (2 * data.length);
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval / fsDivN);
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval / fsDivN);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
+                    case FFT.TYPES.FLOAT :
                         // Set style
                         context.strokeStyle = (this.styles.wave !== 'gradient') ? this.styles.wave : 'rgba(0, 0, 255, 1.0)';  // line only
                         context.lineWidth   = this.styles.width;
                         context.lineCap     = this.styles.cap;
                         context.lineJoin    = this.styles.join;
 
-                        // Visualizer wave
+                        // Draw wave
                         context.beginPath();
 
                         for (var i = 0; i < drawnSize; i++) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                            y = (Math.abs(datas[i] - maxdB) * (innerHeight / range)) + this.styles.top;  // [dB] * [px / dB] = [px]
+                            y = (Math.abs(data[i] - maxdB) * (innerHeight / range)) + this.styles.top;  // [dB] * [px / dB] = [px]
 
                             if (i === 0) {
-                                context.moveTo(x, y);
+                                context.moveTo((x + (this.styles.width / 2)), y);
                             } else {
                                 context.lineTo(x, y);
                             }
@@ -2579,7 +2650,7 @@
                         context.stroke();
 
                         break;
-                    case 'uint' :
+                    case FFT.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -2591,13 +2662,13 @@
 
                                 context.beginPath();
 
-                                // Visualizer wave
+                                // Draw wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                                    y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
+                                    y = Math.floor((1 - (data[i] / 255)) * innerHeight) + this.styles.top;
 
                                     if (i === 0) {
-                                        context.moveTo(x, y);
+                                        context.moveTo((x + (this.styles.width / 2)), y);
                                     } else {
                                         context.lineTo(x, y);
                                     }
@@ -2612,10 +2683,10 @@
                                    context.fillStyle = this.styles.wave;
                                }
 
-                                // Visualizer wave
+                                // Draw wave
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                                    y = -1 * Math.floor((datas[i] / 255) * innerHeight);
+                                    y = -1 * Math.floor((data[i] / 255) * innerHeight);
 
                                    // Set style
                                    if (this.styles.wave === 'gradient') {
@@ -2643,37 +2714,37 @@
                 }
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
-                    // Visualizer grid and text (X axis)
+                    // Draw grid and text (X axis)
                     var f = 0;
 
                     for (var i = 0; i < drawnSize; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                            f = Math.floor(this.textinterval * (i / nTextinterval));
+                            f = Math.floor(this.textInterval * (i / nTextinterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
-                            // Visualizer grid
+                            // Draw grid
                             if (this.styles.grid !== 'none') {
                                 context.fillStyle = this.styles.grid;
                                 context.fillRect(x, this.styles.top, 1, innerHeight);
                             }
 
-                            // Visualizer text
+                            // Draw text
                             if (this.styles.text !== 'none') {
                                 context.fillStyle = this.styles.text;
-                                context.font      = this.styles.font;
-                                context.fillText(t, (x - (context.measureText(t).width / 2)), height);
+                                context.font      = this.createFontString();
+                                context.fillText(t, (x - (context.measureText(t).width / 2)), (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
                             }
                         }
                     }
 
                     // Draw grid and text (Y axis)
                     switch (this.type) {
-                        case 'float' :
+                        case FFT.TYPES.FLOAT :
                             for (var i = mindB; i <= maxdB; i += 10) {
                                 t = i + 'dB';
-                                x = width - Math.floor(context.measureText(t).width);
+                                x = Math.floor(this.styles.left - context.measureText(t).width);
                                 y = Math.floor(((-1 * (i - maxdB)) / range) * innerHeight) + this.styles.top;
 
                                 // Draw grid
@@ -2682,24 +2753,24 @@
                                     context.fillRect(this.styles.left, y, innerWidth, 1);
                                 }
 
-                                y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
+                                y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                                 // Draw text
                                 if (this.styles.text !== 'none') {
                                     context.fillStyle = this.styles.text;
-                                    context.font      = this.styles.font;
+                                    context.font      = this.createFontString();
                                     context.fillText(t, x, y);
                                 }
                             }
 
                             break;
-                        case 'uint' :
+                        case FFT.TYPES.UINT :
                         default     :
                             var texts = ['0.00', '0.25', '0.50', '0.75', '1.00'];
 
                             for (var i = 0, len = texts.length; i < len; i++) {
                                 t = texts[i];
-                                x = width - Math.floor(context.measureText(t).width);
+                                x = Math.floor(this.styles.left - context.measureText(t).width);
                                 y = ((1 - parseFloat(t)) * innerHeight) + this.styles.top;
 
                                 // Draw grid
@@ -2708,12 +2779,12 @@
                                     context.fillRect(this.styles.left, y, innerWidth, 1);
                                 }
 
-                                y -= parseInt(context.font.match(/\s*(\d+)px.*/)[1] / 4);
+                                y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                                 // Draw text
                                 if (this.styles.text !== 'none') {
                                     context.fillStyle = this.styles.text;
-                                    context.font      = this.styles.font;
+                                    context.font      = this.createFontString();
                                     context.fillText(t, x, y);
                                 }
                             }
@@ -2725,16 +2796,16 @@
                 return this;
             };
 
-            /** 
+            /**
              * This method draws sound wave in frequency domain (spectrum) to SVG.
-             * @param {Uint8Array|Float32Array} datas This argument is data for drawing.
+             * @param {Uint8Array|Float32Array} data This argument is data for drawing.
              * @param {number} minDecibels This argument is in order to determine the range of drawing. The default value is -100 dB.
              * @param {number} maxDecibels This argument is in order to determine the range of drawing. The default value is -30 dB.
              * @return {FFT} This is returned for method chain.
              * @override
              */
-            FFT.prototype.drawToSVG = function(datas, minDecibels, maxDecibels) {
-                if (!((this.svg instanceof SVGElement) && (this.svgParent instanceof HTMLElement) && this.isActive)) {
+            FFT.prototype.drawToSVG = function(data, minDecibels, maxDecibels) {
+                if (!((this.svg instanceof SVGElement) && this.isActive)) {
                     return this;
                 }
 
@@ -2743,7 +2814,7 @@
 
                 var range = maxdB - mindB;
 
-                var svg = this.svgParent.innerHTML.match(/(<svg[^<>]*>).*<\/svg>/)[1] + '</svg>';
+                var svg = this.svg;
 
                 var width       = this.svg.getAttribute('width');
                 var height      = this.svg.getAttribute('height');
@@ -2754,142 +2825,119 @@
                 var y = 0;
                 var t = '';
 
-                var drawnSize = (this.size > datas.length) ? datas.length : this.size;
+                var drawnSize = (this.size > data.length) ? data.length : this.size;
 
                 // Frequency resolution (Sampling rate / FFT size)
-                var fsDivN = this.SAMPLE_RATE / (2 * datas.length);
+                var fsDivN = this.SAMPLE_RATE / (2 * data.length);
 
-                // Draw text at intervals of "this.textinterval" [sec]
-                var nTextinterval = Math.floor(this.textinterval / fsDivN);
-
-                // Set style
-                var waveStyle = '';
-
-                switch (this.styles.shape) {
-                    case 'line' :
-                        waveStyle += 'stroke : ' + this.styles.wave + '; ';
-                        waveStyle += 'fill : none; ';
-                        waveStyle += 'stroke-width : ' + this.styles.width + '; ';
-                        waveStyle += 'stroke-linecap : ' + this.styles.cap + '; ';
-                        waveStyle += 'stroke-linejoin : ' + this.styles.join + ';';
-
-                        break;
-                    case 'rect' :
-                        if ((this.type === 'uint') && (this.styles.wave === 'gradient')) {
-                            var gradient = '';
-
-                            gradient += '<defs>';
-                            gradient += '<linearGradient id="svg-linear-gradient" x1="0%" y1="0%" x2="0%" y2="100%">';
-
-                            for (var i = 0, len = this.styles.grad.length; i < len; i++) {
-                                var gradients = this.styles.grad[i];
-
-                                gradient += '<stop offset="' + gradients.offset + '" stop-color="' + gradients.color + '" />';
-                            }
-
-                            gradient += '</linearGradient>';
-                            gradient += '</defs>';
-
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : url(#svg-linear-gradient); ';
-                            waveStyle += 'stroke-width : 0;';
-                        } else if ((this.type === 'uint') && (this.styles.wave !== 'gradient')) {
-                            waveStyle += 'stroke : none; ';
-                            waveStyle += 'fill : ' + this.styles.wave + '; ';
-                            waveStyle += 'stroke-width : 0;';
-                        } else if (this.type !== 'uint') {
-                            // this.type === 'float' -> line only
-                            waveStyle += 'stroke : rgba(0, 0, 255, 1.0); ';
-                            waveStyle += 'fill : none; ';
-                            waveStyle += 'stroke-width : ' + this.styles.width + '; ';
-                            waveStyle += 'stroke-linecap : ' + this.styles.cap + '; ';
-                            waveStyle += 'stroke-linejoin : ' + this.styles.join + ';';
-                        }
-
-                        break;
-                    default :
-                        break;
-                }
-
-                var gridStyle = '';
-                gridStyle += 'stroke : none; ';
-                gridStyle += 'fill : ' + this.styles.grid + '; ';
-                gridStyle += 'stroke-width : 0;';
-
-                var matches = this.styles.font.match(/\s*(\d+)px (.*)/);
-                var family  = matches[2];
-                var size    = matches[1];
-
-                var textStyle = '';
-                textStyle += 'stroke : none; ';
-                textStyle += 'fill : ' + this.styles.text + '; ';
-                textStyle += 'font-family : ' + family + '; ';
-                textStyle += 'font-size : ' + size + ';';
+                // Draw text at intervals of "this.textInterval"
+                var nTextinterval = Math.floor(this.textInterval / fsDivN);
 
                 // Erase previous wave
-                this.svgParent.innerHTML = svg;
+                this.svg.innerHTML = '';
 
                 // Begin drawing
-                svg = this.svgParent.innerHTML.replace('</svg>', '');
-
-                // Uint8Array && Gradient ?
-                if ((this.type === 'uint') && (this.styles.wave === 'gradient')) {
-                    svg += gradient;
-                }
-
                 switch (this.type) {
-                    case 'float' :
+                    case FFT.TYPES.FLOAT :
                         // Draw wave
-                        svg += '<path style="' + waveStyle + '" d="';
+                        var path = document.createElementNS(Visualizer.XMLNS, 'path');
+
+                        var d = '';
 
                         for (var i = 0; i < drawnSize; i++) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                            y = Math.floor(-1 * (datas[i] - maxdB) * (innerHeight / range)) + this.styles.top;
+                            y = Math.floor(-1 * (data[i] - maxdB) * (innerHeight / range)) + this.styles.top;
 
                             if (i === 0) {
-                                svg += 'M' + x + ' ' + y;
+                                d += 'M' + (x + (this.styles.width / 2)) + ' ' + y;
                             } else {
-                                svg += ' ';
-                                svg += 'L' + x + ' ' + y;
+                                d += ' ';
+                                d += 'L' + x + ' ' + y;
                             }
                         }
 
-                        // <path d="..." />
-                        svg += '" />';
+                        path.setAttribute('d', d);
+
+                        path.setAttribute('stroke',          this.styles.wave);
+                        path.setAttribute('fill',            'none');
+                        path.setAttribute('stroke-width',    this.styles.width);
+                        path.setAttribute('stroke-linecap',  this.styles.cap);
+                        path.setAttribute('stroke-linejoin', this.styles.join);
+
+                        svg.appendChild(path);
 
                         break;
-                    case 'uint' :
+                    case FFT.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
                                 // Draw wave
-                                svg += '<path style="' + waveStyle + '" d="';
+                                var path = document.createElementNS(Visualizer.XMLNS, 'path');
 
-                                // Draw wave
+                                var d = '';
+
                                 for (var i = 0; i < drawnSize; i++) {
                                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                                    y = Math.floor((1 - (datas[i] / 255)) * innerHeight) + this.styles.top;
+                                    y = Math.floor((1 - (data[i] / 255)) * innerHeight) + this.styles.top;
 
                                     if (i === 0) {
-                                        svg += 'M' + x + ' ' + y;
+                                        d += 'M' + (x + this.styles.width / 2) + ' ' + y;
                                     } else {
-                                        svg += ' ';
-                                        svg += 'L' + x + ' ' + y;
+                                        d += ' ';
+                                        d += 'L' + x + ' ' + y;
                                     }
                                 }
 
-                                // <path d="..." />
-                                svg += '" />';
+                                path.setAttribute('d', d);
+
+                                path.setAttribute('stroke',          this.styles.wave);
+                                path.setAttribute('fill',            'none');
+                                path.setAttribute('stroke-width',    this.styles.width);
+                                path.setAttribute('stroke-linecap',  this.styles.cap);
+                                path.setAttribute('stroke-linejoin', this.styles.join);
+
+                                svg.appendChild(path);
 
                                 break;
                             case 'rect' :
                                 // Draw wave
-                                for (var i = 0; i < drawnSize; i++) {
-                                    x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
-                                    y = Math.floor((datas[i] / 255) * innerHeight);
+                                var defs = null;
 
-                                    svg += '<rect style="' + waveStyle + '" x="' + x + '" y="' + (this.styles.top + innerHeight) + '" width="' + this.styles.width + '" height="' + y + '" transform="translate(' + this.styles.width + ' 0) rotate(180 ' + x + ' ' + (this.styles.top + innerHeight) + ')" />';
+                                if (this.styles.wave === 'gradient') {
+                                    defs = this.createSVGLinearGradient(Visualizer.SVG_LINEAR_GRADIENT_IDS.FFT);
                                 }
+
+                                // Draw wave
+                                var g = document.createElementNS(Visualizer.XMLNS, 'g');
+
+                                if (defs !== null) {
+                                    g.appendChild(defs);
+                                }
+
+                                for (var i = 0; i < drawnSize; i++) {
+                                    var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                    x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
+                                    y = Math.floor((data[i] / 255) * innerHeight);
+
+                                    rect.setAttribute('x',     x);
+                                    rect.setAttribute('y',     (this.styles.top + innerHeight));
+                                    rect.setAttribute('width', this.styles.width);
+
+                                    if (y < 0) {
+                                        rect.setAttribute('height', -y);
+                                    } else {
+                                        rect.setAttribute('height',    y);
+                                        rect.setAttribute('transform', 'rotate(180 ' + (x + this.styles.width / 2) + ' ' + (this.styles.top + innerHeight) + ')');
+                                    }
+
+                                    rect.setAttribute('stroke', 'none');
+                                    rect.setAttribute('fill',   (defs === null) ? this.styles.wave : ('url(#' + Visualizer.SVG_LINEAR_GRADIENT_IDS.FFT + ')'));
+
+                                    g.appendChild(rect);
+                                }
+
+                                svg.appendChild(g);
 
                                 break;
                             default :
@@ -2907,73 +2955,143 @@
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                            f = Math.floor(this.textinterval * (i / nTextinterval));
+                            f = Math.floor(this.textInterval * (i / nTextinterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
-                                svg += '<rect style="' + gridStyle + '" x="' + x + '" y="' + this.styles.top + '" width="1" height="' + innerHeight + '" />';
+                                var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                rect.setAttribute('x',      x);
+                                rect.setAttribute('y',      this.styles.top);
+                                rect.setAttribute('width',  1);
+                                rect.setAttribute('height', innerHeight);
+
+                                rect.setAttribute('stroke', 'none');
+                                rect.setAttribute('fill',   this.styles.grid);
+
+                                svg.appendChild(rect);
                             }
 
                             // Draw text
                             if (this.styles.text !== 'none') {
-                                svg += '<text text-anchor="middle" style="' + textStyle + '" x="' + x + '" y="' + height + '">' + t + '</text>';
+                                var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                                text.textContent = t;
+
+                                text.setAttribute('x', x);
+                                text.setAttribute('y', (this.styles.top + innerHeight + parseInt(this.styles.font.size)));
+
+                                text.setAttribute('text-anchor', 'middle');
+                                text.setAttribute('stroke',      'none');
+                                text.setAttribute('fill',        this.styles.text);
+                                text.setAttribute('font-family', this.styles.font.family);
+                                text.setAttribute('font-size',   this.styles.font.size);
+                                text.setAttribute('font-style',  this.styles.font.style);
+                                text.setAttribute('font-weight', this.styles.font.weight);
+
+                                svg.appendChild(text);
                             }
                         }
                     }
 
                     // Draw grid and text (Y axis)
                     switch (this.type) {
-                        case 'float' :
+                        case FFT.TYPES.FLOAT :
                             for (var i = mindB; i <= maxdB; i += 10) {
                                 t = i + 'dB';
-                                x = width;
+                                x = this.styles.left;
                                 y = Math.floor(((-1 * (i - maxdB)) / range) * innerHeight) + this.styles.top;
 
                                 // Draw grid
                                 if (this.styles.grid !== 'none') {
-                                    svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
+                                    var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                    rect.setAttribute('x',      x);
+                                    rect.setAttribute('y',      y);
+                                    rect.setAttribute('width',  innerWidth);
+                                    rect.setAttribute('height', 1);
+
+                                    rect.setAttribute('stroke', 'none');
+                                    rect.setAttribute('fill',   this.styles.grid);
+
+                                    svg.appendChild(rect);
                                 }
 
-                                y -= Math.floor(parseInt(size) / 4);
+                                y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                                 // Draw text
                                 if (this.styles.text !== 'none') {
-                                    svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                                    var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                                    text.textContent = t;
+
+                                    text.setAttribute('x', x);
+                                    text.setAttribute('y', y);
+
+                                    text.setAttribute('text-anchor', 'end');
+                                    text.setAttribute('stroke',      'none');
+                                    text.setAttribute('fill',        this.styles.text);
+                                    text.setAttribute('font-family', this.styles.font.family);
+                                    text.setAttribute('font-size',   this.styles.font.size);
+                                    text.setAttribute('font-style',  this.styles.font.style);
+                                    text.setAttribute('font-weight', this.styles.font.weight);
+
+                                    svg.appendChild(text);
                                 }
                             }
 
                             break;
-                        case 'uint' :
+                        case FFT.TYPES.UINT :
                         default     :
                             var texts = ['0.00', '0.25', '0.50', '0.75', '1.00'];
 
                             for (var i = 0, len = texts.length; i < len; i++) {
                                 t = texts[i];
-                                x = width;
+                                x = this.styles.left;
                                 y = ((1 - parseFloat(t)) * innerHeight) + this.styles.top;
 
                                 // Draw grid
                                 if (this.styles.grid !== 'none') {
-                                    svg += '<rect style="' + gridStyle + '" x="' + this.styles.left + '" y="' + y + '" width="' + innerWidth + '" height="1" />';
+                                    var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
+
+                                    rect.setAttribute('x',      x);
+                                    rect.setAttribute('y',      y);
+                                    rect.setAttribute('width',  innerWidth);
+                                    rect.setAttribute('height', 1);
+
+                                    rect.setAttribute('stroke', 'none');
+                                    rect.setAttribute('fill',   this.styles.grid);
+
+                                    svg.appendChild(rect);
                                 }
 
-                                y -= Math.floor(parseInt(size) / 4);
+                                y -= Math.floor(parseInt(this.styles.font.size) / 4);
 
                                 // Draw text
                                 if (this.styles.text !== 'none') {
-                                    svg += '<text text-anchor="end" style="' + textStyle + '" x="' + x + '" y="' + y + '">' + t + '</text>';
+                                    var text = document.createElementNS(Visualizer.XMLNS, 'text');
+
+                                    text.textContent = t;
+
+                                    text.setAttribute('x', x);
+                                    text.setAttribute('y', y);
+
+                                    text.setAttribute('text-anchor', 'end');
+                                    text.setAttribute('stroke',      'none');
+                                    text.setAttribute('fill',        this.styles.text);
+                                    text.setAttribute('font-family', this.styles.font.family);
+                                    text.setAttribute('font-size',   this.styles.font.size);
+                                    text.setAttribute('font-style',  this.styles.font.style);
+                                    text.setAttribute('font-weight', this.styles.font.weight);
+
+                                    svg.appendChild(text);
                                 }
                             }
 
                             break;
                     }
                 }
-
-                // End tag
-                svg += '</svg>';
-
-                this.svgParent.innerHTML = svg;
 
                 return this;
             };
@@ -2982,10 +3100,16 @@
             FFT.prototype.toString = function() {
                 return '[SoundModule Analyser FFT]';
             };
+
+            // Create the instances of Visualizer's subclass
+            this.timeOverviewL = new TimeOverview(context.sampleRate);
+            this.timeOverviewR = new TimeOverview(context.sampleRate);
+            this.time          = new Time(context.sampleRate);
+            this.fft           = new FFT(context.sampleRate);
         }
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number|} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -3026,23 +3150,27 @@
                     case 'frequencybincount' :
                         return this.analyser.frequencyBinCount;  // Getter only
                     case 'mindecibels' :
+                        if (value === undefined) {
+                            return this.analyser.minDecibels;  // Getter
+                        } else {
+                            var v   = parseFloat(value);
+                            var max = -30;
+
+                            if (v < max) {
+                                this.analyser.minDecibels = v;
+                            }
+                        }
+
+                        break;
                     case 'maxdecibels' :
                         if (value === undefined) {
-                            return this.analyser[k.replace('decibels', 'Decibels')];  // Getter
+                            return this.analyser.maxDecibels;  // Getter
                         } else {
-                            var v = parseFloat(value);
+                            var v   = parseFloat(value);
+                            var min = -100;
 
-                            if (!isNaN(v)) {
-                                this.analyser[k.replace('decibels', 'Decibels')] = v;  // Setter
-
-                                if (this.analyser.minDecibels >= this.analyser.maxDecibels) {
-                                    var min = this.analyser.minDecibels;
-                                    var max = this.analyser.maxDecibels;
-
-                                    // Set default value
-                                    this.analyser.minDecibels = -100;
-                                    this.analyser.maxDecibels =  -30;
-                                }
+                            if (v > min) {
+                                this.analyser.maxDecibels = v;
                             }
                         }
 
@@ -3069,10 +3197,10 @@
             return this;
         };
 
-        /** 
+        /**
          * This method creates data for drawing (Float32Array|Uint8Array) and executes drawing.
-         * @param {string} domain This argument is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
-         * @param {AudioBuffer} buffer This argument is the instance of AudioBuffer. The data for drawing audio wave in entire of time domain is gotten from this argument.
+         * @param {string} domain This argument is one of 'time-overview-L', 'time-overview-R', 'time', 'fft'.
+         * @param {AudioBuffer} buffer This argument is the instance of AudioBuffer. The data for drawing audio wave in overview of time domain is gotten from this argument.
          * @return {Analyser} This is returned for method chain.
          */
         Analyser.prototype.start = function(domain, buffer) {
@@ -3081,37 +3209,37 @@
             var self = this;
 
             switch (d) {
-                case 'timealll' :
+                case 'timeoverviewl' :
                     if (buffer instanceof AudioBuffer) {
                         if (buffer.numberOfChannels > 0) {
-                            var datas = new Float32Array(buffer.length);
-                            datas.set(buffer.getChannelData(0));
-                            this.timeAllL.start(datas);
+                            var data = new Float32Array(buffer.length);
+                            data.set(buffer.getChannelData(0));
+                            this.timeOverviewL.start(data);
                         }
                     }
 
                     break;
-                case 'timeallr' :
+                case 'timeoverviewr' :
                     if (buffer instanceof AudioBuffer) {
                         if (buffer.numberOfChannels > 1) {
-                            var datas = new Float32Array(buffer.length);
-                            datas.set(buffer.getChannelData(1));
-                            this.timeAllR.start(datas);
+                            var data = new Float32Array(buffer.length);
+                            data.set(buffer.getChannelData(1));
+                            this.timeOverviewR.start(data);
                         }
                     }
 
                     break;
                 case 'time' :
-                    var datas = null;
+                    var data = null;
 
                     if (this.time.type === 'uint') {
-                        datas = new Uint8Array(this.analyser.fftSize);
-                        this.analyser.getByteTimeDomainData(datas);
-                        this.time.start(datas);
+                        data = new Uint8Array(this.analyser.fftSize);
+                        this.analyser.getByteTimeDomainData(data);
+                        this.time.start(data);
                     } else {
-                        datas = new Float32Array(this.analyser.fftSize);
-                        this.analyser.getFloatTimeDomainData(datas);
-                        this.time.start(datas, this.analyser.minDecibels, this.analyser.maxDecibels);
+                        data = new Float32Array(this.analyser.fftSize);
+                        this.analyser.getFloatTimeDomainData(data);
+                        this.time.start(data, this.analyser.minDecibels, this.analyser.maxDecibels);
                     }
 
                     if (this.time.interval === 'auto') {
@@ -3126,16 +3254,16 @@
 
                     break;
                 case 'fft' :
-                    var datas = null;
+                    var data = null;
 
                     if (this.fft.type === 'uint') {
-                        datas = new Uint8Array(this.analyser.frequencyBinCount);
-                        this.analyser.getByteFrequencyData(datas);
-                        this.fft.start(datas);
+                        data = new Uint8Array(this.analyser.frequencyBinCount);
+                        this.analyser.getByteFrequencyData(data);
+                        this.fft.start(data);
                     } else {
-                        datas = new Float32Array(this.analyser.frequencyBinCount);
-                        this.analyser.getFloatFrequencyData(datas);
-                        this.fft.start(datas, this.analyser.minDecibels, this.analyser.maxDecibels);
+                        data = new Float32Array(this.analyser.frequencyBinCount);
+                        this.analyser.getFloatFrequencyData(data);
+                        this.fft.start(data, this.analyser.minDecibels, this.analyser.maxDecibels);
                     }
 
                     if (this.fft.interval === 'auto') {
@@ -3156,17 +3284,17 @@
             return this;
         };
 
-        /** 
+        /**
          * This method stops drawing.
-         * @param {string} domain This argument is one of 'timeAllL', 'timeAllR', 'time', 'fft'.
+         * @param {string} domain This argument is one of 'time-overview-L', 'time-overview-R', 'time', 'fft'.
          * @return {Analyser} This is returned for method chain.
          */
         Analyser.prototype.stop = function(domain) {
             var d = String(domain).replace(/-/g, '').toLowerCase();
 
             switch (d) {
-                case 'timealll' :
-                case 'timeallr' :
+                case 'timeoverviewl' :
+                case 'timeoverviewr' :
                     break;
                 case 'time' :
                     if (this.time.interval === 'auto') {
@@ -3195,18 +3323,18 @@
             return this;
         };
 
-        /** 
+        /**
          * This method selects domain for drawing.
-         * @param {string} domain This argument is in order to select private class.
-         * @return {TimeAll|Time|FFT} This value is the instance of selected private class.
+         * @param {string} domain This argument is one of 'time-overview-L', 'time-overview-R', 'time', 'fft'.
+         * @return {TimeOverview|Time|FFT} This value is the instance of selected private class.
          */
         Analyser.prototype.domain = function(domain) {
             var d = String(domain).replace(/-/g, '').toLowerCase();
 
             switch (d) {
-                case 'timealll' :
-                case 'timeallr' :
-                    return this['timeAll' + d.slice(-1).toUpperCase()];
+                case 'timeoverviewl' :
+                case 'timeoverviewr' :
+                    return this['timeOverview' + d.slice(-1).toUpperCase()];
                 case 'time' :
                 case 'fft'  :
                     return this[d];
@@ -3228,7 +3356,7 @@
             return '[SoundModule Analyser]';
         };
 
-        /** 
+        /**
          * This private class defines properties for multi track recording.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -3242,8 +3370,8 @@
             this.context   = context;
             this.processor = context.createScriptProcessor(bufferSize, numInput, numOutput);
 
-            this.mixLs = null;  /** @type {Float32Array} */
-            this.mixRs = null;  /** @type {Float32Array} */
+            this.mixedLs = null;  /** @type {Float32Array} */
+            this.mixedRs = null;  /** @type {Float32Array} */
 
             this.trackLs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
             this.trackRs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
@@ -3256,7 +3384,7 @@
             this.gainR = 1;  // Gain of R channel
         };
 
-        /** 
+        /**
          * This method sets max the number of tracks.
          * @param {number} numTrack This argument is the max number of tracks. The default value is 1.
          * @return {Recorder} This is returned for method chain.
@@ -3285,7 +3413,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This abstract method gets or sets parameter.
          * @param {string|object} key This argument is in order to select property in the case of string type.
          *     This argument is in order to select property and value in the case of object.
@@ -3325,7 +3453,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method selects active track.
          * @param {number} track This argument is in order to select active track.
          * @return {Recorder} This is returned for method chain.
@@ -3338,7 +3466,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method starts recording. If there is not any active track, this method stops "onaudioprocess" event handler in the instance of ScriptProcessorNode.
          * @return {Recorder} This is returned for method chain.
          */
@@ -3353,16 +3481,16 @@
                         var inputLs = event.inputBuffer.getChannelData(0);
                         var inputRs = event.inputBuffer.getChannelData(1);
 
-                        var recordLs = new Float32Array(this.bufferSize);
-                        var recordRs = new Float32Array(this.bufferSize);
+                        var recordedLs = new Float32Array(this.bufferSize);
+                        var recordedRs = new Float32Array(this.bufferSize);
 
                         for (var i = 0; i < this.bufferSize; i++) {
-                            recordLs[i] = self.gainL * inputLs[i];
-                            recordRs[i] = self.gainR * inputRs[i];
+                            recordedLs[i] = self.gainL * inputLs[i];
+                            recordedRs[i] = self.gainR * inputRs[i];
                         }
 
-                        self.trackLs[self.activeTrack].push(recordLs);
-                        self.trackRs[self.activeTrack].push(recordRs);
+                        self.trackLs[self.activeTrack].push(recordedLs);
+                        self.trackRs[self.activeTrack].push(recordedRs);
                     } else {
                         this.disconnect(0);
                         this.onaudioprocess = null;  // for Firefox
@@ -3373,7 +3501,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method turns off the all of tracks, and stops "onaudioprocess" event handler in the instance of ScriptProcessorNode.
          * @return {Recorder} This is returned for method chain.
          */
@@ -3385,7 +3513,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method determines whether the designated track number is valid.
          * @param {number} track This argument is track number for validation.
          * @return {boolean} If the designated track is valid range, this value is true. Otherwise, this value is false.
@@ -3396,7 +3524,7 @@
             return ((t >= 0) && (t < this.numTrack)) ? true : false;
         };
 
-        /** 
+        /**
          * This method determines whether active track exists.
          * @return {number} This is returned as active track.
          */
@@ -3404,7 +3532,62 @@
             return this.activeTrack;
         };
 
-        /** 
+        /**
+         * This method synthesizes recorded sounds in track.
+         * @param {string} channel This argument is either 'L' or 'R'.
+         * @return {Float32Array} This is returned as array for synthesized sound.
+         */
+        Recorder.prototype.mixTrack = function(channel) {
+            var tracks        = this['track' + channel + 's'];
+            var mixs          = {values : null, sum : 0, num : 0};
+            var currentBuffer = 0;
+            var index         = 0;
+
+            // Calculate sound data size
+            var numberOfMaxBuffers = 0;
+
+            // Search max number of Float32Arrays each track
+            for (var i = 0, num = tracks.length; i < num; i++) {
+                if (numberOfMaxBuffers < tracks[i].length) {
+                    numberOfMaxBuffers = tracks[i].length;
+                }
+            }
+
+            mixs.values = new Float32Array(numberOfMaxBuffers * this.processor.bufferSize);
+
+            while (true) {
+                for (var currentTrack = 0, len = tracks.length; currentTrack < len; currentTrack++) {
+                    if (tracks[currentTrack][currentBuffer] instanceof Float32Array) {
+                        mixs.sum += tracks[currentTrack][currentBuffer][index];
+                        mixs.num++;
+                    }
+                }
+
+                if (mixs.num > 0) {
+                    var offset = currentBuffer * this.processor.bufferSize;
+
+                    mixs.values[offset + index] = mixs.sum / mixs.num;  // Average
+
+                    // Clear
+                    mixs.sum = 0;
+                    mixs.num = 0;
+
+                    // Next data
+                    if (index < (this.processor.bufferSize - 1)) {
+                        // Next Element in Float32Array
+                        index++;
+                    } else {
+                        // Next Float32Array
+                        currentBuffer++;
+                        index = 0;
+                    }
+                } else {
+                    return mixs.values;
+                }
+            }
+        };
+
+        /**
          * This method synthesizes the all of recorded sounds in track.
          * @return {Recorder} This is returned for method chain.
          */
@@ -3414,65 +3597,13 @@
                 this.stop();
             }
 
-            var mixTrack = function(channel) {
-                var tracks        = this['track' + channel + 's'];
-                var mixs          = {values : null, sum : 0, num : 0};
-                var currentBuffer = 0;
-                var index         = 0;
-
-                // Calculate sound data size
-                var maxNumBuffers = 0;
-
-                // Search max number of Float32Arrays each track
-                for (var i = 0, num = tracks.length; i < num; i++) {
-                    if (maxNumBuffers < tracks[i].length) {
-                        maxNumBuffers = tracks[i].length;
-                    }
-                }
-
-                mixs.values = new Float32Array(maxNumBuffers * this.processor.bufferSize);
-
-                while (true) {
-                    for (var currentTrack = 0, len = tracks.length; currentTrack < len; currentTrack++) {
-                        if (tracks[currentTrack][currentBuffer] instanceof Float32Array) {
-                            mixs.sum += tracks[currentTrack][currentBuffer][index];
-                            mixs.num++;
-                        }
-                    }
-
-                    if (mixs.num > 0) {
-                        var offset = currentBuffer * this.processor.bufferSize;
-                        mixs.values[offset + index] = mixs.sum / mixs.num;  // Average
-
-                        // Clear
-                        mixs.sum = 0;
-                        mixs.num = 0;
-
-                        // Next data
-                        if (index < (this.processor.bufferSize - 1)) {
-                            // Next Element in Float32Array
-                            index++;
-                        } else {
-                            // Next Float32Array
-                            currentBuffer++;
-                            index = 0;
-                        }
-                    } else {
-                        this['mix' + channel + 's'] = mixs.values;
-
-                        // End
-                        break;
-                    }
-                }
-            };
-
-            mixTrack.call(this, 'L');
-            mixTrack.call(this, 'R');
+            this.mixedLs = this.mixTrack('L');
+            this.mixedRs = this.mixTrack('R');
 
             return this;
         };
 
-        /** 
+        /**
          * This method clears recorded sound of the desinated track.
          * @param {number|string} track This argument is track for clearing.
          * @return {Recorder} This is returned for method chain.
@@ -3496,47 +3627,46 @@
             return this;
         };
 
-        /** 
+        /**
          * This method creates WAVE file as Object URL or Data URL.
          * @param {string|number} track This argument is target track.
          * @param {number} channelType This argument is in order to select stereo or monaural of WAVE file. The default value is 2.
          * @param {number} qbit This argument is quantization bit of PCM. The default value is 16 (bit).
-         * @param {string} dataType This argument is in order to select Object URL or Data URL. The default value is 'blob' (Object URL).
          * @return {string} This is returned as Object URL or Data URL for WAVE file.
          */
-        Recorder.prototype.create = function(track, channelType, qbit, dataType) {
+        Recorder.prototype.create = function(track, channelType, qbit) {
             // on the way of recording ?
             if (this.activeTrack !== -1) {
                 this.stop();
             }
 
             /** @type {Float32Array} */
-            var Ls = null;
+            var soundLs = null;
 
             /** @type {Float32Array} */
-            var Rs = null;
+            var soundRs = null;
 
             if (String(track).toLowerCase() === 'all') {
                 this.mix();
 
-                Ls = this.mixLs;
-                Rs = this.mixRs;
+                soundLs = this.mixedLs;
+                soundRs = this.mixedRs;
             } else {
                 if (this.isTrack(track)) {
-                    Ls = this.trackLs[track - 1];
-                    Rs = this.trackRs[track - 1];
+                    soundLs = this.trackLs[track - 1];
+                    soundRs = this.trackRs[track - 1];
                 }
             }
 
             // Sound data exists ?
-            if ((Ls.length === 0) && (Rs.length === 0)) {
+            if ((soundLs.length === 0) && (soundRs.length === 0)) {
                 return;
             }
 
             // PCM parameters
             var CHANNEL = (channelType === 1) ? 1 : 2;
             var QBIT    = (qbit        === 8) ? 8 : 16;
-            var SIZE    = (CHANNEL === 1) ? Math.min(Ls.length, Rs.length) : (2 * Math.min(Ls.length, Rs.length));
+            var SIZE    = (CHANNEL === 1) ? Math.min(soundLs.length, soundRs.length) : (2 * Math.min(soundLs.length, soundRs.length));
 
             /** @type {Uint8Array|Int16Array} */
             var sounds = null;
@@ -3550,9 +3680,9 @@
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = ((Ls[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Left channel
+                            binary = ((soundLs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Left channel
                         } else {
-                            binary = ((Rs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Right channel
+                            binary = ((soundRs[parseInt(i / CHANNEL)] + 1) / 2) * (Math.pow(2, 8) - 1);  // Right channel
                         }
 
                         // for preventing from clipping
@@ -3571,9 +3701,9 @@
                         var binary = 0;
 
                         if ((i % CHANNEL) === 0) {
-                            binary = Ls[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Left channel
+                            binary = soundLs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Left channel
                         } else {
-                            binary = Rs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Right channel
+                            binary = soundRs[parseInt(i / CHANNEL)] * Math.pow(2, 15);  // Right channel
                         }
 
                         // for preventing from clipping
@@ -3597,144 +3727,148 @@
             var BPS        = RATE * CHANNEL * (QBIT / 8);
             var DATA_SIZE  = SIZE * (QBIT / 8);
 
-            switch (String(dataType).toLowerCase()) {
-                case 'base64' :
-                    var wave = '';
+            global.URL = global.URL || global.webkitURL;
 
-                    wave += 'RIFF';
-                    wave += String.fromCharCode(((CHUNK_SIZE >> 0) & 0xFF), ((CHUNK_SIZE >> 8) & 0xFF), ((CHUNK_SIZE >> 16) & 0xFF), ((CHUNK_SIZE >> 24) & 0xFF));
-                    wave += 'WAVE';
+            if (global.URL && global.URL.createObjectURL) {
+                // Object URL
 
-                    // fmt chunk
-                    wave += 'fmt' + ' ' + String.fromCharCode(16, 0, 0, 0);
-                    wave += String.fromCharCode(1, 0);
+                var waves = [];
 
-                    // fmt chunk -> Channels (Monaural or Stereo)
-                    wave += String.fromCharCode(CHANNEL, 0);
+                waves[0] = 0x52;  // 'R'
+                waves[1] = 0x49;  // 'I'
+                waves[2] = 0x46;  // 'F'
+                waves[3] = 0x46;  // 'F'
 
-                    // fmt chunk -> Sample rate
-                    wave += String.fromCharCode(((RATE >> 0) & 0xFF), ((RATE >> 8) & 0xFF), ((RATE >> 16) & 0xFF), ((RATE >> 24) & 0xFF));
+                waves[4] = (CHUNK_SIZE >>  0) & 0xFF;
+                waves[5] = (CHUNK_SIZE >>  8) & 0xFF;
+                waves[6] = (CHUNK_SIZE >> 16) & 0xFF;
+                waves[7] = (CHUNK_SIZE >> 24) & 0xFF;
 
-                    // fmt chunk -> Byte per second
-                    wave += String.fromCharCode(((BPS >> 0) & 0xFF), ((BPS >> 8) & 0xFF), ((BPS >> 16) & 0xFF), ((BPS >> 24) & 0xFF));
+                waves[8]  = 0x57;  // 'W'
+                waves[9]  = 0x41;  // 'A'
+                waves[10] = 0x56;  // 'V'
+                waves[11] = 0x45;  // 'E'
 
-                    // fmt chunk -> Block size
-                    wave += String.fromCharCode((CHANNEL * (QBIT / 8)), 0);
+                // fmt chunk
+                waves[12] = 0x66;  // 'f'
+                waves[13] = 0x6D;  // 'm'
+                waves[14] = 0x74;  // 't'
+                waves[15] = 0x20;  // ' '
 
-                    // fmt chunk -> Byte per Sample
-                    wave += String.fromCharCode(QBIT, 0);
+                waves[16] = 16;
+                waves[17] =  0;
+                waves[18] =  0;
+                waves[19] =  0;
 
-                    // data chunk
-                    wave += 'data';
-                    wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
+                waves[20] = 1;
+                waves[21] = 0;
 
-                    for (var i = 0; i < SIZE; i++) {
-                        switch (QBIT) {
-                            case  8 :
-                                wave += String.fromCharCode(sounds[i]);
-                                break;
-                            case 16 :
-                                // The byte order in WAVE file is little endian
-                                wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
-                                break;
-                            default :
-                                break;
-                        }
+                // fmt chunk -> Channels (Monaural or Stereo)
+                waves[22] = CHANNEL;
+                waves[23] = 0;
+
+                // fmt chunk -> Sample rate
+                waves[24] = (RATE >>  0) & 0xFF;
+                waves[25] = (RATE >>  8) & 0xFF;
+                waves[26] = (RATE >> 16) & 0xFF;
+                waves[27] = (RATE >> 24) & 0xFF;
+
+                // fmt chunk -> Byte per second
+                waves[28] = (BPS >>  0) & 0xFF;
+                waves[29] = (BPS >>  8) & 0xFF;
+                waves[30] = (BPS >> 16) & 0xFF;
+                waves[31] = (BPS >> 24) & 0xFF;
+
+                // fmt chunk -> Block size
+                waves[32] = CHANNEL * (QBIT / 8);
+                waves[33] = 0;
+
+                // fmt chunk -> Byte per Sample
+                waves[34] = QBIT;
+                waves[35] = 0;
+
+                // data chunk
+                waves[36] = 0x64;  // 'd'
+                waves[37] = 0x61;  // 'a'
+                waves[38] = 0x74;  // 't
+                waves[39] = 0x61;  // 'a'
+
+                waves[40] = (DATA_SIZE >>  0) & 0xFF;
+                waves[41] = (DATA_SIZE >>  8) & 0xFF;
+                waves[42] = (DATA_SIZE >> 16) & 0xFF;
+                waves[43] = (DATA_SIZE >> 24) & 0xFF;
+
+                for (var i = 0; i < SIZE; i++) {
+                    switch (QBIT) {
+                        case  8 :
+                            waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
+                            break;
+                        case 16 :
+                            // The byte order in WAVE file is little endian
+                            waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
+                            waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
+                            break;
+                        default :
+                            break;
                     }
+                }
 
-                    var base64  = global.btoa(wave);
-                    var dataURL = 'data:audio/wav;base64,' + base64;
+                global.URL = global.URL || global.webkitURL;
 
-                    return dataURL;
-                case 'blob' :
-                default     :
-                    var waves = [];
+                var blob      = new Blob([new Uint8Array(waves)], {type : 'audio/wav'});
+                var objectURL = global.URL.createObjectURL(blob);
 
-                    waves[0] = 0x52;  // 'R'
-                    waves[1] = 0x49;  // 'I'
-                    waves[2] = 0x46;  // 'F'
-                    waves[3] = 0x46;  // 'F'
+                return objectURL;
+            } else {
+                // Data URL
 
-                    waves[4] = (CHUNK_SIZE >>  0) & 0xFF;
-                    waves[5] = (CHUNK_SIZE >>  8) & 0xFF;
-                    waves[6] = (CHUNK_SIZE >> 16) & 0xFF;
-                    waves[7] = (CHUNK_SIZE >> 24) & 0xFF;
+                var wave = '';
 
-                    waves[8]  = 0x57;  // 'W'
-                    waves[9]  = 0x41;  // 'A'
-                    waves[10] = 0x56;  // 'V'
-                    waves[11] = 0x45;  // 'E'
+                wave += 'RIFF';
+                wave += String.fromCharCode(((CHUNK_SIZE >> 0) & 0xFF), ((CHUNK_SIZE >> 8) & 0xFF), ((CHUNK_SIZE >> 16) & 0xFF), ((CHUNK_SIZE >> 24) & 0xFF));
+                wave += 'WAVE';
 
-                    // fmt chunk
-                    waves[12] = 0x66;  // 'f'
-                    waves[13] = 0x6D;  // 'm'
-                    waves[14] = 0x74;  // 't'
-                    waves[15] = 0x20;  // ' '
+                // fmt chunk
+                wave += 'fmt' + ' ' + String.fromCharCode(16, 0, 0, 0);
+                wave += String.fromCharCode(1, 0);
 
-                    waves[16] = 16;
-                    waves[17] =  0;
-                    waves[18] =  0;
-                    waves[19] =  0;
+                // fmt chunk -> Channels (Monaural or Stereo)
+                wave += String.fromCharCode(CHANNEL, 0);
 
-                    waves[20] = 1;
-                    waves[21] = 0;
+                // fmt chunk -> Sample rate
+                wave += String.fromCharCode(((RATE >> 0) & 0xFF), ((RATE >> 8) & 0xFF), ((RATE >> 16) & 0xFF), ((RATE >> 24) & 0xFF));
 
-                    // fmt chunk -> Channels (Monaural or Stereo)
-                    waves[22] = CHANNEL;
-                    waves[23] = 0;
+                // fmt chunk -> Byte per second
+                wave += String.fromCharCode(((BPS >> 0) & 0xFF), ((BPS >> 8) & 0xFF), ((BPS >> 16) & 0xFF), ((BPS >> 24) & 0xFF));
 
-                    // fmt chunk -> Sample rate
-                    waves[24] = (RATE >>  0) & 0xFF;
-                    waves[25] = (RATE >>  8) & 0xFF;
-                    waves[26] = (RATE >> 16) & 0xFF;
-                    waves[27] = (RATE >> 24) & 0xFF;
+                // fmt chunk -> Block size
+                wave += String.fromCharCode((CHANNEL * (QBIT / 8)), 0);
 
-                    // fmt chunk -> Byte per second
-                    waves[28] = (BPS >>  0) & 0xFF;
-                    waves[29] = (BPS >>  8) & 0xFF;
-                    waves[30] = (BPS >> 16) & 0xFF;
-                    waves[31] = (BPS >> 24) & 0xFF;
+                // fmt chunk -> Byte per Sample
+                wave += String.fromCharCode(QBIT, 0);
 
-                    // fmt chunk -> Block size
-                    waves[32] = CHANNEL * (QBIT / 8);
-                    waves[33] = 0;
+                // data chunk
+                wave += 'data';
+                wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
 
-                    // fmt chunk -> Byte per Sample
-                    waves[34] = QBIT;
-                    waves[35] = 0;
-
-                    // data chunk
-                    waves[36] = 0x64;  // 'd'
-                    waves[37] = 0x61;  // 'a'
-                    waves[38] = 0x74;  // 't
-                    waves[39] = 0x61;  // 'a'
-
-                    waves[40] = (DATA_SIZE >>  0) & 0xFF;
-                    waves[41] = (DATA_SIZE >>  8) & 0xFF;
-                    waves[42] = (DATA_SIZE >> 16) & 0xFF;
-                    waves[43] = (DATA_SIZE >> 24) & 0xFF;
-
-                    for (var i = 0; i < SIZE; i++) {
-                        switch (QBIT) {
-                            case  8 :
-                                waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
-                                break;
-                            case 16 :
-                                // The byte order in WAVE file is little endian
-                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
-                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
-                                break;
-                            default :
-                                break;
-                        }
+                for (var i = 0; i < SIZE; i++) {
+                    switch (QBIT) {
+                        case  8 :
+                            wave += String.fromCharCode(sounds[i]);
+                            break;
+                        case 16 :
+                            // The byte order in WAVE file is little endian
+                            wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
+                            break;
+                        default :
+                            break;
                     }
+                }
 
-                    global.URL = global.URL || global.webkitURL;
+                var base64  = global.btoa(wave);
+                var dataURL = 'data:audio/wav;base64,' + base64;
 
-                    var blob      = new Blob([new Uint8Array(waves)], {type : 'audio/wav'});
-                    var objectURL = global.URL.createObjectURL(blob);
-
-                    return objectURL;
+                return dataURL;
             }
         };
 
@@ -3743,7 +3877,7 @@
             return '[SoundModule Recorder]';
         };
 
-        /** 
+        /**
          * This private class defines properties for sound session on network.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -3769,7 +3903,7 @@
             this.paused    = true;  // for preventing from  the duplicate onaudioprocess event ("start" method)
         }
 
-        /** 
+        /**
          * This method creates the instance of WebSocket and registers event handlers.
          * @param {boolean} tls This argument is in order to select protocol either 'wss' or 'ws'.
          * @param {string} host This argument is server's host name.
@@ -3916,7 +4050,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method sends created sound data to server.
          * @return {Session} This is returned for method chain.
          */
@@ -3949,7 +4083,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method closes connection to server and destroys the instance of WebSocket.
          * @return {Session} This is returned for method chain.
          */
@@ -3967,7 +4101,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method determines whether there is the connection to server.
          * @return {boolean} If the connection to server exists, this value is true. Otherwise, this value is false.
          */
@@ -4024,7 +4158,7 @@
             return '[SoundModule Session]';
         };
 
-        /** 
+        /**
          * This private class defines common properties for effector classes.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -4060,7 +4194,7 @@
             this.isStop = true;
         }
 
-        /** 
+        /**
          * This abstract method gets or sets parameter.
          * @param {string|object} key This argument is in order to select property in the case of string type.
          *     This argument is in order to select property and value in the case of object.
@@ -4079,7 +4213,7 @@
         Effector.prototype.connect = function() {
         };
 
-        /** 
+        /**
          * This method starts LFO. Namely, this method starts Effector.
          * @param {number} startTime This argument is in order to schedule parameter.
          * @return {Effector} This is returned for method chain.
@@ -4099,7 +4233,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method stops LFO, and prepares {OscillatorNode} again in the case of "false".
          * @param {number} stopTime This argument is in order to schedule parameter.
          * @param {number} releaseTime This argument is in order to schedule parameter when it is necessary to consider release time.
@@ -4188,7 +4322,7 @@
             return '[SoundModule Effector]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -4226,9 +4360,9 @@
                     if (value === undefined) {
                         return this.compressor[k].value;  // Getter
                     } else {
-                        var v   = parseFloat(value);
+                        var v = parseFloat(value);
 
-                        var mins = {
+                        var minValues = {
                             threshold : -100,
                             knee      : 0,
                             ratio     : 1,
@@ -4236,7 +4370,7 @@
                             release   : 0
                         };
 
-                        var maxs = {
+                        var maxValues = {
                             threshold : 0,
                             knee      : 40,
                             ratio     : 20,
@@ -4244,8 +4378,8 @@
                             release   : 1
                         };
 
-                        var min = this.compressor[k].minValue || mins[k];
-                        var max = this.compressor[k].maxValue || maxs[k];
+                        var min = this.compressor[k].minValue || minValues[k];
+                        var max = this.compressor[k].maxValue || maxValues[k];
 
                         if ((v >= min) && (v <= max)) {
                             this.compressor[k].value = v;  // Setter
@@ -4301,7 +4435,7 @@
             return '[SoundModule Compressor]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -4318,7 +4452,7 @@
             this.tone       = context.createBiquadFilter();
 
             // Distortion type
-            this.type = 'clean';
+            this.type = Distortion.CURVES.CLEAN;
 
             // for creating curve
             this.numberOfSamples = 4096;
@@ -4339,10 +4473,20 @@
         }
 
         /**
-         * This static method creates the instance of Float32Array for distortion
-         * @param {number} amount This argument is depth of distortion
-         * @param {number} numberOfSamples This argument is the size of Float32Array
-         * @return {Float32Array|null} This is "curve" property in WaveShaperNode
+         * Class (Static) properties
+         */
+        Distortion.CURVES            = {};
+        Distortion.CURVES.CLEAN      = 'clean';
+        Distortion.CURVES.CRUNCH     = 'crunch';
+        Distortion.CURVES.OVERDRIVE  = 'overdrive';
+        Distortion.CURVES.DISTORTION = 'distortion';
+        Distortion.CURVES.FUZZ       = 'fuzz';
+
+        /**
+         * This static method creates the instance of Float32Array for distortion.
+         * @param {number} amount This argument is depth of distortion.
+         * @param {number} numberOfSamples This argument is the size of Float32Array.
+         * @return {Float32Array|null} This is "curve" property in WaveShaperNode.
          */
         Distortion.createCurve = function(amount, numberOfSamples) {
             if ((amount > 0) && (amount < 1)) {
@@ -4390,24 +4534,24 @@
                             var curve = null;
 
                             switch (String(value).toLowerCase()) {
-                                case 'clean' :
-                                    this.type = 'clean';
+                                case Distortion.CURVES.CLEAN :
+                                    this.type = Distortion.CURVES.CLEAN;
                                     curve = Distortion.createCurve(AMOUNTS.CLEAN, this.numberOfSamples);
                                     break;
-                                case 'crunch' :
-                                    this.type = 'crunch';
+                                case Distortion.CURVES.CRUNCH :
+                                    this.type = Distortion.CURVES.CRUNCH;
                                     curve = Distortion.createCurve(AMOUNTS.CRUNCH, this.numberOfSamples);
                                     break;
-                                case 'overdrive' :
-                                    this.type = 'overdrive';
+                                case Distortion.CURVES.OVERDRIVE :
+                                    this.type = Distortion.CURVES.OVERDRIVE;
                                     curve = Distortion.createCurve(AMOUNTS.OVERDRIVE, this.numberOfSamples);
                                     break;
-                                case 'distortion' :
-                                    this.type = 'distortion';
+                                case Distortion.CURVES.DISTORTION :
+                                    this.type = Distortion.CURVES.DISTORTION;
                                     curve = Distortion.createCurve(AMOUNTS.DISTORTION, this.numberOfSamples);
                                     break;
-                                case 'fuzz' :
-                                    this.type = 'fuzz';
+                                case Distortion.CURVES.FUZZ :
+                                    this.type = Distortion.CURVES.FUZZ;
                                     curve = Distortion.createCurve(AMOUNTS.FUZZ, this.numberOfSamples);
                                     break;
                                 default :
@@ -4523,7 +4667,7 @@
             return '[SoundModule Distortion]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -4685,7 +4829,7 @@
 
         /** @override */
         Wah.prototype.toJSON = function() {
-            return JSON.strignify(this.params());
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -4693,7 +4837,7 @@
             return '[SoundModule Wah]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -4814,7 +4958,7 @@
 
         /** @override */
         Equalizer.prototype.toJSON = function() {
-            return JSON.stringify(params);
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -4822,7 +4966,7 @@
             return '[SoundModule Equalizer]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5088,7 +5232,7 @@
             return '[SoundModule Filter]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5099,15 +5243,10 @@
             // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
-            this.amplitudeL = context.createGain();
-            this.amplitudeR = context.createGain();
-            this.splitter   = context.createChannelSplitter(2);
-            this.merger     = context.createChannelMerger(2);
-
-            this.amplitudeL.gain.value = 1;  // 1 +- depth
-            this.amplitudeR.gain.value = 1;  // 1 +- depth
+            this.panner = context.createStereoPanner();
 
             // Initialize parameters
+            this.panner.pan.value = 0;
             this.depth.gain.value = 0;
             this.rate.value       = 0;
 
@@ -5115,13 +5254,9 @@
             this.state(false);
 
             // LFO
-            // OscillatorNode (LFO) -> GainNode (depth) -> ScriptProcessorNode -> ChannelSplitterNode -> AudioParam (GainNode.gain) (L) / (R)
-            this.lfoSplitter = context.createChannelSplitter(2);
+            // OscillatorNode (LFO) -> GainNode (depth) -> AudioParam (StereoPannerNode.gain)
             this.lfo.connect(this.depth);
-            this.depth.connect(this.processor);
-            this.processor.connect(this.lfoSplitter);
-            this.lfoSplitter.connect(this.amplitudeL.gain, 0);
-            this.lfoSplitter.connect(this.amplitudeR.gain, 1);
+            this.depth.connect(this.panner.pan);
         };
 
         /** @override */
@@ -5175,6 +5310,145 @@
         Autopanner.prototype.connect = function() {
             // Clear connection
             this.input.disconnect(0);
+            this.panner.disconnect(0);
+
+            if (this.isActive) {
+                // Effect ON
+
+                // GainNode (input) -> StereoPannerNode -> GainNode (output)
+                this.input.connect(this.panner);
+                this.panner.connect(this.output);
+            } else {
+                // Effect OFF
+
+                // GainNode (input) -> GainNode (output)
+                this.input.connect(this.output);
+            }
+        };
+
+        /** @override */
+        Autopanner.prototype.stop = function(stopTime, releaseTime) {
+            // Call superclass method
+            Effector.prototype.stop.call(this, stopTime, releaseTime);
+
+            // Effector's state is active ?
+            if (this.isActive) {
+                // Connect nodes again
+                this.lfo.connect(this.depth);
+                this.depth.connect(this.panner.pan);
+            }
+
+            return this;
+        };
+
+        /** @override */
+        Autopanner.prototype.params = function() {
+            var params = {
+                state : this.isActive,
+                depth : this.depth.gain.value,
+                rate  : this.rate.value
+            };
+
+            return params;
+        };
+
+        /** @override */
+        Autopanner.prototype.toJSON = function() {
+            return JSON.stringify(this.params());
+        };
+
+        /** @override */
+        Autopanner.prototype.toString = function() {
+            return '[SoundModule Autopanner]';
+        };
+
+        /**
+         * Subclass
+         * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
+         * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
+         * @constructor
+         * @extends {Effector}
+         */
+        function AutopannerFallback(context, bufferSize) {
+            // Call superclass constructor
+            Effector.call(this, context, bufferSize);
+
+            this.amplitudeL = context.createGain();
+            this.amplitudeR = context.createGain();
+            this.splitter   = context.createChannelSplitter(2);
+            this.merger     = context.createChannelMerger(2);
+
+            this.amplitudeL.gain.value = 1;  // 1 +- depth
+            this.amplitudeR.gain.value = 1;  // 1 +- depth
+
+            // Initialize parameters
+            this.depth.gain.value = 0;
+            this.rate.value       = 0;
+
+            // AutopannerFallback is not connected by default
+            this.state(false);
+
+            // LFO
+            // OscillatorNode (LFO) -> GainNode (depth) -> ScriptProcessorNode -> ChannelSplitterNode -> AudioParam (GainNode.gain) (L) / (R)
+            this.lfoSplitter = context.createChannelSplitter(2);
+            this.lfo.connect(this.depth);
+            this.depth.connect(this.processor);
+            this.processor.connect(this.lfoSplitter);
+            this.lfoSplitter.connect(this.amplitudeL.gain, 0);
+            this.lfoSplitter.connect(this.amplitudeR.gain, 1);
+        };
+
+        /** @override */
+        AutopannerFallback.prototype.param = function(key, value) {
+            if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
+                // Associative array
+                for (var k in arguments[0]) {
+                    this.param(k, arguments[0][k]);
+                }
+            } else {
+                var k = String(key).replace(/-/g, '').toLowerCase();
+
+                switch (k) {
+                    case 'depth' :
+                        if (value === undefined) {
+                           return this.depth.gain.value;  // Getter
+                        } else {
+                            var v   = parseFloat(value);
+                            var min = this.depth.gain.minValue || 0;
+                            var max = this.depth.gain.maxValue || 1;
+
+                            if ((v >= min) && (v <= max)) {
+                                this.depth.gain.value = v;  // Setter
+                            }
+                        }
+
+                        break;
+                    case 'rate' :
+                        if (value === undefined) {
+                           return this.rate.value;  // Getter
+                        } else {
+                            var v   = parseFloat(value);
+                            var min = this.rate.minValue || 0;
+                            var max = this.rate.maxValue || 100000;
+
+                            if ((v >= min) && (v <= max)) {
+                                this.rate.value = v;  // Setter
+                            }
+                        }
+
+                        break;
+                    default :
+                        break;
+                }
+            }
+
+            return this;
+        };
+
+        /** @override */
+        AutopannerFallback.prototype.connect = function() {
+            // Clear connection
+            this.input.disconnect(0);
             this.amplitudeL.disconnect(0);
             this.amplitudeR.disconnect(0);
             this.splitter.disconnect(0);
@@ -5196,7 +5470,7 @@
         };
 
         /** @override */
-        Autopanner.prototype.start = function(startTime) {
+        AutopannerFallback.prototype.start = function(startTime) {
             if (this.isActive && this.isStop) {
                 var s = parseFloat(startTime);
 
@@ -5232,7 +5506,7 @@
         };
 
         /** @override */
-        Autopanner.prototype.stop = function(stopTime, releaseTime) {
+        AutopannerFallback.prototype.stop = function(stopTime, releaseTime) {
             // Call superclass method
             Effector.prototype.stop.call(this, stopTime, releaseTime);
 
@@ -5254,7 +5528,7 @@
         };
 
         /** @override */
-        Autopanner.prototype.params = function() {
+        AutopannerFallback.prototype.params = function() {
             var params = {
                 state : this.isActive,
                 depth : this.depth.gain.value,
@@ -5265,16 +5539,16 @@
         };
 
         /** @override */
-        Autopanner.prototype.toJSON = function() {
+        AutopannerFallback.prototype.toJSON = function() {
             return JSON.stringify(this.params());
         };
 
         /** @override */
-        Autopanner.prototype.toString = function() {
-            return '[SoundModule Autopanner]';
+        AutopannerFallback.prototype.toString = function() {
+            return '[SoundModule AutopannerFallback]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5418,7 +5692,7 @@
 
         /** @override */
         Tremolo.prototype.toJSON = function() {
-            return JSON.stringify(this.param());
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -5426,7 +5700,7 @@
             return '[SoundModule Tremolo]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5557,7 +5831,7 @@
             return '[SoundModule Ringmodulator]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5568,11 +5842,10 @@
             // Call superclass constructor
             Effector.call(this, context, bufferSize);
 
-            this.MAXIMUM_STAGES = 24;  // The maximum number of All-Pass Filters
             this.numberOfStages = 12;  // The default number of All-Pass Filters
-            this.filters        = new Array(this.MAXIMUM_STAGES);
+            this.filters        = new Array(Phaser.MAXIMUM_STAGES);
 
-            for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+            for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                 this.filters[i]                 = context.createBiquadFilter();
                 this.filters[i].type            = (Object.prototype.toString.call(this.filters[i].type) === '[object String]') ? 'allpass' : (this.filters[i].ALLPASS || 7);
                 this.filters[i].frequency.value = 350;
@@ -5597,10 +5870,15 @@
             // GainNode (LFO) -> GainNode (depth) -> AudioParam (BiquadFilterNode.frequency)
             this.lfo.connect(this.depth);
 
-            for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+            for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                 this.depth.connect(this.filters[i].frequency);
             }
         }
+
+        /**
+         * Class (Static) property
+         */
+        Phaser.MAXIMUM_STAGES = 24;  // The maximum number of All-Pass Filters
 
         /** @override */
         Phaser.prototype.param = function(key, value) {
@@ -5617,13 +5895,20 @@
                         if (value === undefined) {
                             return this.numberOfStages;  // Getter
                         } else {
-                            var v   = parseInt(value);
-                            var min = 0;
-                            var max = this.MAXIMUM_STAGES;
+                            var v = parseInt(value);
 
-                            if ((v >= min) && (v <= max)) {
-                                this.numberOfStages = v;
-                                this.connect();
+                            switch (v) {
+                                case  0 :
+                                case  2 :
+                                case  4 :
+                                case  8 :
+                                case 12 :
+                                case 24 :
+                                    this.numberOfStages = v;
+                                    this.connect();
+                                    break;
+                                default :
+                                    break;
                             }
                         }
 
@@ -5639,7 +5924,7 @@
 
                             if ((v >= min) && (v <= max)) {
                                 // Setter
-                                for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+                                for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                                     this.filters[i].frequency.value = v;
                                 }
 
@@ -5657,7 +5942,7 @@
                             var max = this.filters[0].Q.maxValue || 1000;
 
                             if ((v >= min) && (v <= max)) {
-                                for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+                                for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                                     this.filters[0].Q.value = v;  // Setter
                                 }
                             }
@@ -5670,7 +5955,7 @@
                         } else {
                             var v   = parseFloat(value);
                             var min = 0;
-                            var max = this.filters[0].frequency.value;
+                            var max = 1;
 
                             if ((v >= min) && (v <= max)) {
                                 // Setter
@@ -5722,7 +6007,7 @@
             // Clear connection
             this.input.disconnect(0);
 
-            for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+            for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                 this.filters[i].disconnect(0);
             }
 
@@ -5763,7 +6048,7 @@
                // Connect nodes again
                this.lfo.connect(this.depth);
 
-               for (var i = 0; i < this.MAXIMUM_STAGES; i++) {
+               for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                    this.depth.connect(this.filters[i].frequency);
                }
             }
@@ -5797,7 +6082,7 @@
             return '[SoundModule Phaser]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -5997,7 +6282,7 @@
             return '[SoundModule Flanger]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -6196,7 +6481,7 @@
             return '[SoundModule Chorus]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -6227,8 +6512,10 @@
             this.state(false);
         };
 
-        // Max delay time is 5000 [ms]
-        Delay.MAX_DELAY_TIME = 5;
+        /**
+         * Class (Static) property
+         */
+        Delay.MAX_DELAY_TIME = 5;  // Max delay time is 5000 [ms]
 
         /** @override */
         Delay.prototype.param = function(key, value) {
@@ -6353,7 +6640,7 @@
             return '[SoundModule Delay]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number|AudioBuffer} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -6488,7 +6775,7 @@
             }
         };
 
-        /** 
+        /**
          * This method sets instance of AudioBuffer to ConvolverNode.
          * @param {AudioBuffer|ArrayBuffer} impulse This argument is in order to convolve impulse response.
          *     This argument is the instance of AudioBuffer or ArrayBuffer for impulse response.
@@ -6519,8 +6806,8 @@
             return this;
         };
 
-        /** 
-         * This method creates the instances of AudioBuffer by Ajax for Revreb presets
+        /**
+         * This method creates the instances of AudioBuffer by Ajax for Revreb presets.
          * @param {Array.<string>|Array.<AudioBuffer>} rirs This argument is either URLs or the instances of AudioBuffer for Impulse Response.
          * @param {number} timeout This argument is timeout of Ajax. The default value is 60000 msec (1 minutes).
          * @param {function} successCallback This argument is executed when the creating AudioBuffers was completed.
@@ -6689,7 +6976,7 @@
             return '[SoundModule Reverb]';
         };
 
-        /** 
+        /**
          * Subclass
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
@@ -6926,14 +7213,14 @@
                 positions      : this.positions,
                 orientations   : this.orientations,
                 velocities     : this.velocities,
-                refdistance    : this.panner.refDistance,
-                maxdistance    : this.panner.maxDistance,
-                rollofffactor  : this.panner.rolloffFactor,
-                coneinnerangle : this.panner.coneInnerAngle,
-                coneouterangle : this.panner.coneOuterAngle,
-                coneoutergain  : this.panner.coneOuterGain,
-                panningmodel   : this.panner.panningModel,
-                distancemodel  : this.panner.distanceModel
+                refDistance    : this.panner.refDistance,
+                maxDistance    : this.panner.maxDistance,
+                rolloffFactor  : this.panner.rolloffFactor,
+                coneInnerAngle : this.panner.coneInnerAngle,
+                coneOuterAngle : this.panner.coneOuterAngle,
+                coneOuterGain  : this.panner.coneOuterGain,
+                panningModel   : this.panner.panningModel,
+                distanceModel  : this.panner.distanceModel
             };
 
             return params;
@@ -6949,7 +7236,7 @@
             return '[SoundModule Panner]';
         };
 
-        /** 
+        /**
          * This private class defines properties for Envelope Generator.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @constructor
@@ -6970,8 +7257,8 @@
             this.release = 1.0;
         }
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -7010,7 +7297,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method determines whether the all of gain schedulings have ended.
          * @return {boolean} If the all of gain schedulings have ended, this value is true. Otherwise, this value is false.
          */
@@ -7038,7 +7325,7 @@
             }
         };
 
-        /** 
+        /**
          * This method connects the instance of AudioNode.
          * @param {number} index This argument is in order to select the instance of GainNode that is Envelope Generator.
          * @param {AudioNode} input This argument is the instance of AudioNode as input.
@@ -7057,7 +7344,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method changes gain (Attack -> Decay -> Sustain).
          * @param {number} startTime This argument is the start time of Attack.
          * @return {EnvelopeGenerator} This is returned for method chain.
@@ -7096,7 +7383,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method changes gain (Attack or Decay or Sustain -> Release).
          * @param {number} stopTime This argument is the start time of Release.
          * @return {EnvelopeGenerator} This is returned for method chain.
@@ -7130,7 +7417,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method gets the instance of GainNode for Envelope Generator.
          * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
          * @return {GainNode} This is returned as the instance of GainNode for Envelope Generator.
@@ -7141,7 +7428,7 @@
             return this.generators[i];
         };
 
-        /** 
+        /**
          * This method sets the instance of GainNode for Envelope Generator.
          * @param {number} index This argument is index of array that has the instance of GainNode for Envelope Generator.
          * @return {EnvelopeGenerator} This is returned for method chain.
@@ -7157,7 +7444,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method clears variables for managing the instance of GainNode.
          * @return {EnvelopeGenerator} This is returned for method chain.
          */
@@ -7188,7 +7475,7 @@
          * @return {string}
          */
         EnvelopeGenerator.prototype.toJSON = function() {
-            return JSON.strignify(this.params());
+            return JSON.stringify(this.params());
         };
 
         /** @override */
@@ -7204,7 +7491,7 @@
         this.session  = new Session(context, this.BUFFER_SIZE, this.NUM_INPUT, this.NUM_OUTPUT, this.analyser);
 
         // for OscillatorModule, OneshotModule
-        this.eg = new EnvelopeGenerator(context);
+        this.envelopegenerator = new EnvelopeGenerator(context);
 
         // Create the instances of Effector's subclass
         this.compressor    = new Compressor(context, this.BUFFER_SIZE);
@@ -7214,7 +7501,7 @@
         this.filter        = new Filter(context, this.BUFFER_SIZE);
         this.tremolo       = new Tremolo(context, this.BUFFER_SIZE);
         this.ringmodulator = new Ringmodulator(context, this.BUFFER_SIZE);
-        this.autopanner    = new Autopanner(context, this.BUFFER_SIZE);
+        this.autopanner    = context.createStereoPanner ? new Autopanner(context, this.BUFFER_SIZE) : new AutopannerFallback(context, this.BUFFER_SIZE);
         this.phaser        = new Phaser(context, this.BUFFER_SIZE);
         this.flanger       = new Flanger(context, this.BUFFER_SIZE);
         this.chorus        = new Chorus(context, this.BUFFER_SIZE);
@@ -7245,8 +7532,8 @@
     SoundModule.prototype.setup = function() {
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string} key This argument is property name.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
      * @return {number} This is returned as the value of designated property in the case of getter. Otherwise, this is returned for method chain.
@@ -7257,14 +7544,14 @@
         switch (k) {
             case 'mastervolume' :
                 if (value === undefined) {
-                    return this.masterVolume.gain.value;  // Getter
+                    return this.mastervolume.gain.value;  // Getter
                 } else {
                     var v   = parseFloat(value);
-                    var min = this.masterVolume.gain.minValue || 0;
-                    var max = this.masterVolume.gain.maxValue || 1;
+                    var min = this.mastervolume.gain.minValue || 0;
+                    var max = this.mastervolume.gain.maxValue || 1;
 
                     if ((v >= min) && (v <= max)) {
-                        this.masterVolume.gain.value = v;  // Setter
+                        this.mastervolume.gain.value = v;  // Setter
                     }
                 }
 
@@ -7290,7 +7577,7 @@
     SoundModule.prototype.get = function() {
     };
 
-    /** 
+    /**
      * This method changes buffer size for ScriptProcessorNode and executes constructor again.
      * @param {number} bufferSize This argument is buffer size for ScriptProcessorNode.
      *     This value is one of 256, 512, 1024, 2048, 4096, 8192, 16384.
@@ -7301,7 +7588,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method connects nodes that are defined by this library and Web Audio API.
      * @param {AudioNode} source This argument is AudioNode for input of sound.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -7314,13 +7601,13 @@
         }
 
         // Start connection
-        // source -> node -> ... -> node -> GainNode (masterVolume) -> AnalyserNode (analyser) -> AudioDestinationNode (output)
+        // source -> node -> ... -> node -> GainNode (Master Volume) -> AnalyserNode (analyser) -> AudioDestinationNode (output)
         source.disconnect(0);  // Clear connection
 
         if (this.modules.length > 0) {
             source.connect(this.modules[0].input);
         } else {
-            source.connect(this.masterVolume);
+            source.connect(this.mastervolume);
         }
 
         for (var i = 0, len = this.modules.length; i < len; i++) {
@@ -7331,25 +7618,25 @@
                 // Connect to next node
                 this.modules[i].output.connect(this.modules[i + 1].input);
             } else {
-                this.modules[i].output.connect(this.masterVolume);
+                this.modules[i].output.connect(this.mastervolume);
             }
         }
 
-        this.masterVolume.connect(this.analyser.input);
+        this.mastervolume.connect(this.analyser.input);
         this.analyser.output.connect(this.context.destination);
 
         // for recording
-        this.masterVolume.connect(this.recorder.processor);
+        this.mastervolume.connect(this.recorder.processor);
         this.recorder.processor.connect(this.context.destination);
 
         // for session
-        this.masterVolume.connect(this.session.sender);
+        this.mastervolume.connect(this.session.sender);
         this.session.sender.connect(this.context.destination);
 
         return this;
     };
 
-    /** 
+    /**
      * This method gets the instance of module that is defined by this library. This method enables to access the instance of module by unified call.
      * @param {string} module This argument is module's name.
      * @return {Listener|Analyser|Recorder|Session|Effector|EnvelopeGenerator|Glide|VocalCanceler} This value is the instance of module.
@@ -7377,12 +7664,10 @@
             case 'reverb'        :
             case 'panner'        :
                 return this[m];
-            case 'eg' :
-                if (m in this) {
-                    return this[m];  // OscillatorModule, OneshotModule
-                }
-
-                // No break;
+            case 'envelopegenerator' :
+            case 'eg'                :
+                // OscillatorModule, OneshotModule
+                return this.envelopegenerator;
             case 'glide' :
                 if (m in this) {
                     return this[m];  // OscillatorModule
@@ -7471,7 +7756,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method extends the assigned class for Effector, and creates the instance of CustomizedEffector.
      * @param {string} effector This argument is in order to select the instance of CustomizedEffector.
      * @param {CustomizedEffector} CustomizedEffector This argument is the subclass of Effector.
@@ -7523,7 +7808,7 @@
         return '[SoundModule]';
     };
 
-    /** 
+    /**
      * This subclass defines properties for creating sound.
      * Actually, properties for creating sound is defined in private class (Oscillator).
      * Therefore, This class manages these private classes for creating sound.
@@ -7547,10 +7832,7 @@
         // This flag determines whether drawing sound wave is executing
         this.isAnalyser = false;
 
-        // Create the instances of private class
-        this.glide = new Glide(context);
-
-        /** 
+        /**
          * This private class defines properties for Glide.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @constructor
@@ -7563,13 +7845,19 @@
                 end   : 0
             };
 
-            this.rate = 0;
             this.time = 0;         // Glide time
             this.type = 'linear';  // 'linear' or 'exponential'
         };
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * Class (Static) properties
+         */
+        Glide.TYPES             = {};
+        Glide.TYPES.LINEAR      = 'linear';
+        Glide.TYPES.EXPONENTIAL = 'exponential';
+
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -7601,10 +7889,10 @@
                         if (value === undefined) {
                             return this.type;  // Getter
                         } else {
-                            var v = String(value).toLowerCase();
+                            var v = String(value).toUpperCase();
 
-                            if ((v === 'linear') || (v === 'exponential')) {
-                                this.type = v;  // Setter
+                            if (v in Glide.TYPES) {
+                                this.type = v.toLowerCase();  // Setter
                             }
                         }
 
@@ -7617,7 +7905,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method sets frequencies for Glide.
          * @param {number} frequency This argument is the frequency at which glide ends.
          * @return {Glide} This is returned for method chain.
@@ -7630,15 +7918,12 @@
             if ((this.frequencies.start === -1) || (this.time === 0) || (diff === 0)) {
                 // The 1st sound or Glide OFF or The same sound
                 this.frequencies.start = this.frequencies.end;
-            } else {
-                // Since the 2nd sound
-                this.rate = diff / this.time;
             }
 
             return this;
         };
 
-        /** 
+        /**
          * This method starts Glide.
          * @param {OscillatorNode} oscillator This argument is the instance of OscillatorNode.
          * @param {number} startTime This argument is the start time of Glide.
@@ -7662,7 +7947,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method stops Glide. Moreover, This method prepares for next Glide.
          * @return {Glide} This is returned for method chain.
          */
@@ -7676,24 +7961,23 @@
         Glide.prototype.toString = function() {
             return '[OscillatorModule Glide]';
         };
+
+        // Create the instances of private class
+        this.glide = new Glide(context);
     }
 
     /** @extends {SoundModule} */
     OscillatorModule.prototype = Object.create(SoundModule.prototype);
     OscillatorModule.prototype.constructor = OscillatorModule;
 
-    /** 
+    /**
      * This method creates the instances of Oscillator.
      * @param {Array.<boolean>|boolean} states This argument is initial state in the instance of Oscillator.
      * @return {OscillatorModule} This is returned for method chain.
      * @override
      */
     OscillatorModule.prototype.setup = function(states) {
-        /** @implements {Statable} */
-        Oscillator.prototype = Object.create(Statable.prototype);
-        Oscillator.prototype.constructor = Oscillator;
-
-        /** 
+        /**
          * This private class defines properties for the instance of OscillatorNode.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
          * @param {boolean} state This argument is initial state.
@@ -7730,8 +8014,12 @@
             };
         };
 
-        /** 
-         * This method is getter or setter for parameters
+        /** @implements {Statable} */
+        Oscillator.prototype = Object.create(Statable.prototype);
+        Oscillator.prototype.constructor = Oscillator;
+
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number|string} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -7810,12 +8098,14 @@
                         if (value === undefined) {
                             return this.octave;  // Getter
                         } else {
-                            var v   = this.octave = parseFloat(value);
+                            var v   = parseFloat(value);
                             var min = (this.source.detune.minValue || -4800) / OCTAVE;
                             var max = (this.source.detune.maxValue ||  4800) / OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = this.fine + (v * OCTAVE);  // Setter
+                                // Setter
+                                this.octave = v;
+                                this.source.detune.value = this.fine + (v * OCTAVE);
                             }
                         }
 
@@ -7829,7 +8119,9 @@
                             var max =  OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = v + (this.octave * OCTAVE);  // Setter
+                                // Setter
+                                this.fine = v;
+                                this.source.detune.value = v + (this.octave * OCTAVE);
                             }
                         }
 
@@ -7857,7 +8149,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method connects nodes.
          * @param {AudioNode} output This argument is the instance of AudioNode as output.
          * @return {Oscillator} This is returned for method chain.
@@ -7905,7 +8197,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method starts sound.
          * @param {number} startTime This argument is the start time.
          * @return {Oscillator} This is returned for method chain.
@@ -7926,7 +8218,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method stops sound.
          * @param {number} stopTime This argument is the stop time.
          * @return {Oscillator} This is returned for method chain.
@@ -7969,6 +8261,9 @@
             return '[OscillatorModule Oscillator]';
         };
 
+        // Clear
+        this.sources.length = 0;
+
         if (!Array.isArray(states)) {
             states = [states];
         }
@@ -7976,14 +8271,14 @@
         // Create the instances of private class and the instances of GainNode for Envelope Generator
         for (var i = 0, len = states.length ; i < len; i++) {
             this.sources[i] = new Oscillator(this.context, Boolean(states[i]));
-            this.eg.setGenerator(i);
+            this.envelopegenerator.setGenerator(i);
         }
 
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8006,7 +8301,7 @@
         return (r === undefined) ? this : r;
     };
 
-    /** 
+    /**
      * This method schedules the start and stop time.
      * @param {number} startTime This argument is the start time. The default value is 0.
      * @param {number} stopTime This argument is the stop time. The default value is 0.
@@ -8023,7 +8318,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts some sounds that are active at the same.
      * @param {Array.<number>}|number} frequencies This argument each oscillator frequency. The default value is 0 Hz.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -8045,7 +8340,7 @@
         }
 
         // Clear previous
-        this.eg.clear();
+        this.envelopegenerator.clear();
         this.processor.disconnect(0);
         this.processor.onaudioprocess = null;  // for Firefox
 
@@ -8064,7 +8359,7 @@
             oscillator.ready(this.processor);
 
             // OscillatorNode (input) -> EnvelopeGenerator -> GainNode (volume) (-> ...)
-            this.eg.ready(i, oscillator.source, oscillator.volume);
+            this.envelopegenerator.ready(i, oscillator.source, oscillator.volume);
 
             // Ready Glide -> Start Glide
             this.glide.ready(frequency).start(oscillator.source, startTime);
@@ -8073,7 +8368,7 @@
         }
 
         // Attack -> Decay -> Sustain
-        this.eg.start(startTime);
+        this.envelopegenerator.start(startTime);
 
         // Start Effectors
         this.on(startTime);
@@ -8113,7 +8408,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops active sounds.
      * @param {function} processCallback This argument is in order to change "onaudioprocess" event handler in the instance of ScriptProcessorNode.
      * @return {OscillatorModule} This is returned for method chain.
@@ -8123,14 +8418,14 @@
         var stopTime = this.context.currentTime + this.times.stop;
 
         // Attack or Decay or Sustain -> Release
-        this.eg.stop(stopTime);
+        this.envelopegenerator.stop(stopTime);
 
         // Stop Effectors
         this.glide.stop();
         this.filter.stop(stopTime);
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.stop(stopTime, this.eg.release);
+            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.release);
         }
 
         var self = this;
@@ -8148,7 +8443,7 @@
                 outputRs.set(inputRs);
 
                 // Stop ?
-                if (self.eg.isStop()) {
+                if (self.envelopegenerator.isStop()) {
                     // Stop
                     var stopTime = self.context.currentTime;
 
@@ -8176,7 +8471,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the instance of OscillatorNode that is used in OscillatorModule.
      * @param {number} index This argument is required in the case of designating OscillatorNode.
      * @return {Array.<Oscillator>|Oscillator}
@@ -8192,7 +8487,7 @@
         }
     };
 
-    /** 
+    /**
      * This method returns the number of oscillators.
      * @return {number} This is returned as the number of oscillators.
      */
@@ -8207,8 +8502,8 @@
 
         params.oscillator = {
             glide : {
-                type : this.glide.type,
-                time : this.glide.time
+                type : this.glide.param('type'),
+                time : this.glide.param('time')
             }
         };
 
@@ -8216,11 +8511,11 @@
             var source = this.sources[i];
 
             params.oscillator['oscillator' + i] = {
-                state  : source.isActive,
-                gain   : source.volume.gain.value,
-                type   : source.source.type,
-                octave : source.octave,
-                fine   : source.fine
+                state  : source.state(),
+                gain   : source.param('gain'),
+                type   : source.param('type'),
+                octave : source.param('octave'),
+                fine   : source.param('fine')
             };
         }
 
@@ -8232,7 +8527,7 @@
         return '[OscillatorModule]';
     };
 
-    /** 
+    /**
      * This subclass defines properties for playing the one-shot audio.
      * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
      * @constructor
@@ -8269,7 +8564,14 @@
     OneshotModule.prototype = Object.create(SoundModule.prototype);
     OneshotModule.prototype.constructor = OneshotModule;
 
-    /** 
+    /**
+     * Class (Static) properties
+     */
+    OneshotModule.ERROR_AJAX         = 'error';
+    OneshotModule.ERROR_AJAX_TIMEOUT = 'timeout';
+    OneshotModule.ERROR_DECODE       = 'decode';
+
+    /**
      * This method creates the instances of AudioBuffer by Ajax.
      * @param {Array.<string>|Array.<AudioBuffer>} resources This argument is either URLs or the instances of AudioBuffer for audio resources.
      * @param {Array.<object>} settings This argument is the properties of each audio sources.
@@ -8326,15 +8628,10 @@
 
             this.isStops[i] = true;
             this.volumes[i] = this.context.createGain();
-            this.eg.setGenerator(i);
+            this.envelopegenerator.setGenerator(i);
         }
 
         this.settings = settings;
-
-        // for errorCallback
-        var ERROR_AJAX         = 'error';
-        var ERROR_AJAX_TIMEOUT = 'timeout';
-        var ERROR_DECODE       = 'decode';
 
         // If the error is at least 1, this method aborts the all of connections.
         // Therefore, this flag are shared with the all instances of XMLHttpRequest.
@@ -8353,7 +8650,7 @@
 
             xhr.ontimeout = function(error) {
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(error, ERROR_AJAX_TIMEOUT);
+                    errorCallback(error, OneshotModule.ERROR_AJAX_TIMEOUT);
                 }
 
                 isError = true;
@@ -8371,7 +8668,7 @@
             // Error
             xhr.onerror = function(event) {
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(event, ERROR_AJAX);
+                    errorCallback(event, OneshotModule.ERROR_AJAX);
                 }
 
                 isError = true;
@@ -8402,7 +8699,7 @@
 
                         var decodeErrorCallback = function(error) {
                             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                errorCallback(error, ERROR_DECODE);
+                                errorCallback(error, OneshotModule.ERROR_DECODE);
                             }
                         };
 
@@ -8433,8 +8730,8 @@
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8479,7 +8776,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method schedules the start and stop time.
      * @param {number} startTime This argument is the start time. The default value is 0.
      * @param {number} stopTime This argument is the stop time. The default value is 0.
@@ -8496,7 +8793,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts one-shot audio with the designated playback rate value and volume.
      * @param {number} index This argument is in order to select the instance of AudioBufferSourceNode.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -8505,9 +8802,9 @@
      * @override
      */
     OneshotModule.prototype.start = function(index, connects, processCallback) {
-        if ((index >= 0) && (index < this.settings.length)) {
-            var activeIndex = parseInt(index);
-        } else {
+        var activeIndex = parseInt(index);
+
+        if (isNaN(activeIndex) || (activeIndex < 0) || (activeIndex >= this.settings.length)) {
             return;
         }
 
@@ -8548,7 +8845,7 @@
         this.volumes[activeIndex].gain.value = volume;
 
         // AudioBufferSourceNode (input) -> EnvelopeGenerator -> GainNode -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
-        this.eg.ready(activeIndex, source, this.volumes[activeIndex]);
+        this.envelopegenerator.ready(activeIndex, source, this.volumes[activeIndex]);
         this.volumes[activeIndex].connect(this.processor);
         this.connect(this.processor, connects);
 
@@ -8559,7 +8856,7 @@
         this.sources[activeIndex] = source;
 
         // Attack -> Decay -> Sustain
-        this.eg.start(startTime);
+        this.envelopegenerator.start(startTime);
 
         // Start Effectors
         this.on(startTime);
@@ -8603,7 +8900,7 @@
                     // Stop Effectors
                     self.on(self.context.currentTime);
 
-                    self.eg.clear();
+                    self.envelopegenerator.clear();
 
                     // Stop drawing sound wave
                     self.analyser.stop('time');
@@ -8628,19 +8925,20 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops the designated one-shot audio.
      * @param {number} index This argument is in order to select the instance of AudioBufferSourceNode.
      * @return {OneshotModule} This is returned for method chain.
      * @override
      */
     OneshotModule.prototype.stop = function(index) {
-        if ((index >= 0) && (index < this.settings.length)) {
-            var activeIndex = parseInt(index);
-            var bufferIndex= this.settings[activeIndex].buffer;
-        } else {
+        var activeIndex = parseInt(index);
+
+        if (isNaN(activeIndex) || (activeIndex < 0) || (activeIndex >= this.settings.length)) {
             return;
         }
+
+        var bufferIndex= this.settings[activeIndex].buffer;
 
         if ((this.buffers[bufferIndex] === undefined) || (this.sources[activeIndex] === undefined)) {
             return;
@@ -8649,19 +8947,19 @@
         var stopTime = this.context.currentTime + this.times.stop;
 
         // Attack or Decay or Sustain -> Release
-        this.eg.stop(stopTime);
+        this.envelopegenerator.stop(stopTime);
 
         // Stop Effectors
         this.filter.stop(stopTime);
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.stop(stopTime, this.eg.release);
+            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.release);
         }
 
         return this;
     };
 
-    /** 
+    /**
      * This method gets the instance of AudioBuffer that is used in OneshotModule.
      * @param {number} index This argument is required in the case of designating AudioBuffer.
      * @return {Array.<AudioBuffer>|AudioBuffer}
@@ -8689,12 +8987,29 @@
         return params;
     };
 
+    /**
+     * This method resets settings.
+     * @param {number} index This argument is in order to select target setting.
+     * @param {string} key This argument is in order to select parameter.
+     * @param {number|boolean} value This argument is new value.
+     * @return {OneshotModule} This is returned for method chain.
+     */
+    OneshotModule.prototype.reset = function(index, key, value) {
+        var activeIndex = parseInt(index);
+
+        if (String(key).toLowerCase() in this.settings[activeIndex]) {
+            this.settings[activeIndex][key.toLowerCase()] = value;
+        }
+
+        return this;
+    };
+
     /** @override */
     OneshotModule.prototype.toString = function() {
         return '[OneshotModule]';
     };
 
-    /** 
+    /**
      * This class is subclass that extends SoundModule.
      * This class defines properties for playing the single audio.
      * Namely, this class creates audio player that has higher functions than HTML5 audio.
@@ -8724,10 +9039,7 @@
             error  : function() {}
         };
 
-        // Create the instance of private class
-        this.vocalcanceler = new VocalCanceler();
-
-        /** 
+        /**
          * Private class
          * @constructor
          */
@@ -8735,8 +9047,8 @@
             this.depth = 0;
         };
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8774,7 +9086,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method removes vocal part in the played audio.
          * @param {number} dataL This argument is gain level for Left channel.
          * @param {number} dataR This argument is gain level for Right channel.
@@ -8788,13 +9100,16 @@
         VocalCanceler.prototype.toString = function() {
             return '[AudioModule VocalCanceler]';
         };
+
+        // Create the instance of private class
+        this.vocalcanceler = new VocalCanceler();
     }
 
     /** @extends {SoundModule} */
     AudioModule.prototype = Object.create(SoundModule.prototype);
     AudioModule.prototype.constructor = AudioModule;
 
-    /** 
+    /**
      * This method sets callback functions.
      * @param {string|object} key This argument is property name.
      *     This argument is pair of property and value in the case of associative array.
@@ -8821,8 +9136,8 @@
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8910,7 +9225,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method creates the instance of AudioBuffer from ArrayBuffer.
      * @param {ArrayBuffer} arrayBuffer This argument is ArrayBuffer for audio.
      * @return {AudioModule} This is returned for method chain.
@@ -8921,8 +9236,8 @@
             var successCallback = function(buffer) {
                 this.buffer = buffer;  // Get the instance of AudioBuffer
 
-                this.analyser.start('time-all-L', buffer);  // Draw audio wave (entire of time domain)
-                this.analyser.start('time-all-R', buffer);  // Draw audio wave (entire of time domain)
+                this.analyser.start('time-overview-L', buffer);  // Draw audio wave (overview of time domain)
+                this.analyser.start('time-overview-R', buffer);  // Draw audio wave (overview of time domain)
 
                 this.callbacks.ready(buffer);
             };
@@ -8936,7 +9251,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts audio from the designated time.
      * @param {number} position This argument is the time that audio is started at. The default value is 0.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -9010,8 +9325,8 @@
                             }
                         }
 
-                        self.analyser.timeAllL.update(self.currentTime);
-                        self.analyser.timeAllR.update(self.currentTime);
+                        self.analyser.timeOverviewL.update(self.currentTime);
+                        self.analyser.timeOverviewR.update(self.currentTime);
                     } else {
                         if (self.source.loop) {
                             self.currentTime = 0;
@@ -9026,7 +9341,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops audio.
      * @return {AudioModule} This is returned for method chain.
      * @override
@@ -9056,7 +9371,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the instance of AudioBufferSourceNode that is used in AudioModule.
      * @return {AudioBufferSourceNode}
      * @override
@@ -9065,7 +9380,7 @@
         return this.source;
     };
 
-    /** 
+    /**
      * This method starts or stops audio according to audio state.
      * @param {number} position This argument is the time that audio is started at. The default value is 0.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -9082,7 +9397,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method rewinds audio.
      * @return {AudioModule} This is returned for method chain.
      */
@@ -9094,7 +9409,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method determines whether the instance of AudioBuffer exists.
      * @return {boolean} If the instance of AudioBuffer already exists, this value is true. Otherwise, this value is false.
      */
@@ -9102,7 +9417,7 @@
         return (this.buffer instanceof AudioBuffer) ? true : false;
     };
 
-    /** 
+    /**
      * This method determines whether the instance of AudioBufferSourceNode exists.
      * @return {boolean} If the instance of AudioBufferSourceNode already exists, this value is true. Otherwise, this value is false.
      */
@@ -9110,7 +9425,7 @@
         return ((this.source instanceof AudioBufferSourceNode) && (this.source.buffer instanceof AudioBuffer)) ? true : false;
     };
 
-    /** 
+    /**
      * This method determines whether the audio is paused.
      * @return {boolean} If the audio is paused, this value is true. Otherwise, this value is false.
      */
@@ -9126,7 +9441,7 @@
         params.audio = {
             playbackrate  : this.source.playbackRate.value,
             vocalcanceler : {
-                depth : this.vocalcanceler.depth
+                depth : this.vocalcanceler.param('depth')
             }
         };
 
@@ -9138,7 +9453,7 @@
         return '[AudioModule]';
     };
 
-    /** 
+    /**
      * This class is subclass that extends AudioModule.
      * This class defines properties for playing the single audio that is attached various effects from HTMLMediaElement .
      * Namely, this class creates audio player that has higher functions from HTMLMediaElement.
@@ -9173,43 +9488,49 @@
     MediaModule.prototype = Object.create(AudioModule.prototype);
     MediaModule.prototype.constructor = MediaModule;
 
-    /** 
+    /**
+     * Class (Static) properties
+     */
+    MediaModule.TYPES       = {};
+    MediaModule.TYPES.AUDIO = 'audio';
+    MediaModule.TYPES.VIDEO = 'video';
+
+    /**
      * This method gets HTMLMediaElement and selects media format. In addition, this method sets event handlers that are defined by HTMLMediaElement.
-     * @param {string} id This argument is id attribute of HTMLMediaElement.
-     *     If new HTMLMediaElement is created, either null or empty string must be designated to this method.
-     * @param {string} type This argument is either 'audio' or 'video'. The default value is 'audio'.
+     * @param {HTMLAudioElement|HTMLVideoElement} media This argument is either HTMLAudioElement or HTMLVideoElement.
      * @param {Array.<string>|string} formats This argument is usable media format. For example, 'wav', 'ogg', 'webm', 'mp4' ...etc.
      * @param {object} callbacks This argument is event handlers that are defined by HTMLMediaElement.
      * @return {MediaModule} This is returned for method chain.
      * @override
      */
-    MediaModule.prototype.setup = function(id, type, formats, callbacks) {
+    MediaModule.prototype.setup = function(media, formats, callbacks) {
         // The argument is associative array ?
         if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
             var properties = arguments[0];
 
-            if ('id'        in properties) {id        = properties.id;}
-            if ('type'      in properties) {type      = properties.type;}
+            if ('media'     in properties) {media     = properties.media;}
             if ('formats'   in properties) {formats   = properties.formats;}
             if ('callbacks' in properties) {callbacks = properties.callbacks;}
         }
 
-        var elementId = String(id);
-        var mediaType = (String(type).toLowerCase() !== 'video') ? 'audio' : 'video';
+        var type = '';
 
-        this.media = ((id !== null) && (elementId !== '')) ? document.getElementById(elementId) : document.createElement(mediaType);
-
-        if (!(this.media instanceof HTMLMediaElement)) {
-            this.media = null;
-            return;
+        if (media instanceof HTMLAudioElement) {
+            type = MediaModule.TYPES.AUDIO;
+        } else if (media instanceof HTMLVideoElement) {
+            type = MediaModule.TYPES.VIDEO;
+        } else {
+            return this;
         }
+
+        this.media = media;
 
         if (!Array.isArray(formats)) {
             formats = [formats];
         }
 
         for (var i = 0, len = formats.length; i < len; i++) {
-            var format = mediaType + '/' + String(formats[i]).toLowerCase();
+            var format = type + '/' + String(formats[i]).toLowerCase();
 
             if (/^(?:maybe|probably)/.test(this.media.canPlayType(format))) {
                 this.ext = formats[i];
@@ -9276,8 +9597,8 @@
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9384,7 +9705,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method prepares for playing the media anytime after loading the media resource.
      * @param {string} source This argument is path name or Data URL or Object URL for the media resource.
      * @return {MediaModule} This is returned for method chain.
@@ -9407,7 +9728,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method starts media from the designated time.
      * @param {number} position This argument is the time that media is started at. The default value is 0.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -9460,7 +9781,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops media. In addition, this method stops the all of effectors.
      * @return {MediaModule} This is returned for method chain.
      * @override
@@ -9484,7 +9805,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the HTMLMediaElement that is used in MediaModule.
      * @return {HTMLMediaElement}
      * @override
@@ -9493,7 +9814,7 @@
         return this.media;
     };
 
-    /** 
+    /**
      * This method starts or stops media according to media state.
      * @param {number} position This argument is time that media is started at.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -9513,7 +9834,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method determines whether the HTMLMediaElement exists.
      * @return {boolean} If the HTMLMediaElement already exists, this value is true. Otherwise, this value is false.
      */
@@ -9521,7 +9842,7 @@
         return (this.media instanceof HTMLMediaElement) ? true : false;
     };
 
-    /** 
+    /**
      * This method determines whether the instance of MediaElementAudioSourceNode exists.
      * @return {boolean} If the instance of MediaElementAudioSourceNode already exists, this value is true. Otherwise, this value is false.
      * @override
@@ -9530,57 +9851,13 @@
         return (this.source instanceof MediaElementAudioSourceNode) ? true : false;
     };
 
-    /** 
+    /**
      * This method determines whether the media is paused.
      * @return {boolean} If the media is paused, this value is true. Otherwise, this value is false.
      * @override
      */
     MediaModule.prototype.isPaused = function() {
         return (this.media instanceof HTMLMediaElement) ? this.media.paused : true;
-    };
-
-    /** 
-     * This method shows video in full screen.
-     * @return {MediaModule} This is returned for method chain.
-     */
-    MediaModule.prototype.fullscreen = function() {
-        if (this.media instanceof HTMLVideoElement) {
-            if (this.media.webkitRequestFullscreen) {
-                // Chrome Safari
-                this.media.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            } else if (this.media.mozRequestFullScreen) {
-                // Firefox
-                this.media.mozRequestFullScreen();
-            } else if (this.media.requestFullscreen) {
-                // Opera
-                this.media.requestFullscreen();
-            } else {
-                throw new Error('Cannot change to full screen.');
-            }
-        }
-
-        return this;
-    };
-
-    /** 
-     * This method shows video in original size from full screen.
-     * @return {MediaModule} This is returned for method chain.
-     */
-    MediaModule.prototype.exitFullscreen = function() {
-        if (document.webkitExitFullscreen) {
-            // Chrome Safari
-            document.webkitExitFullscreen();
-        } else if (document.mozCancelFullscreen) {
-            // Firefox
-            document.mozCancelFullscreen();
-        } else if (document.exitFullscreen) {
-            // Opera
-            document.exitFullscreen();
-        } else {
-            throw new Error('Cannot exit from full screen.');
-        }
-
-        return this;
     };
 
     /** @override */
@@ -9591,7 +9868,7 @@
         params.media = {
             playbackrate  : this.playbackRate,
             vocalcanceler : {
-                depth : this.vocalcanceler.depth
+                depth : this.vocalcanceler.param('depth')
             }
         };
 
@@ -9630,10 +9907,7 @@
 
         this.isStop  = true;
 
-        // Create the instance of private class
-        this.noisegate = new NoiseGate();
-
-        /** 
+        /**
          * Private class
          * @constructor
          */
@@ -9641,8 +9915,8 @@
             this.level = 0;
         }
 
-        /** 
-         * This method is getter or setter for parameters
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9680,7 +9954,7 @@
             return this;
         };
 
-        /** 
+        /**
          * This method detects background noise and removes this.
          * @param {number} data This argument is amplitude (between -1 and 1).
          * @return {number} This is returned as 0 or the raw data.
@@ -9701,6 +9975,9 @@
         NoiseGate.prototype.toString = function() {
             return '[StreamModule NoiseGate]';
         };
+
+        // Create the instance of private class
+        this.noisegate = new NoiseGate();
     }
 
     /** @extends {SoundModule} */
@@ -9728,8 +10005,8 @@
         return this;
     };
 
-    /** 
-     * This method is getter or setter for parameters
+    /**
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9857,7 +10134,7 @@
         return this.source;
     };
 
-    /** 
+    /**
      * This method starts or stops streaming according to current state.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
      * @param {function} processCallback This argument is "onaudioprocess" event handler in the instance of ScriptProcessorNode.
@@ -9888,7 +10165,7 @@
 
         params.stream = {
             noisegate : {
-                level : this.noisegate.level
+                level : this.noisegate.param('level')
             }
         };
 
@@ -9921,7 +10198,7 @@
     MixerModule.prototype = Object.create(SoundModule.prototype);
     MixerModule.prototype.constructor = MixerModule;
 
-    /** 
+    /**
      * This method mixes sound source.
      * @param {Array.<OscillatorModule>|Array.<OneshotModule>|Array.<AudioModule>|Array.<MediaModule>|Array.<StreamModule>} sources This argument is array of sound source module that is defined by this library.
      * @return {MixerModule} This is returned for method chain.
@@ -9987,7 +10264,7 @@
             for (var i = 0, len = self.sources.length; i < 10; i++) {
                 var source = sources[i];
 
-                if ((source instanceof OscillatorModule) && source.eg.isStop()) {
+                if ((source instanceof OscillatorModule) && source.envelopegenerator.isStop()) {
                     isStop = true;
                 } else if ((source instanceof OneshotModule) && source.isStop) {
                     isStop = true;
@@ -10023,7 +10300,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the instance of sound source that is used in this class.
      * @param {number} index This argument is required in the case of designating sound source.
      * @return {Array.<OscillatorModule>|Array.<OneshotModule>|Array.<AudioModule>|Array.<MediaModule>|OscillatorModule|OneshotModule>|AudioModule|MediaModule}
@@ -10044,7 +10321,7 @@
         return '[MixerModule]';
     };
 
-    /** 
+    /**
      * This class defines properties for play the MML (Music Macro Language).
      * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
      * @constructor
@@ -10068,7 +10345,7 @@
     }
 
     /**
-     * Static properties
+     * Class (Static) properties
      */
     MML.ONE_MINUTES       = 60;  // sec
     MML.EQUAL_TEMPERAMENT = 12;
@@ -10084,7 +10361,7 @@
     MML.ERROR_MML_OCTAVE  = 'OCTAVE';
     MML.ERROR_MML_NOTE    = 'NOTE';
 
-    /** 
+    /**
      * This method sets callback functions.
      * @param {string|object} key This argument is property name.
      *     This argument is pair of property and value in the case of associative array.
@@ -10110,7 +10387,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method parses MML (Music Macro Language) string.
      * @param {Array.<OscillatorNode>|OscillatorModule|OneshotModule} source This argument is in order to select sound source.
      * @param {Array.<string>} mmls This argument is MML strings.
@@ -10121,14 +10398,15 @@
             this.stop();  // Stop the previous MML
         }
 
-        this.sequences = [];
-        this.timerids  = [];
-        this.prev      = [];
+        // Clear
+        this.sequences.length = 0;
+        this.timerids.length  = 0;
+        this.prev.length      = 0;
 
         if (Array.isArray(source)) {
             for (var i = 0, len = source.length; i < len; i++) {
                 if (!(source[i] instanceof OscillatorNode)) {
-                    return;
+                    return this;
                 }
             }
 
@@ -10138,7 +10416,7 @@
         } else if ((source instanceof OscillatorModule) || (source instanceof OneshotModule)) {
             this.source = source;
         } else {
-            return;
+            return this;
         }
 
         if (!Array.isArray(mmls)) {
@@ -10379,7 +10657,7 @@
         return this.sequences;
     };
 
-    /** 
+    /**
      * This method starts the designated MML part. Moreover, this method schedules next sound.
      * @param {number} part This argument is the part of MML.
      * @param {Array.<Effector>|Array.<AudioNode>} connects This argument is array for changing the default connection.
@@ -10512,7 +10790,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method stops the all of MML parts.
      * @param {function} processCallback This argument is in order to change "onaudioprocess" event handler in the instance of ScriptProcessorNode.
      * @return {MML} This is returned for method chain.
@@ -10555,7 +10833,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method gets the array that has object for playing the MML.
      * @param {number} index This argument is required in the case of designating sequence.
      * @return {Array.<Array.<object>>|Array.<object>}
@@ -10570,7 +10848,7 @@
         }
     };
 
-    /** 
+    /**
      * This method starts or stops MML according to state.
      * @param {number} part This argument is the part of MML.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -10587,7 +10865,7 @@
         return this;
     };
 
-    /** 
+    /**
      * This method determines whether the array that is used to play the MML exists.
      * @return {boolean} If the array exists, this value is true. Otherwise, this value is false.
      */
@@ -10595,7 +10873,7 @@
         return Array.isArray(this.sequences[0]) ? true : false;
     };
 
-    /** 
+    /**
      * This method determines whether the MML is paused.
      * @return {boolean} If the MML is paused, this value is true. Otherwise, this value is false.
      */
@@ -10614,7 +10892,7 @@
         return true;
     };
 
-    /** 
+    /**
      * This method creates text file for MML.
      * @param {string} mml This argument is MML string.
      * @return {string} This is returned as text file that writes MML.
@@ -10647,6 +10925,78 @@
         return '[MML]';
     };
 
+    /**
+     * This class defines properties for using Web MIDI API.
+     * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
+     * @constructor
+     */
+    function MIDI(context) {
+        this.context = context;
+
+        this.midiAccess = null;  // for the instance of MIDIAccess
+        this.inputs     = [];    // for the instances of MIDIInput
+        this.outputs    = [];    // for the instances of MIDIOutput
+    }
+
+    /**
+     * This method invokes requestMIDIAccess and gets objects for using Web MIDI API.
+     * @param {function} successCallback This argument is invoked when requestMIDIAccess succeeds.
+     * @param {function} errorCallback This argument is invoked when requestMIDIAccess fails.
+     * @return {MIDI} This is returned for method chain.
+     */
+    MIDI.prototype.setup = function(successCallback, errorCallback) {
+        if (!navigator.requestMIDIAccess) {
+            throw new Error('Cannot use Web MIDI API.');
+        }
+
+        var self = this;
+
+        navigator.requestMIDIAccess({sysex : true}).then(function(midiAccess) {
+            self.midiAccess = midiAccess;
+
+            if (Object.prototype.toString.call(midiAccess) === '[object Function]') {
+                // Legacy Chrome
+                self.inputs  = midiAccess.inputs();
+                self.outputs = midiAccess.outputs();
+            } else {
+                // Chrome 39 and later
+                var inputIterator  = midiAccess.inputs.values();
+                var outputIterator = midiAccess.outputs.values();
+
+                for (var i = inputIterator.next(); !i.done; i = inputIterator.next()) {
+                    self.inputs.push(i.value);
+                }
+
+                for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+                    self.outputs.push(o.value);
+                }
+            }
+
+            if (Object.prototype.toString.call(successCallback) === '[object Function]') {
+                successCallback(self.midiAccess, self.inputs, self.outputs);
+            }
+        }, function(error) {
+            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                errorCallback(error);
+            }
+        });
+
+        return this;
+    };
+
+    /**
+     * This method gets the instance of MIDIAccess.
+     * @return {MIDIAccess} This is returned as the instance of MIDIAccess.
+     */
+    MIDI.prototype.get = function() {
+        return this.midiAccess;
+    };
+
+    /** @override */
+    MIDI.prototype.toString = function() {
+        return '[MIDI]';
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 
     // Create instances
@@ -10660,7 +11010,8 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext)
+        mml        : new MML(audiocontext),
+        midi       : new MIDI(audiocontext)
     };
 
     // Cloned instances
@@ -10672,12 +11023,13 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext)
+        mml        : new MML(audiocontext),
+        midi       : new MIDI(audiocontext)
     };
 
-    /** 
-     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML.
-     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml'.
+    /**
+     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML or MIDI.
+     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml', 'midi'.
      * @param {number} index This argument is in order to select one of some oscillators.
      * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule|StreamModule|MixerModule|MML}
      */
@@ -10704,29 +11056,32 @@
             case 'stream'   :
             case 'mixer'    :
             case 'mml'      :
+            case 'midi'     :
                 return sources[s];
             default :
                 break;
         }
     };
 
-    // Static properties
+    // Class (Static) properties
     XSound.IS_XSOUND   = IS_XSOUND;
     XSound.SAMPLE_RATE = sound.SAMPLE_RATE;
     XSound.BUFFER_SIZE = sound.BUFFER_SIZE;
     XSound.NUM_INPUT   = sound.NUM_INPUT;
     XSound.NUM_OUTPUT  = sound.NUM_OUTPUT;
 
-    // Static methods
-    XSound.read          = read;
-    XSound.file          = file;
-    XSound.ajax          = ajax;
-    XSound.decode        = decode;
-    XSound.toFrequencies = toFrequencies;
-    XSound.convertTime   = convertTime;
-    XSound.noConflict    = noConflict;
+    // Class (Static) methods
+    XSound.read           = read;
+    XSound.file           = file;
+    XSound.ajax           = ajax;
+    XSound.decode         = decode;
+    XSound.toFrequencies  = toFrequencies;
+    XSound.convertTime    = convertTime;
+    XSound.fullscreen     = fullscreen;
+    XSound.exitFullscreen = exitFullscreen;
+    XSound.noConflict     = noConflict;
 
-    /** 
+    /**
      * This static method returns function as closure for getter of cloned module.
      * @return {function} This is returned as closure for getter of cloned module.
      */
@@ -10755,6 +11110,7 @@
                 case 'stream'   :
                 case 'mixer'    :
                 case 'mml'      :
+                case 'midi'     :
                     return clones[s];
                 default :
                     break;
@@ -10762,7 +11118,7 @@
         };
     };
 
-    /** 
+    /**
      * This static method releases memory of unnecessary instances.
      * @param {Array.<SoundModule|MML|MediaFallbackModule>} sourceLists This argument is array that has the instances of SoundModule or MML or MediaFallbackModule.
      */
@@ -10793,7 +11149,7 @@
         }
     };
 
-    /** 
+    /**
      * This static method gets the instance of AudioContext.
      * @return {AudioContext} This value is the instance of AudioContext.
      */
@@ -10801,7 +11157,7 @@
         return audiocontext;
     };
 
-    /** 
+    /**
      * This static method gets "currentTime" property in the instance of AudioContext.
      * @return {number}
      */
