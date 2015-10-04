@@ -8,6 +8,8 @@
  
  
  
+'use strict';
+
 process.stdout.setEncoding('UTF-8');
 process.stderr.setEncoding('UTF-8');
 
