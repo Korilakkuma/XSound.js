@@ -26,7 +26,7 @@ try {
     window.alert(error.message);
 }
 
-document.querySelector(&apos;#range-level&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-level&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;stream&apos;).module(&apos;noisegate&apos;).param(&apos;level&apos;, this.valueAsNumber);
     // or,
     // X(&apos;stream&apos;).module(&apos;noisegate&apos;).param({level : this.valueAsNumber});

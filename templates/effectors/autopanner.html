@@ -44,7 +44,7 @@ X(&apos;audio&apos;).setup({
             X(&apos;audio&apos;).module(&apos;autopanner&apos;).state(this.checked);
         }, false);
 
-        document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;depth&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;autopanner&apos;).param({depth : this.valueAsNumber});
@@ -52,7 +52,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;depth&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;autopanner&apos;).param(&apos;rate&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;autopanner&apos;).param({rate : this.valueAsNumber});

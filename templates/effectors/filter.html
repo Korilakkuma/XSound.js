@@ -105,7 +105,7 @@ document.querySelector(&apos;#select-type&apos;).addEventListener(&apos;change&a
     console.log(X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;type&apos;));
 }, false);
 
-document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;frequency&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({frequency : this.valueAsNumber});
@@ -113,7 +113,7 @@ document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;chan
     document.querySelector(&apos;#output-frequency&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;frequency&apos;);
 }, false);
 
-document.querySelector(&apos;#range-q&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-q&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;Q&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({Q : this.valueAsNumber});
@@ -121,7 +121,7 @@ document.querySelector(&apos;#range-q&apos;).addEventListener(&apos;change&apos;
     document.querySelector(&apos;#output-q&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;Q&apos;);
 }, false);
 
-document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;gain&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({gain : this.valueAsNumber});
@@ -129,7 +129,7 @@ document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-gain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;gain&apos;);
 }, false);
 
-document.querySelector(&apos;#range-range&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-range&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;range&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({range : this.valueAsNumber});
@@ -137,7 +137,7 @@ document.querySelector(&apos;#range-range&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-range&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;range&apos;);
 }, false);
 
-document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;attack&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({attack : this.valueAsNumber});
@@ -145,7 +145,7 @@ document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;change&
     document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;attack&apos;);
 }, false);
 
-document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;decay&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({decay : this.valueAsNumber});
@@ -153,7 +153,7 @@ document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-decay&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;decay&apos;);
 }, false);
 
-document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;sustain&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({sustain : this.valueAsNumber});
@@ -161,7 +161,7 @@ document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;change
     document.querySelector(&apos;#output-sustain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;sustain&apos;);
 }, false);
 
-document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;filter&apos;).param(&apos;release&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;filter&apos;).param({release : this.valueAsNumber});

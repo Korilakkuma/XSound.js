@@ -78,7 +78,7 @@ X(&apos;audio&apos;).setup({
             console.log(X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;samples&apos;));
         }, false);
 
-        document.querySelector(&apos;#range-drive&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-drive&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;drive&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;distortion&apos;).param({drive : this.valueAsNumber});
@@ -86,7 +86,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-drive&apos;).textContent = X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;drive&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-color&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-color&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;color&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;distortion&apos;).param({color : this.valueAsNumber});
@@ -94,7 +94,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-color&apos;).textContent = X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;color&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;distortion&apos;).param(&apos;tone&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;distortion&apos;).param({tone : this.valueAsNumber});

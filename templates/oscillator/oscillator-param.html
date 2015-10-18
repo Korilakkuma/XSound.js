@@ -66,7 +66,7 @@ document.querySelector(&apos;[name=&quot;form-type&quot;]&apos;).addEventListene
     }
 }, false);
 
-document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;, 0).param({gain : this.valueAsNumber});
@@ -74,7 +74,7 @@ document.querySelector(&apos;#range-gain&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-gain&apos;).textContent = X(&apos;oscillator&apos;, 0).param(&apos;gain&apos;);
 }, false);
 
-document.querySelector(&apos;#range-octave&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-octave&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;, 0).param({octave : this.valueAsNumber});
@@ -82,7 +82,7 @@ document.querySelector(&apos;#range-octave&apos;).addEventListener(&apos;change&
     document.querySelector(&apos;#output-octave&apos;).textContent = X(&apos;oscillator&apos;, 0).param(&apos;octave&apos;);
 }, false);
 
-document.querySelector(&apos;#range-fine&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-fine&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;, 0).param(&apos;fine&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;, 0).param({fine : this.valueAsNumber});

@@ -92,7 +92,7 @@ document.querySelector(&apos;#select-stage&apos;).addEventListener(&apos;change&
     console.log(X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;stage&apos;));
 }, false);
 
-document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;frequency&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({frequency : this.valueAsNumber});
@@ -100,7 +100,7 @@ document.querySelector(&apos;#range-frequency&apos;).addEventListener(&apos;chan
     document.querySelector(&apos;#output-frequency&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;frequency&apos;);
 }, false);
 
-document.querySelector(&apos;#range-resonance&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-resonance&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;resonance&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({resonance : this.valueAsNumber});
@@ -108,7 +108,7 @@ document.querySelector(&apos;#range-resonance&apos;).addEventListener(&apos;chan
     document.querySelector(&apos;#output-resonance&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;resonance&apos;);
 }, false);
 
-document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;depth&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({depth : this.valueAsNumber});
@@ -116,7 +116,7 @@ document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;depth&apos;);
 }, false);
 
-document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;rate&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({rate : this.valueAsNumber});
@@ -124,7 +124,7 @@ document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-rate&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;rate&apos;);
 }, false);
 
-document.querySelector(&apos;#range-mix&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-mix&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;mix&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({mix : this.valueAsNumber});
@@ -132,7 +132,7 @@ document.querySelector(&apos;#range-mix&apos;).addEventListener(&apos;change&apo
     document.querySelector(&apos;#output-mix&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;mix&apos;);
 }, false);
 
-document.querySelector(&apos;#range-feedback&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-feedback&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param(&apos;feedback&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;phaser&apos;).param({feedback : this.valueAsNumber});

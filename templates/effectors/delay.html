@@ -72,7 +72,7 @@ document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).state(this.checked);
 }, false);
 
-document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;time&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;delay&apos;).param({time : this.valueAsNumber});
@@ -80,7 +80,7 @@ document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-time&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;time&apos;);
 }, false);
 
-document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;dry&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;delay&apos;).param({dry : this.valueAsNumber});
@@ -88,7 +88,7 @@ document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;change&apo
     document.querySelector(&apos;#output-dry&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;dry&apos;);
 }, false);
 
-document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;wet&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;delay&apos;).param({wet : this.valueAsNumber});
@@ -96,7 +96,7 @@ document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;change&apo
     document.querySelector(&apos;#output-wet&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;wet&apos;);
 }, false);
 
-document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;tone&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;delay&apos;).param({tone : this.valueAsNumber});
@@ -104,7 +104,7 @@ document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-tone&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;tone&apos;);
 }, false);
 
-document.querySelector(&apos;#range-feedback&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-feedback&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;delay&apos;).param(&apos;feedback&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;delay&apos;).param({feedback : this.valueAsNumber});

@@ -62,7 +62,7 @@ X(&apos;audio&apos;).setup({
             X(&apos;audio&apos;).module(&apos;reverb&apos;).state(this.checked);
         }, false);
 
-        document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-dry&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;dry&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;reverb&apos;).param({dry : this.valueAsNumber});
@@ -70,7 +70,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-dry&apos;).textContent = X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;dry&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-wet&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;wet&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;reverb&apos;).param({wet : this.valueAsNumber});
@@ -78,7 +78,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-wet&apos;).textContent = X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;wet&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-tone&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;reverb&apos;).param(&apos;tone&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;reverb&apos;).param({tone : this.valueAsNumber});

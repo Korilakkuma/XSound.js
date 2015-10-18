@@ -56,7 +56,7 @@ X(&apos;audio&apos;).setup({
             X(&apos;audio&apos;).module(&apos;equalizer&apos;).state(this.checked);
         }, false);
 
-        document.querySelector(&apos;#range-bass&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-bass&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;bass&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;equalizer&apos;).param({bass : this.valueAsNumber});
@@ -64,7 +64,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-bass&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;bass&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-middle&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-middle&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;middle&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;equalizer&apos;).param({middle : this.valueAsNumber});
@@ -72,7 +72,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-middle&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;middle&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-treble&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-treble&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;treble&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;equalizer&apos;).param({treble : this.valueAsNumber});
@@ -80,7 +80,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-treble&apos;).textContent = X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;treble&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-presence&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-presence&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;equalizer&apos;).param(&apos;presence&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;equalizer&apos;).param({presence : this.valueAsNumber});

@@ -61,7 +61,7 @@ var callbacks = {
             X(&apos;media&apos;).toggle(X(&apos;media&apos;).param(&apos;currentTime&apos;));
         };
 
-        document.querySelector(&apos;#range-master-volume&apos;).onchange = function() {
+        document.querySelector(&apos;#range-master-volume&apos;).oninput = function() {
             X(&apos;media&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
             // or,
             // X(&apos;media&apos;).param({masterVolume : this.valueAsNumber});
@@ -69,7 +69,7 @@ var callbacks = {
             document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;media&apos;).param(&apos;masterVolume&apos;);
         };
 
-        document.querySelector(&apos;#range-playback-rate&apos;).onchange = function() {
+        document.querySelector(&apos;#range-playback-rate&apos;).oninput = function() {
             X(&apos;media&apos;).param(&apos;playbackRate&apos;, this.valueAsNumber);
             // or,
             // X(&apos;media&apos;).param({playbackRate : this.valueAsNumber});
@@ -77,7 +77,7 @@ var callbacks = {
             document.querySelector(&apos;#output-playback-rate&apos;).textContent = X(&apos;media&apos;).param(&apos;playbackRate&apos;);
         };
 
-        document.querySelector(&apos;#range-current-time&apos;).onchange = function() {
+        document.querySelector(&apos;#range-current-time&apos;).oninput = function() {
             X(&apos;media&apos;).param(&apos;currentTime&apos;, this.valueAsNumber);
             // or,
             // X(&apos;media&apos;).param({currentTime : this.valueAsNumber});

@@ -55,7 +55,7 @@ document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener
     X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).state(this.checked);
 }, false);
 
-document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).param(&apos;depth&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).param({depth : this.valueAsNumber});
@@ -63,7 +63,7 @@ document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).param(&apos;depth&apos;);
 }, false);
 
-document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).param(&apos;rate&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;tremolo&apos;).param({rate : this.valueAsNumber});

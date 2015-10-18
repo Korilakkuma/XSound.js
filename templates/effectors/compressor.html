@@ -62,7 +62,7 @@ X(&apos;audio&apos;).setup({
             X(&apos;audio&apos;).module(&apos;compressor&apos;).state(this.checked);
         }, false);
 
-        document.querySelector(&apos;#range-threshold&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-threshold&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;threshold&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;compressor&apos;).param({threshold : this.valueAsNumber});
@@ -70,7 +70,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-threshold&apos;).textContent = X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;threshold&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-knee&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-knee&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;knee&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;compressor&apos;).param({knee : this.valueAsNumber});
@@ -78,7 +78,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-knee&apos;).textContent = X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;knee&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-ratio&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-ratio&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;ratio&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;compressor&apos;).param({ratio : this.valueAsNumber});
@@ -86,7 +86,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-ratio&apos;).textContent = X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;ratio&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;attack&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;compressor&apos;).param({attack : this.valueAsNumber});
@@ -94,7 +94,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;attack&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;compressor&apos;).param(&apos;release&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;compressor&apos;).param({release : this.valueAsNumber});

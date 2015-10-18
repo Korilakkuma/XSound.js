@@ -67,7 +67,7 @@ document.querySelector(&apos;[type=&quot;checkbox&quot;]&apos;).addEventListener
     X(&apos;oscillator&apos;).module(&apos;wah&apos;).state(this.checked);
 }, false);
 
-document.querySelector(&apos;#range-cutoff&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-cutoff&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;cutoff&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;wah&apos;).param({cutoff : this.valueAsNumber});
@@ -75,7 +75,7 @@ document.querySelector(&apos;#range-cutoff&apos;).addEventListener(&apos;change&
     document.querySelector(&apos;#output-cutoff&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;cutoff&apos;);
 }, false);
 
-document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;depth&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;wah&apos;).param({depth : this.valueAsNumber});
@@ -83,7 +83,7 @@ document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-depth&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;depth&apos;);
 }, false);
 
-document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;rate&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;wah&apos;).param({rate : this.valueAsNumber});
@@ -91,7 +91,7 @@ document.querySelector(&apos;#range-rate&apos;).addEventListener(&apos;change&ap
     document.querySelector(&apos;#output-rate&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;rate&apos;);
 }, false);
 
-document.querySelector(&apos;#range-resonance&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-resonance&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;wah&apos;).param(&apos;resonance&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;wah&apos;).param({resonance : this.valueAsNumber});

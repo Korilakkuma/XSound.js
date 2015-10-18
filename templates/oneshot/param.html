@@ -101,7 +101,7 @@ try {
         settings  : settings,
         timeout   : 60000,
         success   : function(event, buffers) {
-            document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;change&apos;, function() {
+            document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;input&apos;, function() {
                 X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
                 // or,
                 // X(&apos;oneshot&apos;).param({masterVolume : this.valueAsNumber});
@@ -111,7 +111,7 @@ try {
                 document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;);
             }, false);
 
-            document.querySelector(&apos;#range-transpose&apos;).addEventListener(&apos;change&apos;, function() {
+            document.querySelector(&apos;#range-transpose&apos;).addEventListener(&apos;input&apos;, function() {
                 X(&apos;oneshot&apos;).param(&apos;transpose&apos;, this.valueAsNumber);
                 // or,
                 // X(&apos;oneshot&apos;).param({transpose : this.valueAsNumber});

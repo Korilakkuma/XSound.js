@@ -52,7 +52,7 @@ document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;
     this.textContent = &apos;START&apos;;
 }, false);
 
-document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-time&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;glide&apos;).param(&apos;time&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;glide&apos;).param({time : this.valueAsNumber});

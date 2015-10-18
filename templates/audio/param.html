@@ -54,7 +54,7 @@ X(&apos;audio&apos;).setup({
             X(&apos;audio&apos;).toggle(X(&apos;audio&apos;).param(&apos;currentTime&apos;));
         }, false);
 
-        document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).param({masterVolume : this.valueAsNumber});
@@ -62,7 +62,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;audio&apos;).param(&apos;masterVolume&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-playback-rate&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-playback-rate&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).param(&apos;playbackRate&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).param({playbackRate : this.valueAsNumber});
@@ -70,7 +70,7 @@ X(&apos;audio&apos;).setup({
             document.querySelector(&apos;#output-playback-rate&apos;).textContent = X(&apos;audio&apos;).param(&apos;playbackRate&apos;);
         }, false);
 
-        document.querySelector(&apos;#range-current-time&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-current-time&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).param(&apos;currentTime&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).param({currentTime : this.valueAsNumber});

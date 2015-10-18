@@ -32,7 +32,7 @@ X(&apos;audio&apos;).setup({
             }
         }, false);
 
-        document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;change&apos;, function() {
+        document.querySelector(&apos;#range-depth&apos;).addEventListener(&apos;input&apos;, function() {
             X(&apos;audio&apos;).module(&apos;vocalcanceler&apos;).param(&apos;depth&apos;, this.valueAsNumber);
             // or,
             // X(&apos;audio&apos;).module(&apos;vocalcanceler&apos;).param({depth : this.valueAsNumber});

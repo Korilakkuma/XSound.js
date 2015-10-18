@@ -69,7 +69,7 @@ document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&ap
     }
 }, false);
 
-document.querySelector(&apos;#range-channel-left&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-channel-left&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param(&apos;gainL&apos;, this.valueAsNumber); 
     // or,
     // X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param({gainL : this.valueAsNumber});
@@ -77,7 +77,7 @@ document.querySelector(&apos;#range-channel-left&apos;).addEventListener(&apos;c
     document.querySelector(&apos;#output-channel-left&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param(&apos;gainL&apos;);
 }, false);
 
-document.querySelector(&apos;#range-channel-right&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-channel-right&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param(&apos;gainR&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;recorder&apos;).param({gainR : this.valueAsNumber});

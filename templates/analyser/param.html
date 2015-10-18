@@ -70,10 +70,12 @@
         console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).param(&apos;fftSize&apos;));
     }, false);
 
-    document.querySelector(&apos;#range-smoothing-time-constant&apos;).addEventListener(&apos;change&apos;, function() {
+    document.querySelector(&apos;#range-smoothing-time-constant&apos;).addEventListener(&apos;input&apos;, function() {
         X(&apos;oscillator&apos;).module(&apos;analyser&apos;).param(&apos;smoothingTimeConstant&apos;, this.valueAsNumber);
         // or,
         // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).param({smoothingTimeConstant : this.valueAsNumber});
+
+        document.querySelector(&apos;#output-smoothing-time-constant&apos;).textContent = this.value;
 
         console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).param(&apos;smoothingTimeConstant&apos;));
     }, false);

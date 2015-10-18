@@ -62,7 +62,7 @@ document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;touchend
     this.textContent = &apos;START&apos;;
 }, false);
 
-document.querySelector(&apos;#range-interval&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-interval&apos;).addEventListener(&apos;input&apos;, function() {
     var interval = this.valueAsNumber;
 
     if (interval === 0) {
@@ -76,7 +76,7 @@ document.querySelector(&apos;#range-interval&apos;).addEventListener(&apos;chang
     document.querySelector(&apos;#output-interval&apos;).textContent = (X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;interval&apos;) === &apos;auto&apos;) ? 0 : X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;interval&apos;);
 }, false);
 
-document.querySelector(&apos;#range-width&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-width&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;width&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({width : this.valueAsNumber});
@@ -84,7 +84,7 @@ document.querySelector(&apos;#range-width&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-width&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;width&apos;);
 }, false);
 
-document.querySelector(&apos;#range-top&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-top&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;top&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({top : this.valueAsNumber});
@@ -92,7 +92,7 @@ document.querySelector(&apos;#range-top&apos;).addEventListener(&apos;change&apo
     document.querySelector(&apos;#output-top&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;top&apos;);
 }, false);
 
-document.querySelector(&apos;#range-right&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-right&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;right&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({right : this.valueAsNumber});
@@ -100,7 +100,7 @@ document.querySelector(&apos;#range-right&apos;).addEventListener(&apos;change&a
     document.querySelector(&apos;#output-right&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;right&apos;);
 }, false);
 
-document.querySelector(&apos;#range-bottom&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-bottom&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;bottom&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({bottom : this.valueAsNumber});
@@ -108,7 +108,7 @@ document.querySelector(&apos;#range-bottom&apos;).addEventListener(&apos;change&
     document.querySelector(&apos;#output-bottom&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;bottom&apos;);
 }, false);
 
-document.querySelector(&apos;#range-left&apos;).addEventListener(&apos;change&apos;, function() {
+document.querySelector(&apos;#range-left&apos;).addEventListener(&apos;input&apos;, function() {
     X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;left&apos;, this.valueAsNumber);
     // or,
     // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({left : this.valueAsNumber});
