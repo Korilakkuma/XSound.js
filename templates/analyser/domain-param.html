@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>domain#param <span class="returns">Returns : <span>number | string | (TimeAll | Time | FFT)</span></span></h1>
+                <h1>domain#param <span class="returns">Returns : <span>number | string | (TimeOverview | Time | FFT)</span></span></h1>
                 <hr />
                 <p>
                     This method gets or sets parameters for visualization.
@@ -38,7 +38,7 @@
 <textarea class="codemirror">
 X(&apos;oscillator&apos;).setup(true);
 
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelector(&apos;canvas&apos;));
 
 X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).state(true);
 
@@ -158,29 +158,25 @@ document.querySelector(&apos;#select-text&apos;).addEventListener(&apos;change&a
 }, false);
 
 document.querySelector(&apos;#select-font-family&apos;).addEventListener(&apos;change&apos;, function() {
-    var font = document.querySelector(&apos;#range-font-size&apos;).value + &apos;px &apos; + this.value;
-
-    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;, font);
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;, {family : document.querySelector(&apos;#select-font-family&apos;).value});
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : font});
+    // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : {family : document.querySelector(&apos;#select-font-family&apos;).value}}});
 
-    console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;));
+    console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;).family);
 }, false);
 
-document.querySelector(&apos;#range-font-size&apos;).addEventListener(&apos;change&apos;, function() {
-    var font = this.value + &apos;px &apos; + document.querySelector(&apos;#select-font-family&apos;).value;
-
-    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;, font);
+document.querySelector(&apos;#range-font-size&apos;).addEventListener(&apos;input&apos;, function() {
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;, {size : (document.querySelector(&apos;#range-font-size&apos;).valueAsNumber + 'px')});
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : font});
+    // X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param({font : {size : (document.querySelector(&apos;#range-font-size&apos;).valueAsNumber + 'px')}});
 
-    console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;));
+    console.log(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).param(&apos;font&apos;).size);
 
     document.querySelector(&apos;#output-font-size&apos;).textContent = this.value;
 }, false);
 </textarea>
                 <div class="draw-container">
-                    <canvas id="canvas-visualizer" width="480" height="120"></canvas>
+                    <canvas width="480" height="120"></canvas>
                 </div>
                 <dl class="sound-controllers">
                     <dt class="invisibility">Analyser Controller</dt>
@@ -190,13 +186,13 @@ document.querySelector(&apos;#range-font-size&apos;).addEventListener(&apos;chan
                     <dt><label for="range-width">width : <span id="output-width">1.5</span></label></dt>
                     <dd><input type="range" id="range-width" value="1.5" min="0" max="5" step="0.5" /></dd>
                     <dt><label for="range-top">top : <span id="output-top">15</span></label></dt>
-                    <dd><input type="range" id="range-top" value="15" min="0" max="30" step="1" /></dd>
-                    <dt><label for="range-right">right : <span id="output-right">15</span></label></dt>
-                    <dd><input type="range" id="range-right" value="15" min="0" max="30" step="1" /></dd>
+                    <dd><input type="range" id="range-top" value="15" min="0" max="60" step="1" /></dd>
+                    <dt><label for="range-right">right : <span id="output-right">30</span></label></dt>
+                    <dd><input type="range" id="range-right" value="30" min="0" max="60" step="1" /></dd>
                     <dt><label for="range-top">bottom : <span id="output-bottom">15</span></label></dt>
-                    <dd><input type="range" id="range-bottom" value="15" min="0" max="30" step="1" /></dd>
-                    <dt><label for="range-top">left : <span id="output-left">15</span></label></dt>
-                    <dd><input type="range" id="range-left" value="15" min="0" max="30" step="1" /></dd>
+                    <dd><input type="range" id="range-bottom" value="15" min="0" max="60" step="1" /></dd>
+                    <dt><label for="range-top">left : <span id="output-left">30</span></label></dt>
+                    <dd><input type="range" id="range-left" value="30" min="0" max="60" step="1" /></dd>
                     <dt>shape</dt>
                     <dd>
                         <form id="form-shape">

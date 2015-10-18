@@ -109,8 +109,7 @@ var callbacks = {
 
 try {
     X(&apos;media&apos;).setup({
-        id        : &apos;audio-element&apos;,
-        type      : &apos;audio&apos;,
+        media     : document.querySelector(&apos;audio&apos;),
         formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
         callbacks : callbacks
     }).ready(&apos;resources/audio/forever-love-piano-instruments&apos;);
@@ -120,7 +119,7 @@ try {
 }
 </textarea>
                 <dl class="sound-controllers">
-                    <dt class="invisibility"><audio id="audio-element"></audio></dt>
+                    <dt class="invisibility"><audio></audio></dt>
                     <dd><button type="button">START</button></dd>
                     <dt>channels</dt>
                     <dd><span id="output-channels">0</span> channels</dd>

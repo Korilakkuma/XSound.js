@@ -10,10 +10,13 @@
 <textarea class="codemirror">
 X(&apos;oscillator&apos;).setup(true);
 
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
-// X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;svg&apos;, &apos;svg-visualizer&apos;, &apos;svg-visualizer-parent&apos;);
+X(&apos;oscillator&apos;, 0).param(&apos;type&apos;, &apos;sawtooth&apos;);
+
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelector(&apos;canvas&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(document.querySelector(&apos;svg&apos;));
 
 X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).state(true);
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).state(true);
 
 document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;mousedown&apos;, function() {
     X(&apos;oscillator&apos;).start(440);
@@ -36,25 +39,29 @@ document.querySelectorAll(&apos;button&apos;)[0].addEventListener(&apos;touchend
 }, false);
 
 document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&apos;, function() {
-    var capturedWave = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).create();
-    document.querySelector(&apos;#captured-wave&apos;).setAttribute(&apos;src&apos;, capturedWave);
+    var capturedWave     = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).create();
+    var capturedSpectrum = X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).create();
+
+    document.querySelector(&apos;img&apos;).setAttribute(&apos;src&apos;, capturedWave);
+    document.querySelector(&apos;#captured-spectrum&apos;).innerHTML = capturedSpectrum;
 }, false);
 </textarea>
                 <div class="draw-container">
                     <canvas id="canvas-visualizer" width="480" height="120"></canvas>
                 </div>
-                <!--
-                <div id="svg-visualizer-parent" class="draw-container">
-                    <svg id="svg-visualizer" width="480" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+
+                <div class="draw-container">
+                    <svg width="480" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
                 </div>
-                -->
+
                 <dl class="sound-controllers">
                     <dt class="invisibility">Analyser Controller</dt>
                     <dd>
                         <button type="button">START</button>
                         <button type="button">CREATE</button>
                     </dd>
-                    <dd><img id="captured-wave" /></dd>
+                    <dd id="captured-wave" style="background-color:rgba(0, 0, 0, 1.0);"><img src="" /></dd>
+                    <dd id="captured-spectrum" style="background-color:rgba(0, 0, 0, 1.0);"></dd>
                 </dl>
             </section>
         </section>

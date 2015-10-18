@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>eg <span class="applicable">Applicable : <span>OscillatorModule | OneshotModule</span></span></h1>
+                <h1>envelopegenerator <span class="applicable">Applicable : <span>OscillatorModule | OneshotModule</span></span></h1>
                 <hr />
                 <p>
                     This module is Envelope Generator.
@@ -61,35 +61,35 @@ document.querySelector(&apos;button&apos;).addEventListener(&apos;touchend&apos;
 }, false);
 
 document.querySelector(&apos;#range-attack&apos;).addEventListener(&apos;input&apos;, function() {
-    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;attack&apos;, this.valueAsNumber);
+    X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;attack&apos;, this.valueAsNumber);
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({attack : this.valueAsNumber});
+    // X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param({attack : this.valueAsNumber});
 
-    document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;attack&apos;);
+    document.querySelector(&apos;#output-attack&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;attack&apos;);
 }, false);
 
 document.querySelector(&apos;#range-decay&apos;).addEventListener(&apos;input&apos;, function() {
-    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;decay&apos;, this.valueAsNumber);
+    X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;decay&apos;, this.valueAsNumber);
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({decay : this.valueAsNumber});
+    // X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param({decay : this.valueAsNumber});
 
-    document.querySelector(&apos;#output-decay&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;decay&apos;);
+    document.querySelector(&apos;#output-decay&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;decay&apos;);
 }, false);
 
 document.querySelector(&apos;#range-sustain&apos;).addEventListener(&apos;input&apos;, function() {
-    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;sustain&apos;, this.valueAsNumber);
+    X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;sustain&apos;, this.valueAsNumber);
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({sustain : this.valueAsNumber});
+    // X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param({sustain : this.valueAsNumber});
 
-    document.querySelector(&apos;#output-sustain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;sustain&apos;);
+    document.querySelector(&apos;#output-sustain&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;sustain&apos;);
 }, false);
 
 document.querySelector(&apos;#range-release&apos;).addEventListener(&apos;input&apos;, function() {
-    X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;release&apos;, this.valueAsNumber);
+    X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;release&apos;, this.valueAsNumber);
     // or,
-    // X(&apos;oscillator&apos;).module(&apos;eg&apos;).param({release : this.valueAsNumber});
+    // X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param({release : this.valueAsNumber});
 
-    document.querySelector(&apos;#output-release&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;eg&apos;).param(&apos;release&apos;);
+    document.querySelector(&apos;#output-release&apos;).textContent = X(&apos;oscillator&apos;).module(&apos;envelopegenerator&apos;).param(&apos;release&apos;);
 }, false);
 </textarea>
                 <dl class="sound-controllers">

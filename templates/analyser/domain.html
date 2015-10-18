@@ -1,9 +1,9 @@
         <section>
             <section>
-                <h1>domain <span class="returns">Returns : <span>TimeAll | Time | FFT</span></span></h1>
+                <h1>domain <span class="returns">Returns : <span>TimeOverview | Time | FFT</span></span></h1>
                 <hr />
                 <p>
-                    This method gets the instance of TimeALL or Time or FFT.
+                    This method gets the instance of TimeOverview or Time or FFT.
                 </p>
                 <table>
                     <caption>Arguments</caption>
@@ -12,18 +12,18 @@
                         <tr>
                             <th>1st</th>
                             <td><span class="type">string</span></td>
-                            <td>This value is one of &apos;time-all-L&apos;, &apos;time-all-R&apos;, &apos;time&apos;, &apos;fft&apos;.</td>
+                            <td>This value is one of &apos;time-overview-L&apos;, &apos;time-overview-R&apos;, &apos;time&apos;, &apos;fft&apos;.</td>
                         </tr>
                     </tbody>
                 </table>
             </section>
             <section>
 <textarea class="codemirror">
-console.log(&apos;TimeAll (for Left Channel)&apos;);
-console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-L&apos;));
+console.log(&apos;TimeOverview (for Left Channel)&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;));
 
-console.log(&apos;TimeAll (for Right Channel)&apos;);
-console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-R&apos;));
+console.log(&apos;TimeOverview (for Right Channel)&apos;);
+console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-R&apos;));
 
 console.log(&apos;Time&apos;);
 console.dir(X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;));

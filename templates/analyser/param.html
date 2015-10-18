@@ -39,8 +39,8 @@
     X(&apos;oscillator&apos;).setup(true);
     X(&apos;oscillator&apos;, 0).param(&apos;type&apos;, &apos;sawtooth&apos;);
 
-    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-time&apos;).state(true);
-    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(&apos;canvas&apos;, &apos;canvas-fft&apos;).state(true);
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelectorAll(&apos;canvas&apos;)[0]).state(true);
+    X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(document.querySelectorAll(&apos;canvas&apos;)[1]).state(true);
 
     document.querySelector(&apos;button&apos;).addEventListener(&apos;mousedown&apos;, function() {
         X(&apos;oscillator&apos;).start(440);
@@ -81,8 +81,8 @@
     }, false);
 </textarea>
                 <div class="draw-container">
-                    <canvas id="canvas-time" width="480" height="120"></canvas>
-                    <canvas id="canvas-fft"  width="480" height="120"></canvas>
+                    <canvas width="480" height="120"></canvas>
+                    <canvas width="480" height="120"></canvas>
                 </div>
                 <dl class="sound-controllers">
                     <dt class="invisibility">Analyser Controller</dt>

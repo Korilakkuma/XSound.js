@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>domain#state <span class="returns">Returns : <span>boolean | (TimeAll | Time | FFT)</span></span></h1>
+                <h1>domain#state <span class="returns">Returns : <span>boolean | (TimeOverview | Time | FFT)</span></span></h1>
                 <hr />
                 <p>
                     This method gets or sets state of analyser.
@@ -21,7 +21,7 @@
 <textarea class="codemirror">
 X(&apos;oscillator&apos;).setup(true);
 
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelector(&apos;canvas&apos;));
 
 X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).state(true);
 
@@ -57,7 +57,7 @@ document.querySelectorAll(&apos;button&apos;)[1].addEventListener(&apos;click&ap
 }, false);
 </textarea>
                 <div class="draw-container">
-                    <canvas id="canvas-visualizer" width="480" height="120"></canvas>
+                    <canvas width="480" height="120"></canvas>
                 </div>
                 <dl class="sound-controllers">
                     <dt class="invisibility">Analyser Controller</dt>

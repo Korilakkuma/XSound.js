@@ -1,0 +1,42 @@
+        <section>
+            <section>
+                <h1>exitFullscreen <span class="returns">Returns : <span>undefined</span></span></h1>
+                <hr />
+                <p>
+                    This method exits full screen.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X.exitFullscreen&quot;);
+
+var video = document.querySelector(&apos;video&apos;);
+
+document.onkeydown = function(event) {
+    switch (event.keyCode) {
+        case 32 :
+            // Space
+            try {
+                X.fullscreen(video);
+            } catch (error) {
+                window.alert(error.message);
+            }
+
+            break;
+        case 27 :
+            // Esc
+            try {
+                X.exitFullscreen();
+            } catch (error) {
+                window.alert(error.message);
+            }
+
+            break;
+        default :
+            break;
+    }
+};
+</textarea>
+                <p><video src="http://curtaincall.weblike.jp/portfolio-music-v/video/forever-love-piano-instruments" width="640" height="480" controls></video></p>
+            </section>
+        </section>

@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>domain#setup <span class="returns">Returns : <span>TimeAll | Time | FFT</span></span></h1>
+                <h1>domain#setup <span class="returns">Returns : <span>TimeOverview | Time | FFT</span></span></h1>
                 <hr />
                 <p>
                     This method setups the drawn Canvas or SVG.
@@ -12,20 +12,7 @@
                         <tr>
                             <th>1st</th>
                             <td><span class="type">string</span></td>
-                            <td>This value is &apos;canvas&apos; or &apos;svg&apos;</td>
-                        </tr>
-                        <tr>
-                            <th>2nd</th>
-                            <td><span class="type">string</span></td>
-                            <td>This value is id attribute of HTMLCanvasElement or SVGElement</td>
-                        </tr>
-                        <tr>
-                            <th>3rd</th>
-                            <td><span class="type">string</span></td>
-                            <td>
-                                This value is id attribute of HTMLElement that wraps SVGElement.
-                                If Canvas is used, this argument can be omitted.
-                            </td>
+                            <td>This value is the instance of HTMLCanvasElement or SVGElement.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -36,36 +23,36 @@
 <code>
 &lt;!-- HTML --&gt;
 &lt;div&gt;
-    &lt;canvas id=&quot;canvas-visualizer&quot; width=&quot;480&quot; height=&quot;120&quot; &gt;&lt;/canvas&gt;
+    &lt;canvas width=&quot;480&quot; height=&quot;120&quot; &gt;&lt;/canvas&gt;
 &lt;/div&gt;
 </code>
 </pre>
 <textarea class="codemirror">
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-L&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-R&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(&apos;canvas&apos;, &apos;canvas-visualizer&apos;);
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;).setup(document.querySelector(&apos;canvas&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-R&apos;).setup(document.querySelector(&apos;canvas&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelector(&apos;canvas&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(document.querySelector(&apos;canvas&apos;));
 </textarea>
                 <div class="draw-container">
-                    <canvas id="canvas-visualizer" width="480" height="120"></canvas>
+                    <canvas width="480" height="120"></canvas>
                 </div>
                <p>In the case of using SVG, </p>
 <pre>
 <code>
 &lt;!-- HTML --&gt;
 &lt;div id=&quot;svg-visualizer-parent&quot;&gt;
-    &lt;svg id=&quot;svg-visualizer&quot; width=&quot;480&quot; height=&quot;120&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;&lt;/svg&gt;
+    &lt;svg width=&quot;480&quot; height=&quot;120&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;&lt;/svg&gt;
 &lt;/div&gt;
 </code>
 </pre>
 <textarea class="codemirror">
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-L&apos;).setup(&apos;svg&apos;, &apos;svg-visualizer&apos;, &apos;svg-visualizer-parent&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-all-R&apos;).setup(&apos;svg&apos;, &apos;svg-visualizer&apos;, &apos;svg-visualizer-parent&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(&apos;svg&apos;, &apos;svg-visualizer&apos;, &apos;svg-visualizer-parent&apos;);
-X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(&apos;svg&apos;, &apos;svg-visualizer&apos;, &apos;svg-visualizer-parent&apos;);
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;).setup(document.querySelector(&apos;svg&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-R&apos;).setup(document.querySelector(&apos;svg&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;time&apos;).setup(document.querySelector(&apos;svg&apos;));
+X(&apos;oscillator&apos;).module(&apos;analyser&apos;).domain(&apos;fft&apos;).setup(document.querySelector(&apos;svg&apos;));
 </textarea>
-                <div id="svg-visualizer-parent">
-                    <svg id="svg-visualizer" width="480" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+                <div>
+                    <svg width="480" height="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
                 </div>
             </section>
         </section>

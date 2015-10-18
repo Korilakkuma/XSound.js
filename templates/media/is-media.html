@@ -22,7 +22,7 @@ if (X.IS_XSOUND) {
 
 try {
     X(&apos;media&apos;).setup({
-        id      : &apos;audio-element&apos;,
+        media   : document.querySelector(&apos;audio&apos;),
         type    : &apos;audio&apos;,
         formats : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;]
     });
@@ -33,6 +33,6 @@ try {
     window.alert(error.message);
 }
 </textarea>
-                <p><audio id="audio-element" controls></audio></p>
+                <p><audio controls></audio></p>
             </section>
         </section>
