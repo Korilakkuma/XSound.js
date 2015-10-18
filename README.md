@@ -1,4 +1,4 @@
-XSound.js
+XSound
 =========
   
 HTML5 Web Audio API Library
@@ -21,5 +21,10 @@ In concrete, this library may be useful to implement the following features.
   
 ## Download & API Document
   
-* [XSound.js Download & API Document](http://korilakkuma.github.io/XSound/)
+* [XSound.js Download & API Document](https://korilakkuma.github.io/XSound/)
+  
+## License
+  
+Copyright (c) 2014 Tomohiro IKEDA (Korilakkuma)  
+Released under the MIT license
   
