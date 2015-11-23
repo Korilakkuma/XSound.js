@@ -13,7 +13,7 @@ console.dir(X(&apos;oscillator&apos;).module(&apos;session&apos;).get());
 try {
     X(&apos;oscillator&apos;).module(&apos;session&apos;).setup({
         tls  : true,
-        host : &apos;x-sound-server.herokuapp.com&apos;,
+        host : &apos;x-sound-server.herokuapp.com/&apos;,
         port : &apos;8000&apos;,
         path : &apos;/app/websocket/&apos;,
         open : function(event, socket) {
