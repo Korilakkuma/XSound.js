@@ -1,0 +1,23 @@
+        <section>
+            <section>
+                <h1>get <span class="returns">Returns : <span>MIDIAccess</span></span></h1>
+                <hr />
+                <p>
+                    This method gets the instance of MIDIAccess.
+                </p>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;midi&apos;).get&quot;);
+
+var successCallback = function(midiAccess, inputs, outputs) {
+    console.dir(X(&apos;midi&apos;).get());
+};
+
+var errorCallback = function(error) {
+};
+
+X(&apos;midi&apos;).setup(successCallback, errorCallback);
+</textarea>
+            </section>
+        </section>

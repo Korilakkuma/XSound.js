@@ -1,0 +1,50 @@
+        <section>
+            <section>
+                <h1>setup <span class="returns">Returns : <span>MIDI</span></span></h1>
+                <hr />
+                <p>
+                    This method setups callback functions.
+                </p>
+                <table>
+                    <caption>Arguments</caption>
+                    <thead><tr><th scope="col"></th><th scope="col">Type</th><th scope="col">Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th>1st</th>
+                            <td><span class="type">function</span></td>
+                            <td>
+                                This callback function is invoked when access to the device is successful.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
+                            <td><span class="type">function</span></td>
+                            <td>
+                                This callback function is invoked when access to the device is failure.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section>
+<textarea class="codemirror">
+console.log(&quot;X(&apos;midi&apos;).setup&quot;);
+
+var successCallback = function(midiAccess, inputs, outputs) {
+    // The 1st argument is the instance of MIDIAccess
+    // The 2nd argument is the instance of MIDIInput
+    // The 3rd argument is the instance of MIDIOutput
+    console.dir(midiAccess);
+    console.dir(inputs);
+    console.dir(outputs);
+};
+
+var errorCallback = function(error) {
+    // The 1st argument is the instance of DOMException
+    console.dir(error);
+};
+
+X(&apos;midi&apos;).setup(successCallback, errorCallback);
+</textarea>
+            </section>
+        </section>
