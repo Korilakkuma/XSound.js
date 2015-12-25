@@ -1,5 +1,5 @@
 /**
- * xsound.dev.js
+ * xsound.js
  * @fileoverview Web Audio API Library
  *
  * Copyright (c) 2012, 2013, 2014 Tomohiro IKEDA (Korilakkuma)
@@ -16,61 +16,6 @@
 
     // Global constant value for the determination that Web Audio API is either enabled or disabled.
     var IS_XSOUND = (global.AudioContext || global.webkitAudioContext) ? true : false;
-
-    // for output of error
-    var ERROR_MODES = {
-        NONE      : 0,
-        ALERT     : 1,
-        CONSOLE   : 2,
-        EXCEPTION : 3
-    };
-
-    var ERROR_MODE = ERROR_MODES.CONSOLE;
-
-    /**
-     * This function outputs error message according to error mode.
-     * @param {string} message This argument is error message.
-     */
-    var _debug = function(message) {
-        switch (XSound.ERROR_MODE) {
-            case ERROR_MODES.ALERT :
-                console.trace();
-                global.alert(message);
-                break;
-            case ERROR_MODES.CONSOLE :
-                console.trace();
-                console.error(message);
-                break;
-            case ERROR_MODES.EXCEPTION :
-                console.trace();
-                throw new Error(message);
-                break;
-            case ERROR_MODES.NONE :
-            default :
-                break;
-        }
-    };
-
-    /**
-     * This function returns the instance of subclass that inherits designated superclass.
-     * This function is wrapper to "create" method in "Object".
-     * @param {object} prototype This argument is prototype property in superclass.
-     * @return {object} This argument is prototype property in superclass.
-     */
-    var _inherit = function(prototype) {
-        if (Object.create) {
-            return Object.create(prototype);
-        }
-
-        function Super() {
-        }
-
-        Super.prototype = prototype;
-
-        return new Super();
-    };
-
-    var _implement = _inherit;
 
     /**
      * This interface is in order to manage state of module that implements this interface.
@@ -90,33 +35,6 @@
     };
 
     // These functions are static methods for "XSound".
-
-    /**
-     * This static method sets error mode for developers that use this library.
-     * @param {string|type} mode This argument is one of 0, 1, 2, 'NONE, 'CONSOLE', 'EXCEPTION'.
-     */
-    var error = function(mode) {
-        switch (String(mode).toUpperCase()) {
-            case 'NONE' :
-            case '0'    :
-                XSound.ERROR_MODE = ERROR_MODES.NONE;
-                break;
-            case 'ALERT' :
-            case '1'     :
-                XSound.ERROR_MODE = ERROR_MODES.ALERT;
-                break;
-            case 'CONSOLE' :
-            case '2'       :
-                XSound.ERROR_MODE = ERROR_MODES.CONSOLE;
-                break;
-            case 'EXCEPTION' :
-            case '3'         :
-                XSound.ERROR_MODE = ERROR_MODES.EXCEPTION;
-                break;
-            default :
-                break;
-        }
-    };
 
     /**
      * This static method reads file of audio or text.
@@ -180,7 +98,7 @@
 
                 // Escape <script> in the case of text
                 if ((Object.prototype.toString.call(result) === '[object String]') && (result.indexOf('data:') === -1) && (result.indexOf('blob:') === -1)) {
-                    result = result.replace(/<(\/?script.*?)>/gi, '&lt;$1&gt;');
+                    result = result.replace(/<(\/?script.*?)>/gi, '<$1>');
                 }
 
                 successCallback(event, result);
@@ -193,8 +111,6 @@
             reader.readAsDataURL(file);
         } else if (/text/i.test(type)) {
             reader.readAsText(file, 'UTF-8');
-        } else {
-            _debug(this + ' read() : The 1st argument is one of "ArrayBuffer", "DataURL", "Text".');
         }
     };
 
@@ -220,7 +136,6 @@
         }
 
         if (!(event instanceof Event)) {
-            _debug(this + ' file() : The 1st argument is event object.');
             return;
         }
 
@@ -237,7 +152,6 @@
             // <input type="file">
             file = event.target.files[0];
         } else {
-            _debug(this + ' file() : The event object is either "drop" or file uploader\'s "change".');
             return;
         }
 
@@ -339,12 +253,10 @@
      */
     var decode = function(context, arrayBuffer, successCallback, errorCallback) {
         if (!(context instanceof AudioContext)) {
-            _debug(this + ' decode() : The 1st argument is the instance of AudioContext.');
             return;
         }
 
         if (!(arrayBuffer instanceof ArrayBuffer)) {
-            _debug(this + ' decode() : The 2nd argument is ArrayBuffer.');
             return;
         }
 
@@ -408,8 +320,6 @@
                 seconds      : s,
                 milliseconds : ms
             };
-        } else {
-            _debug(this + ' convertTime() : The range of the 1st argument is between 0 and audio duration.');
         }
     };
 
@@ -522,7 +432,6 @@
         } else if (media instanceof HTMLVideoElement) {
             type = MediaFallbackModule.TYPES.VIDEO;
         } else {
-            _debug(this + ' setup() : The 1st argument is either HTMLAudioElement or HTMLVideoElement.');
             return this;
         }
 
@@ -571,7 +480,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -602,8 +511,6 @@
                             }
 
                             this.volume = v;
-                        } else {
-                            _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                         }
                     }
 
@@ -622,8 +529,6 @@
                             }
 
                             this.playbackRate = v;
-                        } else {
-                            _debug(this + ' param() : The range of ' +  key + ' is greater than or equal to 0.5.');
                         }
                     }
 
@@ -644,8 +549,6 @@
                         if ((v >= min) && (v <= max)) {
                             // Setter
                             this.media.currentTime = v;
-                        } else {
-                            _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                         }
                     }
 
@@ -678,8 +581,6 @@
                             if (this.media instanceof HTMLVideoElement) {
                                 this.media[k] = v;
                             }
-                        } else {
-                            _debug(this + ' param() : The range of ' +  key + ' is greater than or equal to ' + min + '.');
                         }
                     }
 
@@ -689,7 +590,6 @@
                 case 'channels' :
                     return;  // for MediaModule
                 default :
-                    _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                     break;
             }
         }
@@ -824,14 +724,12 @@
 
         // Class (Static) properties
         XSound.IS_XSOUND   = IS_XSOUND;
-        XSound.ERROR_MODE  = ERROR_MODE;
         XSound.SAMPLE_RATE = null;
         XSound.BUFFER_SIZE = null;
         XSound.NUM_INPUT   = null;
         XSound.NUM_OUTPUT  = null;
 
         // Class (Static) methods
-        XSound.error          = error;
         XSound.read           = read;
         XSound.file           = file;
         XSound.ajax           = ajax;
@@ -916,7 +814,6 @@
                     this.BUFFER_SIZE = parseInt(bufferSize);
                     break;
                 default :
-                    _debug(this + ' constructor() : The 2nd argument is one of 256, 512, 1024, 2048, 4096, 8192, 16384.');
                     return;
             }
         } else if (/(Win(dows )?NT 6\.2)/.test(userAgent)) {
@@ -941,28 +838,28 @@
         this.processor    = context.createScriptProcessor(this.BUFFER_SIZE, this.NUM_INPUT, this.NUM_OUTPUT);
 
         /** @implements {Statable} */
-        Session.prototype  = _implement(Statable.prototype);
-        Effector.prototype = _implement(Statable.prototype);
+        Session.prototype  = Object.create(Statable.prototype);
+        Effector.prototype = Object.create(Statable.prototype);
 
         Session.prototype.constructor  = Session;
         Effector.prototype.constructor = Effector;
 
         /** @extends {Effector} */
-        Compressor.prototype         = _inherit(Effector.prototype);
-        Distortion.prototype         = _inherit(Effector.prototype);
-        Wah.prototype                = _inherit(Effector.prototype);
-        Equalizer.prototype          = _inherit(Effector.prototype);
-        Filter.prototype             = _inherit(Effector.prototype);
-        Tremolo.prototype            = _inherit(Effector.prototype);
-        Ringmodulator.prototype      = _inherit(Effector.prototype);
-        Autopanner.prototype         = _inherit(Effector.prototype);
-        AutopannerFallback.prototype = _inherit(Effector.prototype);
-        Phaser.prototype             = _inherit(Effector.prototype);
-        Flanger.prototype            = _inherit(Effector.prototype);
-        Chorus.prototype             = _inherit(Effector.prototype);
-        Delay.prototype              = _inherit(Effector.prototype);
-        Reverb.prototype             = _inherit(Effector.prototype);
-        Panner.prototype             = _inherit(Effector.prototype);
+        Compressor.prototype         = Object.create(Effector.prototype);
+        Distortion.prototype         = Object.create(Effector.prototype);
+        Wah.prototype                = Object.create(Effector.prototype);
+        Equalizer.prototype          = Object.create(Effector.prototype);
+        Filter.prototype             = Object.create(Effector.prototype);
+        Tremolo.prototype            = Object.create(Effector.prototype);
+        Ringmodulator.prototype      = Object.create(Effector.prototype);
+        Autopanner.prototype         = Object.create(Effector.prototype);
+        AutopannerFallback.prototype = Object.create(Effector.prototype);
+        Phaser.prototype             = Object.create(Effector.prototype);
+        Flanger.prototype            = Object.create(Effector.prototype);
+        Chorus.prototype             = Object.create(Effector.prototype);
+        Delay.prototype              = Object.create(Effector.prototype);
+        Reverb.prototype             = Object.create(Effector.prototype);
+        Panner.prototype             = Object.create(Effector.prototype);
 
         Compressor.prototype.constructor         = Compressor;
         Distortion.prototype.constructor         = Distortion;
@@ -1009,7 +906,7 @@
         };
 
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -1033,8 +930,6 @@
 
                             if (v >= 0) {
                                 this.listener.dopplerFactor = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
@@ -1047,8 +942,6 @@
 
                             if (v >= 0) {
                                 this.listener.speedOfSound = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
@@ -1061,9 +954,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.positions[k] = v;
                                 this.listener.setPosition(this.positions.x, this.positions.y, this.positions.z);
@@ -1079,9 +970,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.fronts[k.charAt(1)] = v;
                                 this.listener.setOrientation(this.fronts.x, this.fronts.y, this.fronts.z, this.ups.x, this.ups.y, this.ups.z);
@@ -1097,9 +986,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.ups[k.charAt(1)] = v;
                                 this.listener.setOrientation(this.fronts.x, this.fronts.y, this.fronts.z, this.ups.x, this.ups.y, this.ups.z);
@@ -1115,9 +1002,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.velocities[k.charAt(1)] = v;
                                 this.listener.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
@@ -1126,7 +1011,6 @@
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -1191,23 +1075,17 @@
             this.analyser.connect(this.output);
 
             /** @implements {Statable} */
-            Visualizer.prototype = _implement(Statable.prototype);
+            Visualizer.prototype = Object.create(Statable.prototype);
             Visualizer.prototype.constructor = Visualizer;
 
             /** @extends {Visualizer} */
-            TimeOverview.prototype = _inherit(Visualizer.prototype);  // The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
-            Time.prototype         = _inherit(Visualizer.prototype);
-            FFT.prototype          = _inherit(Visualizer.prototype);
+            TimeOverview.prototype = Object.create(Visualizer.prototype);  // The purpose of "Object.create" is that the inherited instance is not shared in the instances of subclass
+            Time.prototype         = Object.create(Visualizer.prototype);
+            FFT.prototype          = Object.create(Visualizer.prototype);
 
             TimeOverview.prototype.constructor = TimeOverview;
             Time.prototype.constructor         = Time;
             FFT.prototype.constructor          = FFT;
-
-            // Create the instances of Visualizer's subclass
-            this.timeOverviewL = new TimeOverview(context.sampleRate);
-            this.timeOverviewR = new TimeOverview(context.sampleRate);
-            this.time          = new Time(context.sampleRate);
-            this.fft           = new FFT(context.sampleRate);
 
             // Set default value
             this.analyser.fftSize               = 2048;
@@ -1299,15 +1177,13 @@
 
                     this.svg.setAttribute('xmlns',       Visualizer.XMLNS);
                     this.svg.setAttribute('xmlns:xlink', Visualizer.XLINK);
-                } else {
-                    _debug(this + ' setup() : The 1st argument is either HTMLCanvasElement or SVGElement.');
                 }
 
                 return this;
             };
 
             /**
-             * This method is getter or setter for parameters
+             * This method is getter or setter for parameters.
              * @param {string|object} key This argument is property name in the case of string type.
              *     This argument is pair of property and value in the case of associative array.
              * @param {string|number|Array.<object>} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -1328,8 +1204,6 @@
 
                                 if (v >= 0) {
                                     this.interval = v;  // Setter
-                                } else {
-                                    _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                                 }
                             }
                         }
@@ -1343,8 +1217,6 @@
 
                             if ((v === 'line') || (v === 'rect')) {
                                 this.styles.shape = (this.styles.wave !== 'gradient') ? v : 'rect';  // Setter
-                            } else {
-                                _debug(this + ' param() : The type of "' + key + '" is either "line" or "rect".');
                             }
                         }
 
@@ -1375,9 +1247,7 @@
                                 }
                             }
 
-                            if (isError) {
-                                _debug(this + ' param() : The type of "' + key + '" is object\'s array that has 2 properties ("offset", "color"). The range of "offset" is between 0 and 1.');
-                            } else {
+                            if (!isError) {
                                 this.styles.grad = value;  // Setter
                             }
                         }
@@ -1393,8 +1263,6 @@
                                         this.styles['font'][prop] = String(value[prop]);  // Setter
                                     }
                                 }
-                            } else {
-                                _debug(this + ' param() : The type of "' + key + '" is associative array for font.');
                             }
                         }
 
@@ -1413,8 +1281,6 @@
                                 }
 
                                 this.styles[k] = value.toLowerCase();  // Setter
-                            } else {
-                                _debug(this + ' param() : The type of "' + key + '" is string type.');
                             }
                         }
 
@@ -1431,8 +1297,6 @@
 
                             if (v >= 0) {
                                 this.styles[k] = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
@@ -1786,17 +1650,11 @@
 
                                     if (v > 0) {
                                         this[k.replace('interval', 'Interval')] = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The range of "' + key + '" is greater than 0.');
                                     }
                                 }
 
                                 break;
                             default :
-                                if (!(k in this.styles)) {
-                                    _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                                }
-
                                 break;
                         }
                     }
@@ -1845,7 +1703,7 @@
                     for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                            t = Math.floor(i / this.SAMPLE_RATE) + ' min';
+                            t = Math.floor((i / this.SAMPLE_RATE) / 60) + ' min';
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
@@ -1938,7 +1796,7 @@
                     for (var i = 0, len = data.length; i < len; i++) {
                         if ((i % nTextinterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
-                            t = Math.floor(i / this.SAMPLE_RATE) + ' min';
+                            t = Math.floor((i / this.SAMPLE_RATE) / 60) + ' min';
 
                             // Draw grid
                             if (this.styles.grid !== 'none') {
@@ -2054,7 +1912,6 @@
                 var t = parseFloat(time);
 
                 if (isNaN(t) || (t < 0)) {
-                    _debug(this + ' update() : The 1st argument is number type greater than 0.');
                     return;
                 }
 
@@ -2225,6 +2082,13 @@
                 this.textInterval = 0.005;   // Draw text at intervals this value [sec]
             }
 
+            /**
+             * Class (Static) properties
+             */
+            Time.TYPES       = {};
+            Time.TYPES.UINT  = 'uint';
+            Time.TYPES.FLOAT = 'float';
+
             /** @override */
             Time.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
@@ -2248,10 +2112,8 @@
                                 } else {
                                     var v = String(value).toLowerCase();
 
-                                    if ((v === 'uint') || (v === 'float')) {
+                                    if ((v === Time.TYPES.UINT) || (v === Time.TYPES.FLOAT)) {
                                         this.type = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The value of "' + key + '" is either "uint" or "float".');
                                     }
                                 }
 
@@ -2264,17 +2126,11 @@
 
                                     if (v > 0) {
                                         this.textInterval = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The range of "' + key + '" is greater than 0.');
                                     }
                                 }
 
                                 break;
                             default :
-                                if (!((k === 'interval') ||(k in this.styles))) {
-                                    _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                                }
-
                                 break;
                         }
                     }
@@ -2314,10 +2170,10 @@
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
+                    case Time.TYPES.FLOAT :
                         this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle);
                         break;
-                    case 'uint' :
+                    case Time.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -2407,7 +2263,7 @@
 
                     for (var i = 0, len = texts.length; i < len; i++) {
                         t = texts[i];
-                        x = Math.floor(this.styles.left - context.measureText(t).width); 
+                        x = Math.floor(this.styles.left - context.measureText(t).width);
                         y = Math.floor((1 - parseFloat(t.trim())) * (innerHeight / 2)) + this.styles.top;
 
                         // Draw grid
@@ -2461,10 +2317,10 @@
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
+                    case Time.TYPES.FLOAT :
                         svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
                         break;
-                    case 'uint' :
+                    case Time.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -2657,6 +2513,13 @@
                 this.textInterval = 1000;    // Draw text at intervals of this value [Hz]
             }
 
+            /**
+             * Class (Static) properties
+             */
+            FFT.TYPES       = {};
+            FFT.TYPES.UINT  = 'uint';
+            FFT.TYPES.FLOAT = 'float';
+
             /** @override */
             FFT.prototype.param = function(key, value) {
                 if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
@@ -2680,10 +2543,8 @@
                                 } else {
                                     var v = String(value).toLowerCase();
 
-                                    if ((v === 'uint') || (v === 'float')) {
+                                    if ((v === FFT.TYPES.UINT) || (v === FFT.TYPES.FLOAT)) {
                                         this.type = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The value of "' + key + '" is either "uint" or "float".');
                                     }
                                 }
 
@@ -2698,8 +2559,6 @@
 
                                     if ((v > 0) && (v <= max)) {
                                         this.size = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                                     }
                                 }
 
@@ -2712,17 +2571,11 @@
 
                                     if (v > 0) {
                                         this.textInterval = v;  // Setter
-                                    } else {
-                                        _debug(this + ' param() : The range of "' + key + '" is greater than 0.');
                                     }
                                 }
 
                                 break;
                             default :
-                                if (!((k === 'interval') ||(k in this.styles))) {
-                                    _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                                }
-
                                 break;
                         }
                     }
@@ -2773,7 +2626,7 @@
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
+                    case FFT.TYPES.FLOAT :
                         // Set style
                         context.strokeStyle = (this.styles.wave !== 'gradient') ? this.styles.wave : 'rgba(0, 0, 255, 1.0)';  // line only
                         context.lineWidth   = this.styles.width;
@@ -2797,7 +2650,7 @@
                         context.stroke();
 
                         break;
-                    case 'uint' :
+                    case FFT.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -2888,7 +2741,7 @@
 
                     // Draw grid and text (Y axis)
                     switch (this.type) {
-                        case 'float' :
+                        case FFT.TYPES.FLOAT :
                             for (var i = mindB; i <= maxdB; i += 10) {
                                 t = i + 'dB';
                                 x = Math.floor(this.styles.left - context.measureText(t).width);
@@ -2911,7 +2764,7 @@
                             }
 
                             break;
-                        case 'uint' :
+                        case FFT.TYPES.UINT :
                         default     :
                             var texts = ['0.00', '0.25', '0.50', '0.75', '1.00'];
 
@@ -2985,7 +2838,7 @@
 
                 // Begin drawing
                 switch (this.type) {
-                    case 'float' :
+                    case FFT.TYPES.FLOAT :
                         // Draw wave
                         var path = document.createElementNS(Visualizer.XMLNS, 'path');
 
@@ -3014,7 +2867,7 @@
                         svg.appendChild(path);
 
                         break;
-                    case 'uint' :
+                    case FFT.TYPES.UINT :
                     default     :
                         switch (this.styles.shape) {
                             case 'line' :
@@ -3144,7 +2997,7 @@
 
                     // Draw grid and text (Y axis)
                     switch (this.type) {
-                        case 'float' :
+                        case FFT.TYPES.FLOAT :
                             for (var i = mindB; i <= maxdB; i += 10) {
                                 t = i + 'dB';
                                 x = this.styles.left;
@@ -3189,7 +3042,7 @@
                             }
 
                             break;
-                        case 'uint' :
+                        case FFT.TYPES.UINT :
                         default     :
                             var texts = ['0.00', '0.25', '0.50', '0.75', '1.00'];
 
@@ -3247,10 +3100,16 @@
             FFT.prototype.toString = function() {
                 return '[SoundModule Analyser FFT]';
             };
+
+            // Create the instances of Visualizer's subclass
+            this.timeOverviewL = new TimeOverview(context.sampleRate);
+            this.timeOverviewR = new TimeOverview(context.sampleRate);
+            this.time          = new Time(context.sampleRate);
+            this.fft           = new FFT(context.sampleRate);
         }
 
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number|} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -3283,7 +3142,6 @@
                                     this.analyser.fftSize = v;   // Setter
                                     break;
                                 default :
-                                    _debug(this + ' param() : The value of "' + key + '" is one of 32, 64, 128, 256, 512, 1024, 2048.');
                                     break;
                             }
                         }
@@ -3300,8 +3158,6 @@
 
                             if (v < max) {
                                 this.analyser.minDecibels = v;
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is less than ' + max + '.');
                             }
                         }
 
@@ -3315,8 +3171,6 @@
 
                             if (v > min) {
                                 this.analyser.maxDecibels = v;
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is greater than ' + min + '.');
                             }
                         }
 
@@ -3331,14 +3185,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.analyser.smoothingTimeConstant = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -3365,8 +3216,6 @@
                             data.set(buffer.getChannelData(0));
                             this.timeOverviewL.start(data);
                         }
-                    } else {
-                        _debug(this + ' start() : The 2nd argument is the instance of AudioBuffer.');
                     }
 
                     break;
@@ -3377,8 +3226,6 @@
                             data.set(buffer.getChannelData(1));
                             this.timeOverviewR.start(data);
                         }
-                    } else {
-                        _debug(this + ' start() : The 2nd argument is the instance of AudioBuffer.');
                     }
 
                     break;
@@ -3431,7 +3278,6 @@
 
                     break;
                 default :
-                    _debug(this + ' start() : The 1st argument is one of "time-overview-L", "time-overview-R", "time", "fft".');
                     break;
             }
 
@@ -3471,7 +3317,6 @@
 
                     break;
                 default :
-                    _debug(this + ' stop() : The 1st argument is one of "time-overview-L", "time-overview-R", "time", "fft".');
                     break;
             }
 
@@ -3494,7 +3339,6 @@
                 case 'fft'  :
                     return this[d];
                 default :
-                    _debug(this + ' domain() : The 1st argument is one of "time-overview-L", "time-overview-R", "time", "fft".');
                     break;
             }
         };
@@ -3597,14 +3441,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this['gain' + k.slice(-1).toUpperCase()] = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -3791,10 +3632,9 @@
          * @param {string|number} track This argument is target track.
          * @param {number} channelType This argument is in order to select stereo or monaural of WAVE file. The default value is 2.
          * @param {number} qbit This argument is quantization bit of PCM. The default value is 16 (bit).
-         * @param {string} dataType This argument is in order to select Object URL or Data URL. The default value is 'blob' (Object URL).
          * @return {string} This is returned as Object URL or Data URL for WAVE file.
          */
-        Recorder.prototype.create = function(track, channelType, qbit, dataType) {
+        Recorder.prototype.create = function(track, channelType, qbit) {
             // on the way of recording ?
             if (this.activeTrack !== -1) {
                 this.stop();
@@ -3887,144 +3727,148 @@
             var BPS        = RATE * CHANNEL * (QBIT / 8);
             var DATA_SIZE  = SIZE * (QBIT / 8);
 
-            switch (String(dataType).toLowerCase()) {
-                case 'base64' :
-                    var wave = '';
+            global.URL = global.URL || global.webkitURL;
 
-                    wave += 'RIFF';
-                    wave += String.fromCharCode(((CHUNK_SIZE >> 0) & 0xFF), ((CHUNK_SIZE >> 8) & 0xFF), ((CHUNK_SIZE >> 16) & 0xFF), ((CHUNK_SIZE >> 24) & 0xFF));
-                    wave += 'WAVE';
+            if (global.URL && global.URL.createObjectURL) {
+                // Object URL
 
-                    // fmt chunk
-                    wave += 'fmt' + ' ' + String.fromCharCode(16, 0, 0, 0);
-                    wave += String.fromCharCode(1, 0);
+                var waves = [];
 
-                    // fmt chunk -> Channels (Monaural or Stereo)
-                    wave += String.fromCharCode(CHANNEL, 0);
+                waves[0] = 0x52;  // 'R'
+                waves[1] = 0x49;  // 'I'
+                waves[2] = 0x46;  // 'F'
+                waves[3] = 0x46;  // 'F'
 
-                    // fmt chunk -> Sample rate
-                    wave += String.fromCharCode(((RATE >> 0) & 0xFF), ((RATE >> 8) & 0xFF), ((RATE >> 16) & 0xFF), ((RATE >> 24) & 0xFF));
+                waves[4] = (CHUNK_SIZE >>  0) & 0xFF;
+                waves[5] = (CHUNK_SIZE >>  8) & 0xFF;
+                waves[6] = (CHUNK_SIZE >> 16) & 0xFF;
+                waves[7] = (CHUNK_SIZE >> 24) & 0xFF;
 
-                    // fmt chunk -> Byte per second
-                    wave += String.fromCharCode(((BPS >> 0) & 0xFF), ((BPS >> 8) & 0xFF), ((BPS >> 16) & 0xFF), ((BPS >> 24) & 0xFF));
+                waves[8]  = 0x57;  // 'W'
+                waves[9]  = 0x41;  // 'A'
+                waves[10] = 0x56;  // 'V'
+                waves[11] = 0x45;  // 'E'
 
-                    // fmt chunk -> Block size
-                    wave += String.fromCharCode((CHANNEL * (QBIT / 8)), 0);
+                // fmt chunk
+                waves[12] = 0x66;  // 'f'
+                waves[13] = 0x6D;  // 'm'
+                waves[14] = 0x74;  // 't'
+                waves[15] = 0x20;  // ' '
 
-                    // fmt chunk -> Byte per Sample
-                    wave += String.fromCharCode(QBIT, 0);
+                waves[16] = 16;
+                waves[17] =  0;
+                waves[18] =  0;
+                waves[19] =  0;
 
-                    // data chunk
-                    wave += 'data';
-                    wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
+                waves[20] = 1;
+                waves[21] = 0;
 
-                    for (var i = 0; i < SIZE; i++) {
-                        switch (QBIT) {
-                            case  8 :
-                                wave += String.fromCharCode(sounds[i]);
-                                break;
-                            case 16 :
-                                // The byte order in WAVE file is little endian
-                                wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
-                                break;
-                            default :
-                                break;
-                        }
+                // fmt chunk -> Channels (Monaural or Stereo)
+                waves[22] = CHANNEL;
+                waves[23] = 0;
+
+                // fmt chunk -> Sample rate
+                waves[24] = (RATE >>  0) & 0xFF;
+                waves[25] = (RATE >>  8) & 0xFF;
+                waves[26] = (RATE >> 16) & 0xFF;
+                waves[27] = (RATE >> 24) & 0xFF;
+
+                // fmt chunk -> Byte per second
+                waves[28] = (BPS >>  0) & 0xFF;
+                waves[29] = (BPS >>  8) & 0xFF;
+                waves[30] = (BPS >> 16) & 0xFF;
+                waves[31] = (BPS >> 24) & 0xFF;
+
+                // fmt chunk -> Block size
+                waves[32] = CHANNEL * (QBIT / 8);
+                waves[33] = 0;
+
+                // fmt chunk -> Byte per Sample
+                waves[34] = QBIT;
+                waves[35] = 0;
+
+                // data chunk
+                waves[36] = 0x64;  // 'd'
+                waves[37] = 0x61;  // 'a'
+                waves[38] = 0x74;  // 't
+                waves[39] = 0x61;  // 'a'
+
+                waves[40] = (DATA_SIZE >>  0) & 0xFF;
+                waves[41] = (DATA_SIZE >>  8) & 0xFF;
+                waves[42] = (DATA_SIZE >> 16) & 0xFF;
+                waves[43] = (DATA_SIZE >> 24) & 0xFF;
+
+                for (var i = 0; i < SIZE; i++) {
+                    switch (QBIT) {
+                        case  8 :
+                            waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
+                            break;
+                        case 16 :
+                            // The byte order in WAVE file is little endian
+                            waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
+                            waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
+                            break;
+                        default :
+                            break;
                     }
+                }
 
-                    var base64  = global.btoa(wave);
-                    var dataURL = 'data:audio/wav;base64,' + base64;
+                global.URL = global.URL || global.webkitURL;
 
-                    return dataURL;
-                case 'blob' :
-                default     :
-                    var waves = [];
+                var blob      = new Blob([new Uint8Array(waves)], {type : 'audio/wav'});
+                var objectURL = global.URL.createObjectURL(blob);
 
-                    waves[0] = 0x52;  // 'R'
-                    waves[1] = 0x49;  // 'I'
-                    waves[2] = 0x46;  // 'F'
-                    waves[3] = 0x46;  // 'F'
+                return objectURL;
+            } else {
+                // Data URL
 
-                    waves[4] = (CHUNK_SIZE >>  0) & 0xFF;
-                    waves[5] = (CHUNK_SIZE >>  8) & 0xFF;
-                    waves[6] = (CHUNK_SIZE >> 16) & 0xFF;
-                    waves[7] = (CHUNK_SIZE >> 24) & 0xFF;
+                var wave = '';
 
-                    waves[8]  = 0x57;  // 'W'
-                    waves[9]  = 0x41;  // 'A'
-                    waves[10] = 0x56;  // 'V'
-                    waves[11] = 0x45;  // 'E'
+                wave += 'RIFF';
+                wave += String.fromCharCode(((CHUNK_SIZE >> 0) & 0xFF), ((CHUNK_SIZE >> 8) & 0xFF), ((CHUNK_SIZE >> 16) & 0xFF), ((CHUNK_SIZE >> 24) & 0xFF));
+                wave += 'WAVE';
 
-                    // fmt chunk
-                    waves[12] = 0x66;  // 'f'
-                    waves[13] = 0x6D;  // 'm'
-                    waves[14] = 0x74;  // 't'
-                    waves[15] = 0x20;  // ' '
+                // fmt chunk
+                wave += 'fmt' + ' ' + String.fromCharCode(16, 0, 0, 0);
+                wave += String.fromCharCode(1, 0);
 
-                    waves[16] = 16;
-                    waves[17] =  0;
-                    waves[18] =  0;
-                    waves[19] =  0;
+                // fmt chunk -> Channels (Monaural or Stereo)
+                wave += String.fromCharCode(CHANNEL, 0);
 
-                    waves[20] = 1;
-                    waves[21] = 0;
+                // fmt chunk -> Sample rate
+                wave += String.fromCharCode(((RATE >> 0) & 0xFF), ((RATE >> 8) & 0xFF), ((RATE >> 16) & 0xFF), ((RATE >> 24) & 0xFF));
 
-                    // fmt chunk -> Channels (Monaural or Stereo)
-                    waves[22] = CHANNEL;
-                    waves[23] = 0;
+                // fmt chunk -> Byte per second
+                wave += String.fromCharCode(((BPS >> 0) & 0xFF), ((BPS >> 8) & 0xFF), ((BPS >> 16) & 0xFF), ((BPS >> 24) & 0xFF));
 
-                    // fmt chunk -> Sample rate
-                    waves[24] = (RATE >>  0) & 0xFF;
-                    waves[25] = (RATE >>  8) & 0xFF;
-                    waves[26] = (RATE >> 16) & 0xFF;
-                    waves[27] = (RATE >> 24) & 0xFF;
+                // fmt chunk -> Block size
+                wave += String.fromCharCode((CHANNEL * (QBIT / 8)), 0);
 
-                    // fmt chunk -> Byte per second
-                    waves[28] = (BPS >>  0) & 0xFF;
-                    waves[29] = (BPS >>  8) & 0xFF;
-                    waves[30] = (BPS >> 16) & 0xFF;
-                    waves[31] = (BPS >> 24) & 0xFF;
+                // fmt chunk -> Byte per Sample
+                wave += String.fromCharCode(QBIT, 0);
 
-                    // fmt chunk -> Block size
-                    waves[32] = CHANNEL * (QBIT / 8);
-                    waves[33] = 0;
+                // data chunk
+                wave += 'data';
+                wave += String.fromCharCode(((DATA_SIZE >> 0) & 0xFF), ((DATA_SIZE >> 8) & 0xFF), ((DATA_SIZE >> 16) & 0xFF), ((DATA_SIZE >> 24) & 0xFF));
 
-                    // fmt chunk -> Byte per Sample
-                    waves[34] = QBIT;
-                    waves[35] = 0;
-
-                    // data chunk
-                    waves[36] = 0x64;  // 'd'
-                    waves[37] = 0x61;  // 'a'
-                    waves[38] = 0x74;  // 't
-                    waves[39] = 0x61;  // 'a'
-
-                    waves[40] = (DATA_SIZE >>  0) & 0xFF;
-                    waves[41] = (DATA_SIZE >>  8) & 0xFF;
-                    waves[42] = (DATA_SIZE >> 16) & 0xFF;
-                    waves[43] = (DATA_SIZE >> 24) & 0xFF;
-
-                    for (var i = 0; i < SIZE; i++) {
-                        switch (QBIT) {
-                            case  8 :
-                                waves[(RIFF_CHUNK - DATA_SIZE) + i] = sounds[i];
-                                break;
-                            case 16 :
-                                // The byte order in WAVE file is little endian
-                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 0] = ((sounds[i] >> 0) & 0xFF);
-                                waves[(RIFF_CHUNK - DATA_SIZE) + (2 * i) + 1] = ((sounds[i] >> 8) & 0xFF);
-                                break;
-                            default :
-                                break;
-                        }
+                for (var i = 0; i < SIZE; i++) {
+                    switch (QBIT) {
+                        case  8 :
+                            wave += String.fromCharCode(sounds[i]);
+                            break;
+                        case 16 :
+                            // The byte order in WAVE file is little endian
+                            wave += String.fromCharCode(((sounds[i] >> 0) & 0xFF), ((sounds[i] >> 8) & 0xFF));
+                            break;
+                        default :
+                            break;
                     }
+                }
 
-                    global.URL = global.URL || global.webkitURL;
+                var base64  = global.btoa(wave);
+                var dataURL = 'data:audio/wav;base64,' + base64;
 
-                    var blob      = new Blob([new Uint8Array(waves)], {type : 'audio/wav'});
-                    var objectURL = global.URL.createObjectURL(blob);
-
-                    return objectURL;
+                return dataURL;
             }
         };
 
@@ -4103,7 +3947,6 @@
             var p = parseInt(port);
 
             if (isNaN(p) || (p < 0) || (p > 65535)) {
-                _debug(this + ' setup() : The 3rd argument is number type for port number (0 - 65535)');
                 return;
             }
 
@@ -4540,12 +4383,8 @@
 
                         if ((v >= min) && (v <= max)) {
                             this.compressor[k].value = v;  // Setter
-                        } else {
-                            _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                         }
                     }
-                } else {
-                    _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                 }
             }
 
@@ -4613,7 +4452,7 @@
             this.tone       = context.createBiquadFilter();
 
             // Distortion type
-            this.type = 'clean';
+            this.type = Distortion.CURVES.CLEAN;
 
             // for creating curve
             this.numberOfSamples = 4096;
@@ -4634,10 +4473,20 @@
         }
 
         /**
-         * This static method creates the instance of Float32Array for distortion
-         * @param {number} amount This argument is depth of distortion
-         * @param {number} numberOfSamples This argument is the size of Float32Array
-         * @return {Float32Array|null} This is "curve" property in WaveShaperNode
+         * Class (Static) properties
+         */
+        Distortion.CURVES            = {};
+        Distortion.CURVES.CLEAN      = 'clean';
+        Distortion.CURVES.CRUNCH     = 'crunch';
+        Distortion.CURVES.OVERDRIVE  = 'overdrive';
+        Distortion.CURVES.DISTORTION = 'distortion';
+        Distortion.CURVES.FUZZ       = 'fuzz';
+
+        /**
+         * This static method creates the instance of Float32Array for distortion.
+         * @param {number} amount This argument is depth of distortion.
+         * @param {number} numberOfSamples This argument is the size of Float32Array.
+         * @return {Float32Array|null} This is "curve" property in WaveShaperNode.
          */
         Distortion.createCurve = function(amount, numberOfSamples) {
             if ((amount > 0) && (amount < 1)) {
@@ -4685,31 +4534,29 @@
                             var curve = null;
 
                             switch (String(value).toLowerCase()) {
-                                case 'clean' :
-                                    this.type = 'clean';
+                                case Distortion.CURVES.CLEAN :
+                                    this.type = Distortion.CURVES.CLEAN;
                                     curve = Distortion.createCurve(AMOUNTS.CLEAN, this.numberOfSamples);
                                     break;
-                                case 'crunch' :
-                                    this.type = 'crunch';
+                                case Distortion.CURVES.CRUNCH :
+                                    this.type = Distortion.CURVES.CRUNCH;
                                     curve = Distortion.createCurve(AMOUNTS.CRUNCH, this.numberOfSamples);
                                     break;
-                                case 'overdrive' :
-                                    this.type = 'overdrive';
+                                case Distortion.CURVES.OVERDRIVE :
+                                    this.type = Distortion.CURVES.OVERDRIVE;
                                     curve = Distortion.createCurve(AMOUNTS.OVERDRIVE, this.numberOfSamples);
                                     break;
-                                case 'distortion' :
-                                    this.type = 'distortion';
+                                case Distortion.CURVES.DISTORTION :
+                                    this.type = Distortion.CURVES.DISTORTION;
                                     curve = Distortion.createCurve(AMOUNTS.DISTORTION, this.numberOfSamples);
                                     break;
-                                case 'fuzz' :
-                                    this.type = 'fuzz';
+                                case Distortion.CURVES.FUZZ :
+                                    this.type = Distortion.CURVES.FUZZ;
                                     curve = Distortion.createCurve(AMOUNTS.FUZZ, this.numberOfSamples);
                                     break;
                                 default :
                                     if (value instanceof Float32Array) {
                                         curve = value;
-                                    } else {
-                                        _debug(this + ' param() : The value of "' + key + '" is one of "clean", "crunch", "overdrive", "distortion", "fuzz", the instance of Float32Array.');
                                     }
 
                                     break;
@@ -4729,8 +4576,6 @@
                                 // Setter
                                 this.numberOfSamples = v;
                                 this.param('curve', this.type);
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
@@ -4745,8 +4590,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.drive.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -4762,14 +4605,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].frequency.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -4883,8 +4723,6 @@
                                 // Setter
                                 this.lowpass.frequency.value = v;
                                 this.depth.gain.value        = this.lowpass.frequency.value * this.depthRate;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -4901,8 +4739,6 @@
                                 // Setter
                                 this.depth.gain.value = this.lowpass.frequency.value * v;
                                 this.depthRate        = v;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -4917,8 +4753,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -4933,14 +4767,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.lowpass.Q.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5074,14 +4905,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5203,8 +5031,6 @@
 
                             if (v in FILTER_TYPES) {
                                 this.filter.type = (Object.prototype.toString.call(this.filter.type) === '[object String]') ? v : FILTER_TYPES[v];  // Setter
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is one of "lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass".');
                             }
                         }
 
@@ -5222,8 +5048,6 @@
                                 // Setter
                                 this.maxFrequency           = v;
                                 this.filter.frequency.value = v;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5238,8 +5062,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.filter.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5254,8 +5076,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.filter.Q.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5270,8 +5090,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.range= v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5287,14 +5105,11 @@
 
                             if (v >= 0) {
                                 this[k] = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5465,8 +5280,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.depth.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5481,14 +5294,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5609,8 +5419,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.depth.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5625,14 +5433,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5792,8 +5597,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.depth.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5808,8 +5611,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5830,14 +5631,11 @@
 
                             if (v in WAVE_TYPE) {
                                 this.lfo.type = (Object.prototype.toString.call(this.lfo.type) === '[object String]') ? v : WAVE_TYPE[v];  // Setter
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is one of "sine", "square", "sawtooth", "triangle".');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -5951,8 +5749,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.depth.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -5967,14 +5763,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -6115,7 +5908,6 @@
                                     this.connect();
                                     break;
                                 default :
-                                    _debug(this + ' param() : The value of "' + key + '" is one of 0, 2, 4, 8, 12, 24.');
                                     break;
                             }
                         }
@@ -6137,8 +5929,6 @@
                                 }
 
                                 this.depth.gain.value = this.filters[0].frequency.value * this.depthRate;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6155,8 +5945,6 @@
                                 for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                                     this.filters[0].Q.value = v;  // Setter
                                 }
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6173,8 +5961,6 @@
                                 // Setter
                                 this.depth.gain.value = this.filters[0].frequency.value * v;
                                 this.depthRate        = v;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6189,8 +5975,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6206,14 +5990,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -6362,8 +6143,6 @@
                                 // Setter
                                 this.delay.delayTime.value = v;
                                 this.depth.gain.value      = this.delay.delayTime.value * this.depthRate;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6381,8 +6160,6 @@
                                 // Setter
                                 this.depth.gain.value = this.delay.delayTime.value * v;
                                 this.depthRate        = v;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6397,8 +6174,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6414,8 +6189,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6430,14 +6203,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.tone.frequency.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -6573,8 +6343,6 @@
                                 // Setter
                                 this.delay.delayTime.value = v;
                                 this.depth.gain.value      = this.delay.delayTime.value * this.depthRate;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6592,8 +6360,6 @@
                                 // Setter
                                 this.depth.gain.value = this.delay.delayTime.value * v;
                                 this.depthRate        = v;
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6608,8 +6374,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.rate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6625,8 +6389,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6641,14 +6403,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.tone.frequency.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -6780,8 +6539,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.delay.delayTime.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6798,8 +6555,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6814,14 +6569,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.tone.frequency.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -6951,8 +6703,6 @@
                             } else if ((v >= min) && (v <= max)) {
                                 this.convolver.buffer = this.rirs[v];  // Setter
                                 this.connect();
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6968,8 +6718,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this[k].gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6984,8 +6732,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.tone.frequency.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -6993,7 +6739,6 @@
                     case 'rirs' :
                         return this.rirs;  // Getter only
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -7056,15 +6801,13 @@
 
                 // Asynchronously
                 this.decodeAudioData(impulse, successCallback, errorCallback);
-            } else {
-                _debug(this + ' start() : The 1st argument is one of AudioBuffer, ArrayBuffer, null.');
             }
 
             return this;
         };
 
         /**
-         * This method creates the instances of AudioBuffer by Ajax for Revreb presets
+         * This method creates the instances of AudioBuffer by Ajax for Revreb presets.
          * @param {Array.<string>|Array.<AudioBuffer>} rirs This argument is either URLs or the instances of AudioBuffer for Impulse Response.
          * @param {number} timeout This argument is timeout of Ajax. The default value is 60000 msec (1 minutes).
          * @param {function} successCallback This argument is executed when the creating AudioBuffers was completed.
@@ -7288,9 +7031,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.positions[k] = v;
                                 this.panner.setPosition(this.positions.x, this.positions.y, this.positions.z);
@@ -7306,9 +7047,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.orientations[k.charAt(1)] = v;
                                 this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
@@ -7324,9 +7063,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 // Setter
                                 this.velocities[k.charAt(1)] = v;
                                 this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
@@ -7340,9 +7077,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.refDistance = v;  // Setter
                             }
                         }
@@ -7354,9 +7089,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.maxDistance = v;  // Setter
                             }
                         }
@@ -7368,9 +7101,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.rolloffFactor = v;  // Setter
                             }
                         }
@@ -7382,9 +7113,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.coneInnerAngle = v;  // Setter
                             }
                         }
@@ -7396,9 +7125,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.coneOuterAngle = v;  // Setter
                             }
                         }
@@ -7410,9 +7137,7 @@
                         } else {
                             var v = parseFloat(value);
 
-                            if (isNaN(v)) {
-                                _debug(this + ' param() : The type of "' + key + '" is number type.');
-                            } else {
+                            if (!isNaN(v)) {
                                 this.panner.coneOuterGain = v;  // Setter
                             }
                         }
@@ -7431,8 +7156,6 @@
 
                             if (v in MODELS) {
                                 this.panner.panningModel = (Object.prototype.toString.call(this.panner.panningModel) === '[object String]') ? v : MODELS[v];  // Setter
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is either "equalpower" or "HRTF".');
                             }
                         }
 
@@ -7451,14 +7174,11 @@
 
                             if (v in MODELS) {
                                 this.panner.distanceModel = (Object.prototype.toString.call(this.panner.distanceModel) === '[object String]') ? v : MODELS[v];  // Setter
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is one of "linear", "inverse", "exponential".');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -7538,7 +7258,7 @@
         }
 
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -7565,14 +7285,11 @@
 
                             if (v >= 0) {
                                 this[k] = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The type of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -7816,7 +7533,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string} key This argument is property name.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
      * @return {number} This is returned as the value of designated property in the case of getter. Otherwise, this is returned for method chain.
@@ -7835,8 +7552,6 @@
 
                     if ((v >= min) && (v <= max)) {
                         this.mastervolume.gain.value = v;  // Setter
-                    } else {
-                        _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                     }
                 }
 
@@ -7978,7 +7693,6 @@
                     }
                 }
 
-                _debug(this + ' param() : The designated property ("' + module + '") does not exist in accessible properties.');
                 break;
         }
     };
@@ -8052,8 +7766,6 @@
         if (Object.prototype.toString.call(CustomizedEffector) === '[object Function]') {
             CustomizedEffector.prototype = new this.Effector(this.context, this.BUFFER_SIZE);
             this.plugins.push({name : String(effector).toLowerCase(), plugin : new CustomizedEffector(this.context)});
-        } else {
-            _debug(this + ' install() : The 1st argument is class (function) for created effector.');
         }
 
         return this;
@@ -8120,9 +7832,6 @@
         // This flag determines whether drawing sound wave is executing
         this.isAnalyser = false;
 
-        // Create the instances of private class
-        this.glide = new Glide(context);
-
         /**
          * This private class defines properties for Glide.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
@@ -8136,13 +7845,19 @@
                 end   : 0
             };
 
-            this.rate = 0;
             this.time = 0;         // Glide time
             this.type = 'linear';  // 'linear' or 'exponential'
         };
 
         /**
-         * This method is getter or setter for parameters
+         * Class (Static) properties
+         */
+        Glide.TYPES             = {};
+        Glide.TYPES.LINEAR      = 'linear';
+        Glide.TYPES.EXPONENTIAL = 'exponential';
+
+        /**
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8166,8 +7881,6 @@
 
                             if (v >= 0) {
                                 this.time = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of "' + key + '" is greater than or equal to 0.');
                             }
                         }
 
@@ -8176,18 +7889,15 @@
                         if (value === undefined) {
                             return this.type;  // Getter
                         } else {
-                            var v = String(value).toLowerCase();
+                            var v = String(value).toUpperCase();
 
-                            if ((v === 'linear') || (v === 'exponential')) {
-                                this.type = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The value of "' + key + '" is either "linear" or "exponential".');
+                            if (v in Glide.TYPES) {
+                                this.type = v.toLowerCase();  // Setter
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -8208,9 +7918,6 @@
             if ((this.frequencies.start === -1) || (this.time === 0) || (diff === 0)) {
                 // The 1st sound or Glide OFF or The same sound
                 this.frequencies.start = this.frequencies.end;
-            } else {
-                // Since the 2nd sound
-                this.rate = diff / this.time;
             }
 
             return this;
@@ -8254,10 +7961,13 @@
         Glide.prototype.toString = function() {
             return '[OscillatorModule Glide]';
         };
+
+        // Create the instances of private class
+        this.glide = new Glide(context);
     }
 
     /** @extends {SoundModule} */
-    OscillatorModule.prototype = _inherit(SoundModule.prototype);
+    OscillatorModule.prototype = Object.create(SoundModule.prototype);
     OscillatorModule.prototype.constructor = OscillatorModule;
 
     /**
@@ -8267,10 +7977,6 @@
      * @override
      */
     OscillatorModule.prototype.setup = function(states) {
-        /** @implements {Statable} */
-        Oscillator.prototype = _implement(Statable.prototype);
-        Oscillator.prototype.constructor = Oscillator;
-
         /**
          * This private class defines properties for the instance of OscillatorNode.
          * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
@@ -8308,8 +8014,12 @@
             };
         };
 
+        /** @implements {Statable} */
+        Oscillator.prototype = Object.create(Statable.prototype);
+        Oscillator.prototype.constructor = Oscillator;
+
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number|string} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8344,14 +8054,10 @@
 
                                 if (v in WAVE_TYPE) {
                                     this.source.type = (Object.prototype.toString.call(this.source.type) === '[object String]') ? v : WAVE_TYPE[v];  // Setter
-                                } else {
-                                    _debug(this + ' param() : The value of "' + key + '" is one of "sine", "square", "sawtooth", "triangle".');
                                 }
                             } else {
                                 // Custom wave
-                                if (!(('real' in value) && ('imag' in value))) {
-                                    _debug(this + ' param() : The value of "' +  key + '" is plain object (associative array) that has 2 keys ("real", "image" ).');
-                                } else {
+                                if (('real' in value) && ('imag' in value)) {
                                     var reals = null;
                                     var imags = null;
 
@@ -8359,16 +8065,12 @@
                                         reals = value.real;
                                     } else if (Array.isArray(value.real)) {
                                         reals = new Float32Array(value.real);
-                                    } else {
-                                        _debug(this + ' param() : The value of "real" is the instance of Float32Array or Array.');
                                     }
 
                                     if (value.imag instanceof Float32Array) {
                                         imags = value.imag;
                                     } else if (Array.isArray(value.imag)) {
                                         imags = new Float32Array(value.imag);
-                                    } else {
-                                        _debug(this + ' param() : The value of "imag" is the instance of Float32Array or Array.');
                                     }
 
                                     if ((reals instanceof Float32Array) && (imags instanceof Float32Array)) {
@@ -8396,14 +8098,14 @@
                         if (value === undefined) {
                             return this.octave;  // Getter
                         } else {
-                            var v   = this.octave = parseFloat(value);
+                            var v   = parseFloat(value);
                             var min = (this.source.detune.minValue || -4800) / OCTAVE;
                             var max = (this.source.detune.maxValue ||  4800) / OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = this.fine + (v * OCTAVE);  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
+                                // Setter
+                                this.octave = v;
+                                this.source.detune.value = this.fine + (v * OCTAVE);
                             }
                         }
 
@@ -8417,9 +8119,9 @@
                             var max =  OCTAVE;
 
                             if ((v >= min) && (v <= max)) {
-                                this.source.detune.value = v + (this.octave * OCTAVE);  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
+                                // Setter
+                                this.fine = v;
+                                this.source.detune.value = v + (this.octave * OCTAVE);
                             }
                         }
 
@@ -8435,14 +8137,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.volume.gain.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -8562,6 +8261,9 @@
             return '[OscillatorModule Oscillator]';
         };
 
+        // Clear
+        this.sources.length = 0;
+
         if (!Array.isArray(states)) {
             states = [states];
         }
@@ -8576,7 +8278,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -8800,8 +8502,8 @@
 
         params.oscillator = {
             glide : {
-                type : this.glide.type,
-                time : this.glide.time
+                type : this.glide.param('type'),
+                time : this.glide.param('time')
             }
         };
 
@@ -8859,8 +8561,15 @@
     }
 
     /** @extends {SoundModule} */
-    OneshotModule.prototype = _inherit(SoundModule.prototype);
+    OneshotModule.prototype = Object.create(SoundModule.prototype);
     OneshotModule.prototype.constructor = OneshotModule;
+
+    /**
+     * Class (Static) properties
+     */
+    OneshotModule.ERROR_AJAX         = 'error';
+    OneshotModule.ERROR_AJAX_TIMEOUT = 'timeout';
+    OneshotModule.ERROR_DECODE       = 'decode';
 
     /**
      * This method creates the instances of AudioBuffer by Ajax.
@@ -8905,11 +8614,9 @@
                 if ((buf >= 0) && (buf < this.buffers.length)) {
                     settings[i].buffer = buf;
                 } else {
-                    _debug(this + ' setup() : The "buffer" property in the 2nd argument is number type between 0 and ' + (this.buffers.length - 1) + '.');
                     return;
                 }
             } else {
-                _debug(this + ' setup() : The element of array in the 2nd argument  requires "buffer" property.');
                 return;
             }
 
@@ -8925,11 +8632,6 @@
         }
 
         this.settings = settings;
-
-        // for errorCallback
-        var ERROR_AJAX         = 'error';
-        var ERROR_AJAX_TIMEOUT = 'timeout';
-        var ERROR_DECODE       = 'decode';
 
         // If the error is at least 1, this method aborts the all of connections.
         // Therefore, this flag are shared with the all instances of XMLHttpRequest.
@@ -8948,7 +8650,7 @@
 
             xhr.ontimeout = function(error) {
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(error, ERROR_AJAX_TIMEOUT);
+                    errorCallback(error, OneshotModule.ERROR_AJAX_TIMEOUT);
                 }
 
                 isError = true;
@@ -8966,7 +8668,7 @@
             // Error
             xhr.onerror = function(event) {
                 if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                    errorCallback(event, ERROR_AJAX);
+                    errorCallback(event, OneshotModule.ERROR_AJAX);
                 }
 
                 isError = true;
@@ -8997,7 +8699,7 @@
 
                         var decodeErrorCallback = function(error) {
                             if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                errorCallback(error, ERROR_DECODE);
+                                errorCallback(error, OneshotModule.ERROR_DECODE);
                             }
                         };
 
@@ -9029,7 +8731,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9061,17 +8763,11 @@
 
                             if (v > min) {
                                 this.transpose = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is greater than ' + min + '.');
                             }
                         }
 
                         break;
                     default :
-                        if (k !== 'mastervolume') {
-                            _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                        }
-
                         break;
                 }
             }
@@ -9106,10 +8802,9 @@
      * @override
      */
     OneshotModule.prototype.start = function(index, connects, processCallback) {
-        if ((index >= 0) && (index < this.settings.length)) {
-            var activeIndex = parseInt(index);
-        } else {
-            _debug(this + ' start() : The 1st argument is number type between 0 and ' + (this.settings.length - 1) + '.');
+        var activeIndex = parseInt(index);
+
+        if (isNaN(activeIndex) || (activeIndex < 0) || (activeIndex >= this.settings.length)) {
             return;
         }
 
@@ -9237,13 +8932,13 @@
      * @override
      */
     OneshotModule.prototype.stop = function(index) {
-        if ((index >= 0) && (index < this.settings.length)) {
-            var activeIndex = parseInt(index);
-            var bufferIndex= this.settings[activeIndex].buffer;
-        } else {
-            _debug(this + ' stop() : The 1st argument is number type between 0 and ' + (this.settings.length - 1) + '.');
+        var activeIndex = parseInt(index);
+
+        if (isNaN(activeIndex) || (activeIndex < 0) || (activeIndex >= this.settings.length)) {
             return;
         }
+
+        var bufferIndex= this.settings[activeIndex].buffer;
 
         if ((this.buffers[bufferIndex] === undefined) || (this.sources[activeIndex] === undefined)) {
             return;
@@ -9292,6 +8987,23 @@
         return params;
     };
 
+    /**
+     * This method resets settings.
+     * @param {number} index This argument is in order to select target setting.
+     * @param {string} key This argument is in order to select parameter.
+     * @param {number|boolean} value This argument is new value.
+     * @return {OneshotModule} This is returned for method chain.
+     */
+    OneshotModule.prototype.reset = function(index, key, value) {
+        var activeIndex = parseInt(index);
+
+        if (String(key).toLowerCase() in this.settings[activeIndex]) {
+            this.settings[activeIndex][key.toLowerCase()] = value;
+        }
+
+        return this;
+    };
+
     /** @override */
     OneshotModule.prototype.toString = function() {
         return '[OneshotModule]';
@@ -9327,9 +9039,6 @@
             error  : function() {}
         };
 
-        // Create the instance of private class
-        this.vocalcanceler = new VocalCanceler();
-
         /**
          * Private class
          * @constructor
@@ -9339,7 +9048,7 @@
         };
 
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9365,14 +9074,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.depth = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -9394,10 +9100,13 @@
         VocalCanceler.prototype.toString = function() {
             return '[AudioModule VocalCanceler]';
         };
+
+        // Create the instance of private class
+        this.vocalcanceler = new VocalCanceler();
     }
 
     /** @extends {SoundModule} */
-    AudioModule.prototype = _inherit(SoundModule.prototype);
+    AudioModule.prototype = Object.create(SoundModule.prototype);
     AudioModule.prototype.constructor = AudioModule;
 
     /**
@@ -9420,11 +9129,7 @@
             if (k in this.callbacks) {
                 if (Object.prototype.toString.call(value) === '[object Function]') {
                     this.callbacks[k] = value;
-                } else {
-                    _debug(this + ' setup() : The type of "' + key + '" is function.');
                 }
-            } else {
-                _debug(this + ' setup() : The designated property ("' + key + '") does not exist in accessible properties.');
             }
         }
 
@@ -9432,7 +9137,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9465,8 +9170,6 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.source.playbackRate.value = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -9503,8 +9206,6 @@
                                     this.stop();
                                     this.start(v);  // Setter
                                 }
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -9516,10 +9217,6 @@
                     case 'channels' :
                         return (this.buffer instanceof AudioBuffer) ? this.buffer.numberOfChannels : 0;  // Getter only
                     default :
-                        if (k !== 'mastervolume') {
-                            _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                        }
-
                         break;
                 }
             }
@@ -9549,8 +9246,6 @@
             this.context.decodeAudioData(arrayBuffer, successCallback.bind(this), this.callbacks.error.bind(this));
 
             this.callbacks.decode(arrayBuffer);
-        } else {
-            _debug(this + ' ready() : The 1st argument is ArrayBuffer for audio.');
         }
 
         return this;
@@ -9746,7 +9441,7 @@
         params.audio = {
             playbackrate  : this.source.playbackRate.value,
             vocalcanceler : {
-                depth : this.vocalcanceler.depth
+                depth : this.vocalcanceler.param('depth')
             }
         };
 
@@ -9790,7 +9485,7 @@
     }
 
     /** @extends {AudioModule} */
-    MediaModule.prototype = _inherit(AudioModule.prototype);
+    MediaModule.prototype = Object.create(AudioModule.prototype);
     MediaModule.prototype.constructor = MediaModule;
 
     /**
@@ -9825,7 +9520,6 @@
         } else if (media instanceof HTMLVideoElement) {
             type = MediaModule.TYPES.VIDEO;
         } else {
-            _debug(this + ' setup() : The 1st argument is either HTMLAudioElement or HTMLVideoElement.');
             return this;
         }
 
@@ -9904,7 +9598,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number|boolean} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -9942,8 +9636,6 @@
                                 }
 
                                 this.playbackRate = v;
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is greater than or equal to 0.5.');
                             }
                         }
 
@@ -9964,8 +9656,6 @@
                             if ((v >= min) && (v <= max)) {
                                 // Setter
                                 this.media.currentTime = v;
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
@@ -9998,8 +9688,6 @@
                                 if (this.media instanceof HTMLVideoElement) {
                                     this.media[k] = v;
                                 }
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is greater than or equal to ' + min + '.');
                             }
                         }
 
@@ -10009,10 +9697,6 @@
                     case 'channels' :
                         return (this.source instanceof MediaElementAudioSourceNode) ? this.source.channelCount : 0;  // Getter only
                     default :
-                        if (k !== 'mastervolume') {
-                            _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
-                        }
-
                         break;
                 }
             }
@@ -10184,7 +9868,7 @@
         params.media = {
             playbackrate  : this.playbackRate,
             vocalcanceler : {
-                depth : this.vocalcanceler.depth
+                depth : this.vocalcanceler.param('depth')
             }
         };
 
@@ -10223,9 +9907,6 @@
 
         this.isStop  = true;
 
-        // Create the instance of private class
-        this.noisegate = new NoiseGate();
-
         /**
          * Private class
          * @constructor
@@ -10235,7 +9916,7 @@
         }
 
         /**
-         * This method is getter or setter for parameters
+         * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
          * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -10261,14 +9942,11 @@
 
                             if ((v >= min) && (v <= max)) {
                                 this.level = v;  // Setter
-                            } else {
-                                _debug(this + ' param() : The range of ' +  key + ' is between ' + min + ' and ' + max + '.');
                             }
                         }
 
                         break;
                     default :
-                        _debug(this + ' param() : The designated property ("' + key + '") does not exist in accessible properties.');
                         break;
                 }
             }
@@ -10297,10 +9975,13 @@
         NoiseGate.prototype.toString = function() {
             return '[StreamModule NoiseGate]';
         };
+
+        // Create the instance of private class
+        this.noisegate = new NoiseGate();
     }
 
     /** @extends {SoundModule} */
-    StreamModule.prototype = _inherit(SoundModule.prototype);
+    StreamModule.prototype = Object.create(SoundModule.prototype);
     StreamModule.prototype.constructor = StreamModule;
 
     /**
@@ -10325,7 +10006,7 @@
     };
 
     /**
-     * This method is getter or setter for parameters
+     * This method is getter or setter for parameters.
      * @param {string|object} key This argument is property name in the case of string type.
      *     This argument is pair of property and value in the case of associative array.
      * @param {number} value This argument is the value of designated property. If this argument is omitted, This method is getter.
@@ -10484,7 +10165,7 @@
 
         params.stream = {
             noisegate : {
-                level : this.noisegate.level
+                level : this.noisegate.param('level')
             }
         };
 
@@ -10514,7 +10195,7 @@
     };
 
     /** @extends {SoundModule} */
-    MixerModule.prototype = _inherit(SoundModule.prototype);
+    MixerModule.prototype = Object.create(SoundModule.prototype);
     MixerModule.prototype.constructor = MixerModule;
 
     /**
@@ -10533,7 +10214,6 @@
             var source = this.sources[i];
 
             if (!((source instanceof OscillatorModule) || (source instanceof OneshotModule) || (source instanceof AudioModule) || (source instanceof MediaModule) || (source instanceof StreamModule))) {
-                _debug(this + ' mix() : The 1st argument is array that has X("oscillator") or X("oneshot") or X("audio") or X("media") or X("stream").');
                 return;
             }
 
@@ -10700,11 +10380,7 @@
             if (k in this.callbacks) {
                 if (Object.prototype.toString.call(value) === '[object Function]') {
                     this.callbacks[k] = value;
-                } else {
-                    _debug(this + ' setup() : The type of "' + key + '" is function.');
                 }
-            } else {
-                _debug(this + ' setup() : The designated property ("' + key + '") does not exist in accessible properties.');
             }
         }
 
@@ -10730,8 +10406,7 @@
         if (Array.isArray(source)) {
             for (var i = 0, len = source.length; i < len; i++) {
                 if (!(source[i] instanceof OscillatorNode)) {
-                    _debug(this + ' ready() : The 1st argument is one of array that has OscillatorNode, X("oscillator"), X("oneshot").');
-                    return;
+                    return this;
                 }
             }
 
@@ -10741,8 +10416,7 @@
         } else if ((source instanceof OscillatorModule) || (source instanceof OneshotModule)) {
             this.source = source;
         } else {
-            _debug(this + ' ready() ; The 1st argument is one of array that has OscillatorNode, X("oscillator"), X("oneshot").');
-            return;
+            return this;
         }
 
         if (!Array.isArray(mmls)) {
@@ -11036,7 +10710,6 @@
                                 var next = connects[i + 1];
 
                                 if (!((node instanceof AudioNode) && (next instanceof AudioNode))) {
-                                    _debug(this + ' start() : The 2nd argument is array that has AudioNode.');
                                     return;
                                 }
 
@@ -11112,8 +10785,6 @@
 
                 sequence = null;
             }, (sequence.duration * 1000));
-        } else {
-            _debug(this + ' start() : The range of designated MML part is between 0 and ' + (this.sequences.length - 1) + '.');
         }
 
         return this;
@@ -11254,6 +10925,78 @@
         return '[MML]';
     };
 
+    /**
+     * This class defines properties for using Web MIDI API.
+     * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
+     * @constructor
+     */
+    function MIDI(context) {
+        this.context = context;
+
+        this.midiAccess = null;  // for the instance of MIDIAccess
+        this.inputs     = [];    // for the instances of MIDIInput
+        this.outputs    = [];    // for the instances of MIDIOutput
+    }
+
+    /**
+     * This method invokes requestMIDIAccess and gets objects for using Web MIDI API.
+     * @param {function} successCallback This argument is invoked when requestMIDIAccess succeeds.
+     * @param {function} errorCallback This argument is invoked when requestMIDIAccess fails.
+     * @return {MIDI} This is returned for method chain.
+     */
+    MIDI.prototype.setup = function(successCallback, errorCallback) {
+        if (!navigator.requestMIDIAccess) {
+            throw new Error('Cannot use Web MIDI API.');
+        }
+
+        var self = this;
+
+        navigator.requestMIDIAccess({sysex : true}).then(function(midiAccess) {
+            self.midiAccess = midiAccess;
+
+            if (Object.prototype.toString.call(midiAccess) === '[object Function]') {
+                // Legacy Chrome
+                self.inputs  = midiAccess.inputs();
+                self.outputs = midiAccess.outputs();
+            } else {
+                // Chrome 39 and later
+                var inputIterator  = midiAccess.inputs.values();
+                var outputIterator = midiAccess.outputs.values();
+
+                for (var i = inputIterator.next(); !i.done; i = inputIterator.next()) {
+                    self.inputs.push(i.value);
+                }
+
+                for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+                    self.outputs.push(o.value);
+                }
+            }
+
+            if (Object.prototype.toString.call(successCallback) === '[object Function]') {
+                successCallback(self.midiAccess, self.inputs, self.outputs);
+            }
+        }, function(error) {
+            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                errorCallback(error);
+            }
+        });
+
+        return this;
+    };
+
+    /**
+     * This method gets the instance of MIDIAccess.
+     * @return {MIDIAccess} This is returned as the instance of MIDIAccess.
+     */
+    MIDI.prototype.get = function() {
+        return this.midiAccess;
+    };
+
+    /** @override */
+    MIDI.prototype.toString = function() {
+        return '[MIDI]';
+    };
+
 ////////////////////////////////////////////////////////////////////////////////
 
     // Create instances
@@ -11267,7 +11010,8 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext)
+        mml        : new MML(audiocontext),
+        midi       : new MIDI(audiocontext)
     };
 
     // Cloned instances
@@ -11279,12 +11023,13 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext)
+        mml        : new MML(audiocontext),
+        midi       : new MIDI(audiocontext)
     };
 
     /**
-     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML.
-     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml'.
+     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML or MIDI.
+     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml', 'midi'.
      * @param {number} index This argument is in order to select one of some oscillators.
      * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule|StreamModule|MixerModule|MML}
      */
@@ -11300,8 +11045,6 @@
 
                     if ((i >= 0) && (i < sources.oscillator.sources.length)) {
                         return sources.oscillator.sources[i];
-                    } else {
-                        _debug('XSound() : The range of the 2nd argument is between 0 and ' + (sources.oscillator.sources.length - 1) + '.');
                     }
                 }
 
@@ -11313,23 +11056,21 @@
             case 'stream'   :
             case 'mixer'    :
             case 'mml'      :
+            case 'midi'     :
                 return sources[s];
             default :
-                _debug('XSound() : The 1st argument ("' + source + '") is one of "oscillator", "oneshot", "audio", "media", "fallback", "stream", "mixer", "mml".');
                 break;
         }
     };
 
     // Class (Static) properties
     XSound.IS_XSOUND   = IS_XSOUND;
-    XSound.ERROR_MODE  = ERROR_MODE;
     XSound.SAMPLE_RATE = sound.SAMPLE_RATE;
     XSound.BUFFER_SIZE = sound.BUFFER_SIZE;
     XSound.NUM_INPUT   = sound.NUM_INPUT;
     XSound.NUM_OUTPUT  = sound.NUM_OUTPUT;
 
     // Class (Static) methods
-    XSound.error          = error;
     XSound.read           = read;
     XSound.file           = file;
     XSound.ajax           = ajax;
@@ -11358,8 +11099,6 @@
 
                         if ((i >= 0) && (i < clones.oscillator.sources.length)) {
                             return clones.oscillator.sources[i];
-                        } else {
-                            _debug('XSound() : The range of the 2nd argument is between 0 and ' + (clones.oscillator.sources.length - 1) + '.');
                         }
                     }
 
@@ -11371,9 +11110,9 @@
                 case 'stream'   :
                 case 'mixer'    :
                 case 'mml'      :
+                case 'midi'     :
                     return clones[s];
                 default :
-                    _debug('XSound() : The 1st argument ("' + source + '") is one of "oscillator", "oneshot", "audio", "media", "fallback", "stream", "mixer", "mml".');
                     break;
             };
         };
