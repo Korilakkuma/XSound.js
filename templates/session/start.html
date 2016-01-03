@@ -21,8 +21,8 @@ try {
 
             document.querySelector(&apos;button&apos;).addEventListener(&apos;click&apos;, function() {
                 if (isStop) {
-                    X(&apos;oscillator&apos;).start(440);
                     X(&apos;oscillator&apos;).module(&apos;session&apos;).start();
+                    X(&apos;oscillator&apos;).start(440);
 
                     this.textContent = &apos;STOP&apos;;
                 } else {
