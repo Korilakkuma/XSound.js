@@ -328,6 +328,10 @@
      * @param {HTMLElement} element This argument is the instance of HTMLElement that is target of full screen.
      */
     var fullscreen = function(element) {
+        if (!(element instanceof HTMLElement)) {
+            return;
+        }
+
         if (element.webkitRequestFullscreen) {
             element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         } else if (element.mozRequestFullScreen) {
@@ -1315,9 +1319,14 @@
              */
             Visualizer.prototype.start = function(data, minDecibels, maxDecibels) {
                 switch (this.drawType) {
-                    case Visualizer.DRAW_TYPES.CANVAS : this.drawToCanvas(data, minDecibels, maxDecibels); break;
-                    case Visualizer.DRAW_TYPES.SVG    : this.drawToSVG(data, minDecibels, maxDecibels);    break;
-                    default       : break;
+                    case Visualizer.DRAW_TYPES.CANVAS :
+                        this.drawToCanvas(data, minDecibels, maxDecibels);
+                        break;
+                    case Visualizer.DRAW_TYPES.SVG :
+                        this.drawToSVG(data, minDecibels, maxDecibels);
+                        break;
+                    default :
+                        break;
                 }
 
                 return this;
@@ -1329,9 +1338,12 @@
              */
             Visualizer.prototype.create = function() {
                 switch (this.drawType) {
-                    case Visualizer.DRAW_TYPES.CANVAS : return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-                    case Visualizer.DRAW_TYPES.SVG    : return this.svg.outerHTML;
-                    default       : return this;
+                    case Visualizer.DRAW_TYPES.CANVAS :
+                        return this.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+                    case Visualizer.DRAW_TYPES.SVG :
+                        return this.svg.outerHTML;
+                    default :
+                        return this;
                 }
             };
 
@@ -1456,8 +1468,6 @@
              * @return {SVGPathElement|SVGGElement} This is returned as SVGElement.
              */
             Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotinterval, linearGradientId) {
-                var svg = '';
-
                 var x = 0;
                 var y = 0;
 
@@ -3373,9 +3383,9 @@
             this.mixedLs = null;  /** @type {Float32Array} */
             this.mixedRs = null;  /** @type {Float32Array} */
 
-            this.trackLs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
-            this.trackRs     = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
-            this.numtrack    = 0;
+            this.numberOfTracks = 0;
+            this.trackLs        = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
+            this.trackRs        = [];  /** @type {Array.<Array.<Float32Array>>} 2 dimensions array */
 
             this.activeTrack = -1;      // There is not any active track in the case of -1
             this.paused      = true;    // for preventing from the duplicate onaudioprocess event ("start" method)
@@ -3386,25 +3396,25 @@
 
         /**
          * This method sets max the number of tracks.
-         * @param {number} numTrack This argument is the max number of tracks. The default value is 1.
+         * @param {number} numberOfTracks This argument is the max number of tracks. The default value is 1.
          * @return {Recorder} This is returned for method chain.
          */
-        Recorder.prototype.setup = function(numTrack) {
-            var n = parseInt(numTrack);
+        Recorder.prototype.setup = function(numberOfTracks) {
+            var n = parseInt(numberOfTracks);
 
             if (n > 0) {
-                this.numTrack = n;
+                this.numberOfTracks = n;
 
-                this.trackLs = new Array(this.numTrack);
-                this.trackRs = new Array(this.numTrack);
+                this.trackLs = new Array(this.numberOfTracks);
+                this.trackRs = new Array(this.numberOfTracks);
 
                 for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  // n * array
                 for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  // n * array
             } else {
-                this.numTrack = 1;
+                this.numberOfTracks = 1;
 
-                this.trackLs = new Array(this.numTrack);
-                this.trackRs = new Array(this.numTrack);
+                this.trackLs = new Array(this.numberOfTracks);
+                this.trackRs = new Array(this.numberOfTracks);
 
                 this.trackLs[0] = [];  // 1 * array
                 this.trackRs[0] = [];  // 1 * array
@@ -3461,6 +3471,8 @@
         Recorder.prototype.ready = function(track) {
             if (this.isTrack(track)) {
                 this.activeTrack = track;
+            } else {
+                this.activeTrack = -1;
             }
 
             return this;
@@ -3493,7 +3505,7 @@
                         self.trackRs[self.activeTrack].push(recordedRs);
                     } else {
                         this.disconnect(0);
-                        this.onaudioprocess = null;  // for Firefox
+                        this.onaudioprocess = null;
                     }
                 };
             }
@@ -3509,7 +3521,7 @@
             this.activeTrack = -1;  // Flag becomes inactive
             this.paused      = true;
             this.processor.disconnect(0);  // Stop onaudioprocess event
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
             return this;
         };
 
@@ -3521,7 +3533,7 @@
         Recorder.prototype.isTrack = function(track) {
             var t = parseInt(track);
 
-            return ((t >= 0) && (t < this.numTrack)) ? true : false;
+            return ((t >= 0) && (t < this.numberOfTracks)) ? true : false;
         };
 
         /**
@@ -3947,7 +3959,7 @@
             var p = parseInt(port);
 
             if (isNaN(p) || (p < 0) || (p > 65535)) {
-                return;
+                return this;
             }
 
             this.websocket = new WebSocket(scheme + host + ':' + p + path);
@@ -4035,7 +4047,6 @@
             this.receiver.disconnect(0);
             this.sender.disconnect(0);
 
-            // for Firefox
             this.receiver.onaudioprocess = null;
             this.sender.onaudioprocess   = null;
 
@@ -5514,7 +5525,7 @@
             if (this.isActive) {
                 // Stop onaudioprocess event
                 this.processor.disconnect(0);
-                this.processor.onaudioprocess = null;  // for Firefox
+                this.processor.onaudioprocess = null;
 
                 // Connect nodes again
                 this.lfo.connect(this.depth);
@@ -6674,6 +6685,13 @@
             this.state(false);
         }
 
+        /**
+         * Class (Static) properties
+         */
+        Reverb.ERROR_AJAX         = 'error';
+        Reverb.ERROR_AJAX_TIMEOUT = 'timeout';
+        Reverb.ERROR_DECODE       = 'decode';
+
         /** @override */
         Reverb.prototype.param = function(key, value) {
             if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
@@ -6834,11 +6852,6 @@
 
             this.rirs = new Array(rirs.length);
 
-            // for errorCallback
-            var ERROR_AJAX         = 'error';
-            var ERROR_AJAX_TIMEOUT = 'timeout';
-            var ERROR_DECODE       = 'decode';
-
             // If the error is at least 1, this method aborts the all of connections.
             // Therefore, this flag are shared with the all instances of XMLHttpRequest.
             var isError = false;
@@ -6856,7 +6869,7 @@
 
                 xhr.ontimeout = function(event) {
                     if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                        errorCallback(event, ERROR_AJAX_TIMEOUT);
+                        errorCallback(event, Reverb.ERROR_AJAX_TIMEOUT);
                     }
 
                     isError = true;
@@ -6874,7 +6887,7 @@
                 // Error
                 xhr.onerror = function(event) {
                     if (!isError && (Object.prototype.toString.call(errorCallback) === '[object Function]')) {
-                        errorCallback(event, ERROR_AJAX);
+                        errorCallback(event, Reverb.ERROR_AJAX);
                     }
 
                     isError = true;
@@ -6905,7 +6918,7 @@
 
                             var decodeErrorCallback = function(error) {
                                 if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                                    errorCallback(error, ERROR_DECODE);
+                                    errorCallback(error, Reverb.ERROR_DECODE);
                                 }
                             };
 
@@ -7258,6 +7271,11 @@
         }
 
         /**
+         * Class (Static) property
+         */
+        EnvelopeGenerator.MIN_GAIN = 1e-3;
+
+        /**
          * This method is getter or setter for parameters.
          * @param {string|object} key This argument is property name in the case of string type.
          *     This argument is pair of property and value in the case of associative array.
@@ -7302,8 +7320,7 @@
          * @return {boolean} If the all of gain schedulings have ended, this value is true. Otherwise, this value is false.
          */
         EnvelopeGenerator.prototype.isStop = function() {
-            var MIN_GAIN = 1e-3;
-            var counter  = 0;
+            var counter = 0;
 
             for (var i = 0, len = this.activeIndexes.length; i < len; i++) {
                 var activeIndex = this.activeIndexes[i];
@@ -7312,7 +7329,7 @@
                     continue;
                 }
 
-                if (this.generators[activeIndex].gain.value > MIN_GAIN) {
+                if (this.generators[activeIndex].gain.value > EnvelopeGenerator.MIN_GAIN) {
                     return false;
                 } else {
                     counter++;
@@ -7451,6 +7468,10 @@
         EnvelopeGenerator.prototype.clear = function() {
             this.activeIndexes = [];
             this.activeCounter = 0;
+
+            for (var i = 0, len = this.generators.length; i < len; i++) {
+                this.generators[i].gain.value = 1;
+            }
 
             return this;
         };
@@ -8315,6 +8336,8 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
+        this.envelopegenerator.clear();
+
         return this;
     };
 
@@ -8342,7 +8365,7 @@
         // Clear previous
         this.envelopegenerator.clear();
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  // for Firefox
+        this.processor.onaudioprocess = null;
 
         // (... ->) ScriptProcessorNode (composite oscillators) -> ... -> AudioDestinationNode (output)
         this.connect(this.processor, connects);
@@ -8380,17 +8403,6 @@
             this.isAnalyser = true;
         }
 
-        // In the case of scheduling stop time
-        var duration = this.times.stop - this.times.start;
-
-        if (duration > 0) {
-            var self = this;
-
-            global.setTimeout(function() {
-                self.stop(processCallback);
-            }, (duration * 1000));
-        }
-
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
             this.processor.onaudioprocess = processCallback;
         } else {
@@ -8425,7 +8437,7 @@
         this.filter.stop(stopTime);
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.release);
+            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.param('release'));
         }
 
         var self = this;
@@ -8461,7 +8473,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  // for Firefox
+                    this.onaudioprocess = null;
                 } else {
                     // Release
                 }
@@ -8790,6 +8802,8 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
+        this.envelopegenerator.clear();
+
         return this;
     };
 
@@ -8844,6 +8858,8 @@
 
         this.volumes[activeIndex].gain.value = volume;
 
+        this.envelopegenerator.clear();
+
         // AudioBufferSourceNode (input) -> EnvelopeGenerator -> GainNode -> ScriptProcessorNode -> ... -> AudioDestinationNode (output)
         this.envelopegenerator.ready(activeIndex, source, this.volumes[activeIndex]);
         this.volumes[activeIndex].connect(this.processor);
@@ -8873,12 +8889,10 @@
         var self = this;
 
         // In the case of scheduling stop time
-        var duration = this.times.stop - this.times.start;
-
-        if (duration > 0) {
+        if (this.times.stop > 0) {
             global.setTimeout(function() {
                 self.stop(activeIndex);
-            }, (duration * 1000));
+            }, (this.times.stop * 1000));
         }
 
         // Call on stopping audio
@@ -8909,7 +8923,7 @@
 
                     // Stop onaudioprocess event
                     this.disconnect(0);
-                    this.onaudioprocess = null;  // for Firefox
+                    this.onaudioprocess = null;
                 } else {
                     var inputLs  = event.inputBuffer.getChannelData(0);
                     var inputRs  = event.inputBuffer.getChannelData(1);
@@ -8953,7 +8967,7 @@
         this.filter.stop(stopTime);
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.release);
+            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.param('release'));
         }
 
         return this;
@@ -9363,7 +9377,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
             this.paused = true;
             this.callbacks.stop(this.source, this.currentTime);
         }
@@ -9581,7 +9595,7 @@
 
             // Stop onaudioprocess event
             self.processor.disconnect(0);
-            self.processor.onaudioprocess = null;  // for Firefox
+            self.processor.onaudioprocess = null;
 
             if ('ended' in self.callbacks) {
                 self.callbacks.ended(event, this);
@@ -9799,7 +9813,7 @@
 
             // Stop onaudioprocess event
             this.processor.disconnect(0);
-            this.processor.onaudioprocess = null;  // for Firefox
+            this.processor.onaudioprocess = null;
         }
 
         return this;
@@ -10118,7 +10132,7 @@
 
         // Stop onaudioprocess event
         this.processor.disconnect(0);
-        this.processor.onaudioprocess = null;  // for Firefox
+        this.processor.onaudioprocess = null;
 
         this.isStop = true;
 
@@ -10290,7 +10304,7 @@
 
                 // Stop onaudioprocess event
                 this.disconnect(0);
-                this.onaudioprocess = null;  // for Firefox
+                this.onaudioprocess = null;
             } else {
                 outputLs.set(inputLs);
                 outputRs.set(inputRs);
@@ -10319,6 +10333,79 @@
     /** @override */
     MixerModule.prototype.toString = function() {
         return '[MixerModule]';
+    };
+
+    /**
+     * This class defines properties for using Web MIDI API.
+     * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
+     * @constructor
+     */
+    function MIDI(context) {
+        this.context = context;
+
+        this.midiAccess = null;  // for the instance of MIDIAccess
+        this.inputs     = [];    // for the instances of MIDIInput
+        this.outputs    = [];    // for the instances of MIDIOutput
+    }
+
+    /**
+     * This method invokes requestMIDIAccess and gets objects for using Web MIDI API.
+     * @param {function} sysex This argument is in order to determine whether using system exclusive message.
+     * @param {function} successCallback This argument is invoked when requestMIDIAccess succeeds.
+     * @param {function} errorCallback This argument is invoked when requestMIDIAccess fails.
+     * @return {MIDI} This is returned for method chain.
+     */
+    MIDI.prototype.setup = function(sysex, successCallback, errorCallback) {
+        if (!navigator.requestMIDIAccess) {
+            throw new Error('Cannot use Web MIDI API.');
+        }
+
+        var self = this;
+
+        navigator.requestMIDIAccess({sysex : Boolean(sysex)}).then(function(midiAccess) {
+            self.midiAccess = midiAccess;
+
+            if (Object.prototype.toString.call(midiAccess) === '[object Function]') {
+                // Legacy Chrome
+                self.inputs  = midiAccess.inputs();
+                self.outputs = midiAccess.outputs();
+            } else {
+                // Chrome 39 and later
+                var inputIterator  = midiAccess.inputs.values();
+                var outputIterator = midiAccess.outputs.values();
+
+                for (var i = inputIterator.next(); !i.done; i = inputIterator.next()) {
+                    self.inputs.push(i.value);
+                }
+
+                for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
+                    self.outputs.push(o.value);
+                }
+            }
+
+            if (Object.prototype.toString.call(successCallback) === '[object Function]') {
+                successCallback(self.midiAccess, self.inputs, self.outputs);
+            }
+        }, function(error) {
+            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
+                errorCallback(error);
+            }
+        });
+
+        return this;
+    };
+
+    /**
+     * This method gets the instance of MIDIAccess.
+     * @return {MIDIAccess} This is returned as the instance of MIDIAccess.
+     */
+    MIDI.prototype.get = function() {
+        return this.midiAccess;
+    };
+
+    /** @override */
+    MIDI.prototype.toString = function() {
+        return '[MIDI]';
     };
 
     /**
@@ -10925,78 +11012,6 @@
         return '[MML]';
     };
 
-    /**
-     * This class defines properties for using Web MIDI API.
-     * @param {AudioContext} context This argument is in order to use the interfaces of Web Audio API.
-     * @constructor
-     */
-    function MIDI(context) {
-        this.context = context;
-
-        this.midiAccess = null;  // for the instance of MIDIAccess
-        this.inputs     = [];    // for the instances of MIDIInput
-        this.outputs    = [];    // for the instances of MIDIOutput
-    }
-
-    /**
-     * This method invokes requestMIDIAccess and gets objects for using Web MIDI API.
-     * @param {function} successCallback This argument is invoked when requestMIDIAccess succeeds.
-     * @param {function} errorCallback This argument is invoked when requestMIDIAccess fails.
-     * @return {MIDI} This is returned for method chain.
-     */
-    MIDI.prototype.setup = function(successCallback, errorCallback) {
-        if (!navigator.requestMIDIAccess) {
-            throw new Error('Cannot use Web MIDI API.');
-        }
-
-        var self = this;
-
-        navigator.requestMIDIAccess({sysex : true}).then(function(midiAccess) {
-            self.midiAccess = midiAccess;
-
-            if (Object.prototype.toString.call(midiAccess) === '[object Function]') {
-                // Legacy Chrome
-                self.inputs  = midiAccess.inputs();
-                self.outputs = midiAccess.outputs();
-            } else {
-                // Chrome 39 and later
-                var inputIterator  = midiAccess.inputs.values();
-                var outputIterator = midiAccess.outputs.values();
-
-                for (var i = inputIterator.next(); !i.done; i = inputIterator.next()) {
-                    self.inputs.push(i.value);
-                }
-
-                for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
-                    self.outputs.push(o.value);
-                }
-            }
-
-            if (Object.prototype.toString.call(successCallback) === '[object Function]') {
-                successCallback(self.midiAccess, self.inputs, self.outputs);
-            }
-        }, function(error) {
-            if (Object.prototype.toString.call(errorCallback) === '[object Function]') {
-                errorCallback(error);
-            }
-        });
-
-        return this;
-    };
-
-    /**
-     * This method gets the instance of MIDIAccess.
-     * @return {MIDIAccess} This is returned as the instance of MIDIAccess.
-     */
-    MIDI.prototype.get = function() {
-        return this.midiAccess;
-    };
-
-    /** @override */
-    MIDI.prototype.toString = function() {
-        return '[MIDI]';
-    };
-
 ////////////////////////////////////////////////////////////////////////////////
 
     // Create instances
@@ -11010,8 +11025,8 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext),
-        midi       : new MIDI(audiocontext)
+        midi       : new MIDI(audiocontext),
+        mml        : new MML(audiocontext)
     };
 
     // Cloned instances
@@ -11023,13 +11038,13 @@
         fallback   : new MediaFallbackModule(),
         stream     : new StreamModule(audiocontext),
         mixer      : new MixerModule(audiocontext),
-        mml        : new MML(audiocontext),
-        midi       : new MIDI(audiocontext)
+        midi       : new MIDI(audiocontext),
+        mml        : new MML(audiocontext)
     };
 
     /**
-     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MML or MIDI.
-     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer' , 'mml', 'midi'.
+     * This function is global object for getting the instance of OscillatorModule or OneshotModule or AudioModule or MediaModule or MediaFallbackModule or StreamModule or MixerModule or MIDI or MML.
+     * @param {string} source This argument is one of 'oscillator', 'oneshot', 'audio', 'media', 'fallback', 'stream', 'mixer', 'midi', 'mml'.
      * @param {number} index This argument is in order to select one of some oscillators.
      * @return {OscillatorModule|Oscillator|OneshotModule|AudioModule|MediaModule|MediaFallbackModule|StreamModule|MixerModule|MML}
      */
@@ -11055,8 +11070,8 @@
             case 'fallback' :
             case 'stream'   :
             case 'mixer'    :
-            case 'mml'      :
             case 'midi'     :
+            case 'mml'      :
                 return sources[s];
             default :
                 break;
@@ -11109,8 +11124,8 @@
                 case 'fallback' :
                 case 'stream'   :
                 case 'mixer'    :
-                case 'mml'      :
                 case 'midi'     :
+                case 'mml'      :
                     return clones[s];
                 default :
                     break;
@@ -11120,7 +11135,7 @@
 
     /**
      * This static method releases memory of unnecessary instances.
-     * @param {Array.<SoundModule|MML|MediaFallbackModule>} sourceLists This argument is array that has the instances of SoundModule or MML or MediaFallbackModule.
+     * @param {Array.<SoundModule|MIDI|MML|MediaFallbackModule>} sourceLists This argument is array that has the instances of SoundModule or MIDI or MML or MediaFallbackModule.
      */
     XSound.free = function(sourceLists) {
         if (!Array.isArray(sourceLists)) {
