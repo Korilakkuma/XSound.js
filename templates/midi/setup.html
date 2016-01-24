@@ -11,13 +11,20 @@
                     <tbody>
                         <tr>
                             <th>1st</th>
+                            <td><span class="type">boolean</span></td>
+                            <td>
+                                This value is to determine whether using system exclusive message.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2nd</th>
                             <td><span class="type">function</span></td>
                             <td>
                                 This callback function is invoked when access to the device is successful.
                             </td>
                         </tr>
                         <tr>
-                            <th>2nd</th>
+                            <th>3rd</th>
                             <td><span class="type">function</span></td>
                             <td>
                                 This callback function is invoked when access to the device is failure.
@@ -29,6 +36,8 @@
             <section>
 <textarea class="codemirror">
 console.log(&quot;X(&apos;midi&apos;).setup&quot;);
+
+var sysex = true;
 
 var successCallback = function(midiAccess, inputs, outputs) {
     // The 1st argument is the instance of MIDIAccess
@@ -44,7 +53,7 @@ var errorCallback = function(error) {
     console.dir(error);
 };
 
-X(&apos;midi&apos;).setup(successCallback, errorCallback);
+X(&apos;midi&apos;).setup(sysex, successCallback, errorCallback);
 </textarea>
             </section>
         </section>
