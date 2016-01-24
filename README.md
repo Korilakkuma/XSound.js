@@ -12,9 +12,10 @@ In concrete, this library may be useful to implement the following features.
 * Play the One-Shot Audio
 * Play the Audio
 * Play the Media (Fallback by HTML5 MediaElement)
-* Play the MML (Music Macro Language)
 * Streaming (by WebRTC)
-* Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb, and Original Effector ... etc)
+* MIDI (by Web MIDI API)
+* MML (Music Macro Language)
+* Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb, and Original Effector ...etc)
 * Visualization (Overview in Time Domain / Time Domain / Spectrum)
 * Recording (Create WAVE file)
 * Session (by WebSocket)
