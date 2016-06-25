@@ -19,7 +19,7 @@
             </section>
             <section>
 <textarea class="codemirror">
-X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;).setup(document.querySelector(&apos;canvas&apos;)).state(true);
+X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;timeOverviewL&apos;).setup(document.querySelector(&apos;canvas&apos;)).state(true);
 
 X(&apos;audio&apos;).setup({
     ready : function(buffer) {
@@ -34,10 +34,10 @@ X(&apos;audio&apos;).setup({
         }, false);
     },
     update : function(source, currentTime) {
-        X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;).update(currentTime);
+        X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;timeOverviewL&apos;).update(currentTime);
     },
     ended : function(source, currentTime) {
-        X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;time-overview-L&apos;).update(0);
+        X(&apos;audio&apos;).module(&apos;analyser&apos;).domain(&apos;timeOverviewL&apos;).update(0);
         document.querySelector(&apos;button&apos;).textContent = &apos;START&apos;;
     }
 });
