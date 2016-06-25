@@ -1,6 +1,6 @@
         <section>
             <section>
-                <h1>decode <span class="returns">Returns : <span>undefined</span></span></h1>
+                <h1>decode <span class="returns">Returns : <span>Promise</span></span></h1>
                 <hr />
                 <p>
                     This method creates the instance of AudioBuffer by decoding ArrayBuffer.
@@ -61,7 +61,9 @@ X.ajax({
             }
         };
 
-        X.decode(context, arrayBuffer, successCallback, errorCallback);
+        var p = X.decode(context, arrayBuffer, successCallback, errorCallback);
+
+        console.dir(p);
     },
     error    : function(event, textStatus) {
         console.error(textStatus);
