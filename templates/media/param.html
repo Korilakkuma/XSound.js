@@ -62,11 +62,11 @@ var callbacks = {
         };
 
         document.querySelector(&apos;#range-master-volume&apos;).oninput = function() {
-            X(&apos;media&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+            X(&apos;media&apos;).param(&apos;mastervolume&apos;, this.valueAsNumber);
             // or,
-            // X(&apos;media&apos;).param({masterVolume : this.valueAsNumber});
+            // X(&apos;media&apos;).param({mastervolume : this.valueAsNumber});
 
-            document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;media&apos;).param(&apos;masterVolume&apos;);
+            document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;media&apos;).param(&apos;mastervolume&apos;);
         };
 
         document.querySelector(&apos;#range-playback-rate&apos;).oninput = function() {
@@ -127,7 +127,7 @@ try {
                     <dd class="invisibility"></dd>
                     <dt><label><input type="checkbox" id="checkbox-muted" /> muted</label></dt>
                     <dd class="invisibility"></dd>
-                    <dt><label for="range-master-volume">masterVolume : <span id="output-master-volume">1</span></label></dt>
+                    <dt><label for="range-master-volume">mastervolume : <span id="output-master-volume">1</span></label></dt>
                     <dd><input type="range" id="range-master-volume" value="1" min="0" max="1" step="0.05" /><dd>
                     <dt><label for="range-playback-rate">playbackRate : <span id="output-playback-rate">1</span></label></dt>
                     <dd><input type="range" id="range-playback-rate" value='1' min='0.05' max="2" step="0.05" /></dd>

@@ -102,13 +102,13 @@ try {
         timeout   : 60000,
         success   : function(event, buffers) {
             document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;input&apos;, function() {
-                X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+                X(&apos;oneshot&apos;).param(&apos;mastervolume&apos;, this.valueAsNumber);
                 // or,
-                // X(&apos;oneshot&apos;).param({masterVolume : this.valueAsNumber});
+                // X(&apos;oneshot&apos;).param({mastervolume : this.valueAsNumber});
 
                 X(&apos;oneshot&apos;).start(48);
 
-                document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;oneshot&apos;).param(&apos;masterVolume&apos;);
+                document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;oneshot&apos;).param(&apos;mastervolume&apos;);
             }, false);
 
             document.querySelector(&apos;#range-transpose&apos;).addEventListener(&apos;input&apos;, function() {
@@ -128,7 +128,7 @@ try {
 }
 </textarea>
                 <dl class="sound-controllers">
-                    <dt><label for="range-master-volume">masterVolume : <span id="output-master-volume">1</span></label></dt>
+                    <dt><label for="range-master-volume">mastervolume : <span id="output-master-volume">1</span></label></dt>
                     <dd><input type="range" id="range-master-volume" value="1" min="0" max="1" step="0.05" /><dd>
                     <dt><label for="range-transpose">transpose : <span id="output-transpose">1</span></label></dt>
                     <dd><input type="range" id="range-transpose" value='1' min='0.05' max="2" step="0.05" /></dd>

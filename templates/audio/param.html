@@ -55,11 +55,11 @@ X(&apos;audio&apos;).setup({
         }, false);
 
         document.querySelector(&apos;#range-master-volume&apos;).addEventListener(&apos;input&apos;, function() {
-            X(&apos;audio&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+            X(&apos;audio&apos;).param(&apos;mastervolume&apos;, this.valueAsNumber);
             // or,
-            // X(&apos;audio&apos;).param({masterVolume : this.valueAsNumber});
+            // X(&apos;audio&apos;).param({mastervolume : this.valueAsNumber});
 
-            document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;audio&apos;).param(&apos;masterVolume&apos;);
+            document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;audio&apos;).param(&apos;mastervolume&apos;);
         }, false);
 
         document.querySelector(&apos;#range-playback-rate&apos;).addEventListener(&apos;input&apos;, function() {
@@ -122,7 +122,7 @@ X.ajax({
                     <dd><span id="output-channels">0</span> channels</dd>
                     <dt><label><input type="checkbox" /> loop</label></dt>
                     <dd class="invisibility"></dd>
-                    <dt><label for="range-master-volume">masterVolume : <span id="output-master-volume">1</span></label></dt>
+                    <dt><label for="range-master-volume">mastervolume : <span id="output-master-volume">1</span></label></dt>
                     <dd><input type="range" id="range-master-volume" value="1" min="0" max="1" step="0.05" /><dd>
                     <dt><label for="range-playback-rate">playbackRate : <span id="output-playback-rate">1</span></label></dt>
                     <dd><input type="range" id="range-playback-rate" value='1' min='0.05' max="2" step="0.05" /></dd>

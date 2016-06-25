@@ -45,15 +45,15 @@ try {
 }
 
 document.querySelector(&apos;[type=&quot;range&quot;]&apos;).addEventListener(&apos;input&apos;, function() {
-    X(&apos;stream&apos;).param(&apos;masterVolume&apos;, this.valueAsNumber);
+    X(&apos;stream&apos;).param(&apos;mastervolume&apos;, this.valueAsNumber);
     // or,
-    // X(&apos;stream&apos;).param({masterVolume : this.valueAsNumber});
+    // X(&apos;stream&apos;).param({mastervolume : this.valueAsNumber});
 
-    document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;stream&apos;).param(&apos;masterVolume&apos;);
+    document.querySelector(&apos;#output-master-volume&apos;).textContent = X(&apos;stream&apos;).param(&apos;mastervolume&apos;);
 }, false);
 </textarea>
                 <dl class="sound-controllers">
-                    <dt>masterVolume : <span id="output-master-volume">1</span></dt>
+                    <dt>mastervolume : <span id="output-master-volume">1</span></dt>
                     <dd><input type="range" value="1" min="0" max="1" step="0.05" /><dd>
                 </dl>
             </section>
