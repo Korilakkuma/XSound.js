@@ -3,7 +3,7 @@
                 <h1>setup <span class="returns">Returns : <span>MediaModule | MediaFallbackModule</span></span></h1>
                 <hr />
                 <p>
-                    This method setups HTMLMediaElement, media formats and callback functions.
+                    This method setups HTMLMediaElement, media formats and event listeners.
                 </p>
                 <table>
                     <caption>Arguments</caption>
@@ -19,8 +19,8 @@
                                     <dd>This value is the instance of HTMLAudioElement or HTMLVideoElement.</dd>
                                     <dt>formats <span class="type">Array</span></dt>
                                     <dd>This value is the array that contains media formats.</dd>
-                                    <dt>callbacks <span class="type">Object</span></dt>
-                                    <dd>This value is the associative array that contains the callback functions that are defined by HTMLMediaElement.</dd>
+                                    <dt>listeners <span class="type">Object</span></dt>
+                                    <dd>This value is the associative array that contains event listeners that are defined by HTMLMediaElement.</dd>
                                 </dl>
                             </td>
                         </tr>
@@ -39,18 +39,17 @@ if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
-var callbacks = {
+var listeners = {
     // The 1st argument is event object
-    // The 2nd argument is the instance of HTMLAudioElement or HTMLVideoElement
-    loadstart      : function(event, media) {},
-    loadedmetadata : function(event, media) {},
-    loadeddata     : function(event, media) {},
-    canplay        : function(event, media) {},
-    canplaythrough : function(event, media) {},
-    play           : function(event, media) {},
-    pause          : function(event, media) {},
-    timeupdate     : function(event, media) {},
-    ended          : function(event, media) {}
+    loadstart      : function(event) {},
+    loadedmetadata : function(event) {},
+    loadeddata     : function(event) {},
+    canplay        : function(event) {},
+    canplaythrough : function(event) {},
+    play           : function(event) {},
+    pause          : function(event) {},
+    timeupdate     : function(event) {},
+    ended          : function(event) {}
     // ...etc
 };
 
@@ -58,7 +57,7 @@ try {
     X(&apos;media&apos;).setup({
         media     : document.querySelector(&apos;audio&apos;),
         formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
-        callbacks : callbacks
+        listeners : listeners
     });
 } catch (error) {
     // Cannot use HTMLMediaElement (for example, less than IE9)

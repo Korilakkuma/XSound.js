@@ -20,8 +20,8 @@ if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
-var callbacks = {
-    loadstart : function(event, media) {
+var listeners = {
+    loadstart : function(event) {
         console.log(&apos;loadstart&apos;);
         console.log(X(&apos;media&apos;).isSource());
     }
@@ -31,7 +31,7 @@ try {
     X(&apos;media&apos;).setup({
         media     : document.querySelector(&apos;audio&apos;),
         formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
-        callbacks : callbacks
+        listeners : listeners
     }).ready(&apos;resources/audio/forever-love-piano-instruments&apos;);
 
     console.log(X(&apos;media&apos;).isSource());

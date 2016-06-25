@@ -18,8 +18,8 @@ if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);  // Not use Web Audio API (Fallback by HTMLMediaElement)
 }
 
-var callbacks = {
-    canplaythrough : function(event, media) {
+var listeners = {
+    canplaythrough : function(event) {
         console.log(&apos;canplaythrough&apos;);
         console.log(X(&apos;media&apos;).isPaused());
 
@@ -33,19 +33,19 @@ var callbacks = {
             }
         };
     },
-    play           : function(event, media) {
+    play           : function(event) {
         console.log(&apos;play&apos;);
         console.log(X(&apos;media&apos;).isPaused());
     },
-    pause          : function(event, media) {
+    pause          : function(event) {
         console.log(&apos;pause&apos;);
         console.log(X(&apos;media&apos;).isPaused());
     },
-    timeupdate     : function(event, media) {
+    timeupdate     : function(event) {
         console.log(&apos;timeupdate&apos;);
         console.log(X(&apos;media&apos;).isPaused());
     },
-    ended          : function(event, media) {
+    ended          : function(event) {
         console.log(&apos;ended&apos;);
         console.log(X(&apos;media&apos;).isPaused());
 
@@ -58,7 +58,7 @@ try {
     X(&apos;media&apos;).setup({
         media     : document.querySelector(&apos;audio&apos;),
         formats   : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;],
-        callbacks : callbacks
+        listeners : listeners
     }).ready(&apos;resources/audio/forever-love-piano-instruments&apos;);
 } catch (error) {
     // Cannot use HTMLMediaElement (for example, less than IE9)
