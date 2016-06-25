@@ -16,7 +16,7 @@ try {
         host : &apos;x-sound-server.herokuapp.com/&apos;,
         port : &apos;8000&apos;,
         path : &apos;/app/websocket/&apos;,
-        open : function(event, socket) {
+        open : function(event) {
             console.dir(X(&apos;oscillator&apos;).module(&apos;session&apos;).get());
         }
     });

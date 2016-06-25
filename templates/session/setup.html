@@ -43,29 +43,20 @@ try {
         host  : &apos;x-sound-server.herokuapp.com/&apos;,
         port  : &apos;8000&apos;,
         path  : &apos;/app/websocket/&apos;,
-        open  : function(event, socket) {
+        open  : function(event) {
             // The 1st argument is event object on &apos;onopen&apos; event handler in the instance of WebSocket
-            // The 2nd argument is the instance of WebSocket
-
             console.log(&apos;open&apos;);
             console.dir(event);
-            console.dir(socket);
         },
-        close : function(event, socket) {
+        close : function(event) {
             // The 1st argument is event object on &apos;onclose&apos; event handler in the instance of WebSocket
-            // The 2nd argument is the instance of WebSocket
-
             console.log(&apos;close&apos;);
             console.dir(event);
-            console.dir(socket);
         },
-        error : function(event, socket) {
+        error : function(event) {
             // The 1st argumentis event object on &apos;onerror&apos; event handler in the instance of WebSocket
-            // The 2nd argument is the instance of WebSocket
-
             console.log(&apos;error&apos;);
             console.dir(event);
-            console.dir(socket);
         }
     });
 } catch (error) {

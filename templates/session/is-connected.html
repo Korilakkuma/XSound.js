@@ -16,7 +16,7 @@ try {
         host  : &apos;x-sound-server.herokuapp.com/&apos;,
         port  : &apos;8000&apos;,
         path  : &apos;/app/websocket/&apos;,
-        open  : function(event, socket) {
+        open  : function(event) {
             console.log(X(&apos;oscillator&apos;).module(&apos;session&apos;).isConnected());
 
             var isStop = true;
@@ -41,12 +41,11 @@ try {
                 console.log(X(&apos;oscillator&apos;).module(&apos;session&apos;).isConnected());
             }, false);
         },
-        close : function(event, socket) {
+        close : function(event) {
             window.alert(&apos;onclose&apos;);
 
             console.log(&apos;close&apos;);
             console.dir(event);
-            console.dir(socket);
         }
     }).state(true);
 } catch (error) {
