@@ -32,7 +32,8 @@ X.free([
     X(&apos;media&apos;),
     X(&apos;stream&apos;),
     X(&apos;mixer&apos;),
-    X(&apos;mml&apos;)
+    X(&apos;mml&apos;),
+    X(&apos;midi&apos;)
 ]);
 
 // null
@@ -43,6 +44,30 @@ console.dir(X(&apos;media&apos;));
 console.dir(X(&apos;stream&apos;));
 console.dir(X(&apos;mixer&apos;));
 console.dir(X(&apos;mml&apos;));
+console.dir(X(&apos;midi&apos;));
+
+var C = X.clone();
+
+C.free([
+    C(&apos;oscillator&apos;),
+    C(&apos;oneshot&apos;),
+    C(&apos;audio&apos;),
+    C(&apos;media&apos;),
+    C(&apos;stream&apos;),
+    C(&apos;mixer&apos;),
+    C(&apos;mml&apos;),
+    C(&apos;midi&apos;)
+]);
+
+// null
+console.dir(C(&apos;oscillator&apos;));
+console.dir(C(&apos;oneshot&apos;));
+console.dir(C(&apos;audio&apos;));
+console.dir(C(&apos;media&apos;));
+console.dir(C(&apos;stream&apos;));
+console.dir(C(&apos;mixer&apos;));
+console.dir(C(&apos;mml&apos;));
+console.dir(C(&apos;midi&apos;));
 </textarea>
             </section>
         </section>
