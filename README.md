@@ -26,6 +26,6 @@ In concrete, this library may be useful to implement the following features.
   
 ## License
   
-Copyright (c) 2014 Tomohiro IKEDA (Korilakkuma)  
+Copyright (c) 2012, 2013, 2014 Tomohiro IKEDA (Korilakkuma)  
 Released under the MIT license
   
