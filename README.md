@@ -5,7 +5,7 @@ HTML5 Web Audio API Library
   
 ## Overview
   
-This library enables developers to use **Web Audio API by description like jQuery**.  
+This is full stack library for Web Audio API.  
 In concrete, this library may be useful to implement the following features.
   
 * Create Sound
@@ -15,7 +15,7 @@ In concrete, this library may be useful to implement the following features.
 * Streaming (by WebRTC)
 * MIDI (by Web MIDI API)
 * MML (Music Macro Language)
-* Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb, and Original Effector ...etc)
+* Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb ...etc)
 * Visualization (Overview in Time Domain / Time Domain / Spectrum)
 * Recording (Create WAVE file)
 * Session (by WebSocket)
