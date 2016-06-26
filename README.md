@@ -20,9 +20,9 @@ In concrete, this library may be useful to implement the following features.
 * Recording (Create WAVE file)
 * Session (by WebSocket)
   
-## Download & API Document
+## API Document
   
-* [XSound.js Download & API Document](https://korilakkuma.github.io/XSound/)
+* [XSound.js API Document](https://korilakkuma.github.io/XSound/)
   
 ## License
   
