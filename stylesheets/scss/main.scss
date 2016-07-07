@@ -114,6 +114,14 @@ h1 {
     text-shadow:-1px -1px 1px rgba($black, 1.0);
 }
 
+#github-buttons {
+    display:none;
+    position:absolute;
+    top:8px;
+    right:170px;
+    z-index:10;
+}
+
 #forkme-banner {
     display:none;
     position:absolute;
@@ -494,8 +502,12 @@ a {
         text-align:left;
     }
 
-    #forkme-banner {
+    #github-buttons, #forkme-banner {
         display:block;
+    }
+
+    #github-buttons {
+        right:156px;
     }
 
     #downloads {
@@ -566,7 +578,7 @@ a {
         font-size:2rem;
     }
 
-    #forkme-banner {
+    #github-buttons, #forkme-banner {
         display:block;
     }
 
