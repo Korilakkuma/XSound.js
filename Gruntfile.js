@@ -4,22 +4,44 @@ module.exports = function(grunt) {
     // Config
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
-        closurecompiler: {
-            minify: {
+        jshint: {
+            all: ['build/xsound.js', 'build/xsound-server-session-websocket.js', 'xsound-server-session-ws.js'],
+            options: {
+                jshintrc: true
+            }
+        },
+        uglify: {
+            target: {
+                options: {
+                    sourceMap: true,
+                    sourceMapName: 'build/xsound.js.map'
+                },
                 files: {
                     'build/xsound.min.js': ['build/xsound.js']
-                },
-                options: {
-                    'compilation_level': 'SIMPLE_OPTIMIZATIONS'
                 }
             }
-        }
+        },
+        watch: {
+            files: ['build/xsound.js'],
+            tasks: ['uglify']
+            /*
+            options: {
+                livereload: true
+            }
+            */
+        },
+        clean: ['build/*.min.js', 'build/*.map']
     });
 
     // Plugins
-    grunt.loadNpmTasks('grunt-closurecompiler');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
-    // Task
-    grunt.registerTask('default', ['closurecompiler:minify']);
+    // Tasks
+    grunt.registerTask('hint',  ['jshint']);
+    grunt.registerTask('build', ['clean', 'uglify']);
+    grunt.registerTask('observe', ['watch']);
+    grunt.registerTask('default', ['hint', 'build']);
 };
