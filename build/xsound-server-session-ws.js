@@ -1,13 +1,15 @@
-/** 
+/**
  * xsound-server-session-ws.js
  * @fileoverview WebSocketServer
  *
  * Copyright 2013, 2014@Tomohiro IKEDA
  * Released under the MIT license
  */
- 
- 
- 
+
+
+
+'use strict';
+
 process.stdout.setEncoding('UTF-8');
 process.stderr.setEncoding('UTF-8');
 
@@ -65,7 +67,7 @@ var ws              = new WebSocketServer({server : httpd});
 var sockets = [];
 
 ws.on('connection', function(socket) {
-    appendLog('connection', '079');
+    appendLog('connection', '070');
     socket.send('Connection to server is success !!', {binary : false});
 
     sockets.push(socket);
@@ -81,7 +83,7 @@ ws.on('connection', function(socket) {
     socket.on('close', function() {
         for (var i = 0, len = sockets.length; i < len; i++) {
             if (sockets[i] === this) {
-                appendLog('close', '095');
+                appendLog('close', '086');
 
                 sockets[i].removeAllListeners('message');
                 sockets[i].removeAllListeners('close');
@@ -107,6 +109,6 @@ process.on('SIGINT', function() {
 
 // Catch Exception
 process.on('uncaughtException', function(error) {
-    appendLog(error.message, '121');
-    process.stderr.write('LINE 122 :' + error.message + '\n');
+    appendLog(error.message, '112');
+    process.stderr.write('LINE 113 :' + error.message + '\n');
 });

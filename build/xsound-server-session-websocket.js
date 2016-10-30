@@ -1,13 +1,15 @@
-/** 
+/**
  * xsound-server-session-websocket.js
  * @fileoverview WebSocketServer
  *
  * Copyright 2013, 2014@Tomohiro IKEDA
  * Released under the MIT license
  */
- 
- 
- 
+
+
+
+'use strict';
+
 process.stdout.setEncoding('UTF-8');
 process.stderr.setEncoding('UTF-8');
 
@@ -65,12 +67,12 @@ var ws              = new WebSocketServer({httpServer : httpd/*, autoAcceptConne
 var sockets = [];
 
 ws.on('request', function(request) {
-    appendLog('request', '079');
+    appendLog('request', '070');
     request.accept(null, null);
 });
 
 ws.on('connect', function(socket) {
-    appendLog('connect', '084');
+    appendLog('connect', '075');
     socket.sendUTF('Connection to server is success !!');
 
     sockets.push(socket);
@@ -79,13 +81,13 @@ ws.on('connect', function(socket) {
         for (var i = 0, len = sockets.length; i < len; i++) {
             if (sockets[i] !== this) {
                 switch (data.type) {
-                    case 'utf8' :
+                    case 'utf8':
                         sockets[i].send(data.utf8Data);
                         break;
-                    case 'binary' :
+                    case 'binary':
                         sockets[i].send(data.binaryData);
                         break;
-                    default :
+                    default:
                         break;
                 }
             }
@@ -95,7 +97,7 @@ ws.on('connect', function(socket) {
     socket.on('close', function() {
         for (var i = 0, len = sockets.length; i < len; i++) {
             if (sockets[i] === this) {
-                appendLog('close', '109');
+                appendLog('close', '100');
 
                 sockets[i].removeAllListeners('message');
                 sockets[i].removeAllListeners('close');
@@ -121,6 +123,6 @@ process.on('SIGINT', function() {
 
 // Catch Exception
 process.on('uncaughtException', function(error) {
-    appendLog(error.message, '135');
-    process.stderr.write('LINE 136 :' + error.message + '\n');
+    appendLog(error.message, '126');
+    process.stderr.write('LINE 127 :' + error.message + '\n');
 });
