@@ -1,14 +1,16 @@
-describe('Class (Static) Method TEST', function() {
+describe('XSound TEST', function() {
 
-    describe('XSound.convertTime()', function() {
+    describe('XSound.convertTime', function() {
 
         // Negative
+
         it('should return undefined', function() {
             expect(X.convertTime()).toBeUndefined()
             expect(X.convertTime(-1)).toBeUndefined();
         });
 
         // Positive
+
         it('should return associative array', function() {
             var times1 = X.convertTime(0);
 
