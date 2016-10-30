@@ -1,10 +1,11 @@
-describe('Class (Static) Method TEST', function() {
+describe('XSound TEST', function() {
 
-    describe('XSound.clone()', function() {
+    describe('XSound.clone', function() {
 
         var C = X.clone();
 
         // Negative
+
         it('should return undefined', function() {
             expect(C()).toBeUndefined();
             expect(C('')).toBeUndefined();
@@ -14,18 +15,20 @@ describe('Class (Static) Method TEST', function() {
         });
 
         // Positive
-        it('should return one of SoundModule, MediaFallbackModule, Oscillator, MML', function() {
-            expect(C('oscillator') instanceof Mocks.OscillatorModule).toBeTruthy();
-            expect(C('oneshot')    instanceof Mocks.OneshotModule).toBeTruthy();
-            expect(C('audio')      instanceof Mocks.AudioModule).toBeTruthy();
-            expect(C('media')      instanceof Mocks.MediaModule).toBeTruthy();
-            expect(C('fallback')   instanceof Mocks.MediaFallbackModule).toBeTruthy();
-            expect(C('stream')     instanceof Mocks.StreamModule).toBeTruthy();
-            expect(C('mixer')      instanceof Mocks.MixerModule).toBeTruthy();
-            expect(C('mml')        instanceof Mocks.MML).toBeTruthy();
 
-            expect(C('oscillator', 0) instanceof Mocks.OscillatorModule.Oscillator).toBeTruthy();
-            expect(C('oscillator', 2) instanceof Mocks.OscillatorModule.Oscillator).toBeTruthy();
+        it('should return one of SoundModule, MediaFallbackModule, Oscillator, MML, MIDI', function() {
+            expect(C('oscillator')).toEqual(jasmine.any(Mocks.OscillatorModule));
+            expect(C('oneshot')).toEqual(jasmine.any(Mocks.OneshotModule));
+            expect(C('audio')).toEqual(jasmine.any(Mocks.AudioModule));
+            expect(C('media')).toEqual(jasmine.any(Mocks.MediaModule));
+            expect(C('fallback')).toEqual(jasmine.any(Mocks.MediaFallbackModule));
+            expect(C('stream')).toEqual(jasmine.any(Mocks.StreamModule));
+            expect(C('mixer')).toEqual(jasmine.any(Mocks.MixerModule));
+            expect(C('midi')).toEqual(jasmine.any(Mocks.MIDI));
+            expect(C('mml')).toEqual(jasmine.any(Mocks.MML));
+
+            expect(C('oscillator', 0)).toEqual(jasmine.any(Mocks.OscillatorModule.Oscillator));
+            expect(C('oscillator', 2)).toEqual(jasmine.any(Mocks.OscillatorModule.Oscillator));
         });
 
     });
