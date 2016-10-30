@@ -494,10 +494,8 @@
             switch (k) {
                 case 'mastervolume':
                     if (value === undefined) {
-                        // Getter
                         return (this.media instanceof HTMLMediaElement) ? this.media.volume : this.volume;
                     } else {
-                        // Setter
                         var v   = parseFloat(value);
                         var min = 0;
                         var max = 1;
@@ -514,10 +512,8 @@
                     break;
                 case 'playbackrate':
                     if (value === undefined) {
-                        // Getter
                         return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;
                     } else {
-                        // Setter
                         var v   = parseFloat(value);
                         var min = 0.5;  // for Chrome
 
@@ -533,10 +529,8 @@
                     break;
                 case 'currenttime':
                     if (value === undefined) {
-                        // Getter
                         return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;
                     } else {
-                        // Setter
                         if (this.media instanceof HTMLMediaElement) {
                             var v   = parseFloat(value);
                             var min = 0;
@@ -553,10 +547,8 @@
                 case 'muted'   :
                 case 'controls':
                     if (value === undefined) {
-                        // Getter
                         return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];
                     } else {
-                        // Setter
                         if (this.media instanceof HTMLMediaElement) {
                             this.media[k] = Boolean(value);
                         }
@@ -568,10 +560,8 @@
                 case 'width' :
                 case 'height':
                     if (value === undefined) {
-                        // Getter
                         return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;
                     } else {
-                        // Setter
                         var v   = parseInt(value);
                         var min = 0;
 
@@ -754,7 +744,7 @@
         };
 
         /** @override */
-        XSound.prototype.toString = function() {
+        XSound.toString = function() {
             return '[XSound]';
         };
 
@@ -792,12 +782,8 @@
      * @constructor
      */
     function SoundModule(context, bufferSize) {
-        this.context = context;
-
+        this.context    = context;
         this.sampleRate = context.sampleRate;
-
-        this.numberOfInputs  = 2;
-        this.numberOfOutputs = 2;
 
         var userAgent = navigator.userAgent;
 
@@ -1027,10 +1013,8 @@
                 switch (k) {
                     case 'interval':
                         if (value === undefined) {
-                            // Getter
                             return this.interval;
                         } else {
-                            // Setter
                             if (String(value).toLowerCase() === 'auto') {
                                 this.interval = 'auto';
                             } else {
@@ -1045,10 +1029,8 @@
                         break;
                     case 'shape':
                         if (value === undefined) {
-                            // Getter
                             return this.styles.shape;
                         } else {
-                            // Setter
                             var v = String(value).toLowerCase();
 
                             if ((v === 'line') || (v === 'rect')) {
@@ -1059,10 +1041,8 @@
                         break;
                     case 'grad':
                         if (value === undefined) {
-                            // Getter
                             return this.styles.grad;
                         } else {
-                            // Setter
                             if (!Array.isArray(value)) {
                                 value = [value];
                             }
@@ -1095,7 +1075,6 @@
                         if (value === undefined) {
                             return this.styles[k];
                         } else {
-                            // Setter
                             if (Object.prototype.toString.call(value) === '[object Object]') {
                                 for (var prop in value) {
                                     if (/family|size|style|weight/i.test(prop)) {
@@ -1112,10 +1091,8 @@
                     case 'cap' :
                     case 'join':
                         if (value === undefined) {
-                            // Getter
                             return this.styles[k];
                         } else {
-                            // Setter
                             if (Object.prototype.toString.call(value) === '[object String]') {
                                 if ((k === 'wave') && (value === 'gradient')) {
                                     this.styles.shape = 'rect';
@@ -1132,10 +1109,8 @@
                     case 'bottom':
                     case 'left'  :
                         if (value === undefined) {
-                            // Getter
                             return this.styles[k];
                         } else {
-                            // Setter
                             var v = (k === 'width') ? parseFloat(value) : parseInt(value);
 
                             if (v >= 0) {
@@ -1189,14 +1164,13 @@
             /** @override */
             Visualizer.prototype.state = function(state) {
                 if (state === undefined) {
-                    return this.isActive;  // Getter
+                    return this.isActive;
                 } else if (String(state).toLowerCase() === 'toggle') {
-                    this.isActive = !this.isActive;  // Setter
+                    this.isActive = !this.isActive;
                 } else {
-                    this.isActive = Boolean(state);  // Setter
+                    this.isActive = Boolean(state);
                 }
 
-                // in the case of setter
                 return this;
             };
 
@@ -1206,7 +1180,7 @@
              * @param {Float32Array} data This argument is time domain data.
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
-             * @param {number} middle This argument is the middle of drawn area.
+             * @param {number} middle This argument is the middle of drawing area.
              * @param {number} nPlotinterval This argument is the interval of drawing.
              */
             Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotinterval) {
@@ -1300,7 +1274,7 @@
              * @param {Float32Array} data This argument is time domain data.
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
-             * @param {number} middle This argument is the middle of drawn area.
+             * @param {number} middle This argument is the middle of drawing area.
              * @param {number} nPlotinterval This argument is the interval of drawing.
              * @param {string} linearGradientId This argument is id attribute for SVGLinearGradientElement.
              * @return {SVGPathElement|SVGGElement} This is returned as SVGElement.
@@ -1474,16 +1448,13 @@
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        // Getter
                         return r;
                     } else {
                         switch (k) {
                             case 'currenttime':
                                 if (value === undefined) {
-                                    // Getter
                                     return this.currentTime;
                                 } else {
-                                    // Setter
                                     this.currentTime = String(value).toLowerCase();
                                 }
 
@@ -1491,10 +1462,8 @@
                             case 'plotinterval':
                             case 'textinterval':
                                 if (value === undefined) {
-                                    // Getter
                                     return this[k.replace('interval', 'Interval')];
                                 } else {
-                                    // Setter
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
@@ -1618,8 +1587,8 @@
 
                 var svg = this.svg;
 
-                var width       = parseInt(this.svg.getAttribute('width'));
-                var height      = parseInt(this.svg.getAttribute('height'));
+                var width       = parseInt(svg.getAttribute('width'));
+                var height      = parseInt(svg.getAttribute('height'));
                 var innerWidth  = width  - (this.styles.left + this.styles.right);
                 var innerHeight = height - (this.styles.top  + this.styles.bottom);
                 var middle      = Math.floor(innerHeight / 2) + this.styles.top;
@@ -1949,7 +1918,6 @@
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        // Getter
                         return r;
                     } else {
                         switch (k) {
@@ -1958,7 +1926,6 @@
                                     // Gettre
                                     return this.type;
                                 } else {
-                                    // Setter
                                     var v = String(value).toLowerCase();
 
                                     if ((v === Time.TYPES.UINT) || (v === Time.TYPES.FLOAT)) {
@@ -1969,10 +1936,8 @@
                                 break;
                             case 'textinterval':
                                 if (value === undefined) {
-                                    // Getter
                                     return this.textInterval;
                                 } else {
-                                    // Setter
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
@@ -1996,7 +1961,7 @@
              * @return {Time} This is returned for method chain.
              * @override
              */
-            Time.prototype.drawToCanvas = function(data, minDecibels, maxDecibels) {
+            Time.prototype.drawToCanvas = function(data) {
                 if (!((this.canvas instanceof HTMLCanvasElement) && this.isActive)) {
                     return this;
                 }
@@ -2150,8 +2115,8 @@
 
                 var svg = this.svg;
 
-                var width       = parseInt(this.svg.getAttribute('width'));
-                var height      = parseInt(this.svg.getAttribute('height'));
+                var width       = parseInt(svg.getAttribute('width'));
+                var height      = parseInt(svg.getAttribute('height'));
                 var innerWidth  = width  - (this.styles.left + this.styles.right);
                 var innerHeight = height - (this.styles.top  + this.styles.bottom);
                 var middle      = Math.floor(innerHeight / 2) + this.styles.top;
@@ -2383,16 +2348,13 @@
                     var r = Visualizer.prototype.param.call(this, k, value);
 
                     if (r !== undefined) {
-                        // Getter
                         return r;
                     } else {
                         switch (k) {
                             case 'type':
                                 if (value === undefined) {
-                                    // Getter
                                     return this.type;
                                 } else {
-                                    // Setter
                                     var v = String(value).toLowerCase();
 
                                     if ((v === FFT.TYPES.UINT) || (v === FFT.TYPES.FLOAT)) {
@@ -2403,10 +2365,8 @@
                                 break;
                             case 'size':
                                 if (value === undefined) {
-                                    // Getter
                                     return this.size;
                                 } else {
-                                    // Setter
                                     var v   = parseInt(value);
                                     var min = 0;
                                     var max = 1024;  // AnalyserNode#fftSize max 2048 -> half 1024
@@ -2419,10 +2379,8 @@
                                 break;
                             case 'textinterval':
                                 if (value === undefined) {
-                                    // Getter
                                     return this.textInterval;
                                 } else {
-                                    // Setter
                                     var v = parseFloat(value);
 
                                     if (v > 0) {
@@ -2672,8 +2630,8 @@
 
                 var svg = this.svg;
 
-                var width       = this.svg.getAttribute('width');
-                var height      = this.svg.getAttribute('height');
+                var width       = svg.getAttribute('width');
+                var height      = svg.getAttribute('height');
                 var innerWidth  = width  - (this.styles.left + this.styles.right);
                 var innerHeight = height - (this.styles.top  + this.styles.bottom);
 
@@ -2690,7 +2648,7 @@
                 var nTextinterval = Math.floor(this.textInterval / fsDivN);
 
                 // Erase previous wave
-                this.svg.innerHTML = '';
+                svg.innerHTML = '';
 
                 // Begin drawing
                 switch (this.type) {
@@ -2737,7 +2695,7 @@
                                     y = Math.floor((1 - (data[i] / 255)) * innerHeight) + this.styles.top;
 
                                     if (i === 0) {
-                                        d += 'M' + (x + this.styles.width / 2) + ' ' + y;
+                                        d += 'M' + (x + (this.styles.width / 2)) + ' ' + y;
                                     } else {
                                         d += ' ';
                                         d += 'L' + x + ' ' + y;
@@ -2982,10 +2940,8 @@
                 switch (k) {
                     case 'fftsize':
                         if (value === undefined) {
-                            // Getter
                             return this.analyser.fftSize;
                         } else {
-                            // Setter
                             var v = parseInt(value);
 
                             switch (v) {
@@ -3008,10 +2964,8 @@
                         return this.analyser.frequencyBinCount;  // Getter only
                     case 'mindecibels':
                         if (value === undefined) {
-                            // Getter
                             return this.analyser.minDecibels;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var max = -30;
 
@@ -3023,10 +2977,8 @@
                         break;
                     case 'maxdecibels':
                         if (value === undefined) {
-                            // Getter
                             return this.analyser.maxDecibels;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = -100;
 
@@ -3038,10 +2990,8 @@
                         break;
                     case 'smoothingtimeconstant':
                         if (value === undefined) {
-                            // Getter
                             return this.analyser.smoothingTimeConstant;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -3102,7 +3052,7 @@
                     } else {
                         data = new Float32Array(this.analyser.fftSize);
                         this.analyser.getFloatTimeDomainData(data);
-                        this.time.start(data, this.analyser.minDecibels, this.analyser.maxDecibels);
+                        this.time.start(data);
                     }
 
                     if (this.time.param('interval') === 'auto') {
@@ -3149,7 +3099,7 @@
 
         /**
          * This method stops drawing.
-         * @param {string} domain This argument is one of 'timeOverviewL', 'timeOverview-R', 'time', 'fft'.
+         * @param {string} domain This argument is one of 'timeOverviewL', 'timeOverviewR', 'time', 'fft'.
          * @return {Analyser} This is returned for method chain.
          */
         Analyser.prototype.stop = function(domain) {
@@ -3261,8 +3211,8 @@
                 this.trackLs = new Array(this.numberOfTracks);
                 this.trackRs = new Array(this.numberOfTracks);
 
-                for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  // n * array
-                for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  // n * array
+                for (var i = 0; i < n; i++) {this.trackLs[i] = [];}  // n x array
+                for (var i = 0; i < n; i++) {this.trackRs[i] = [];}  // n x array
             } else {
                 this.numberOfTracks = 1;
 
@@ -3296,10 +3246,8 @@
                     case 'gainl':
                     case 'gainr':
                         if (value === undefined) {
-                            // Getter
                             return this['gain' + k.slice(-1).toUpperCase()];
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -3683,7 +3631,7 @@
                     }
                 }
 
-                var blob      = new Blob([new Uint8Array(waves)], {type : 'audio/wav'});
+                var blob      = new Blob([new Uint8Array(waves)], {'type': 'audio/wav'});
                 var objectURL = global.URL.createObjectURL(blob);
 
                 return objectURL;
@@ -3977,7 +3925,6 @@
         /** @override */
         Session.prototype.state = function(state, stateCallback, waitCallback) {
             if (state === undefined) {
-                // Getter
                 return this.isActive;
             }
 
@@ -3992,7 +3939,6 @@
                     return;
                 }
 
-                // Setter
                 if (String(state).toLowerCase() === 'toggle') {
                     self.isActive = !self.isActive;
                 } else {
@@ -4008,13 +3954,12 @@
                 global.clearInterval(intervalid);
             }, 10);
 
-            // in the case of setter
             return this;
         };
 
         /**
          * This method gets the instance of WebSocket.
-         * @return {WebSocket} This value is the instance of WebSocket.
+         * @return {WebSocket}
          */
         Session.prototype.get = function() {
             return this.websocket;
@@ -4146,14 +4091,12 @@
         /** @override */
         Effector.prototype.state = function(state) {
             if (state === undefined) {
-                return this.isActive;  // Getter
+                return this.isActive;
             } else if (String(state).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  // Setter
+                this.isActive = !this.isActive;
             } else {
-                this.isActive = Boolean(state);  // Setter
+                this.isActive = Boolean(state);
             }
-
-            // in the case of setter
 
             // Change connection
             this.connect();
@@ -4222,10 +4165,8 @@
 
                 if (k in this.compressor) {
                     if (value === undefined) {
-                        // Getter
                         return this.compressor[k].value;
                     } else {
-                        // Setter
                         var v = parseFloat(value);
 
                         var minValues = {
@@ -4385,10 +4326,8 @@
                 switch (k) {
                     case 'curve':
                         if (value === undefined) {
-                            // Getter
                             return this.distortion.curve;
                         } else {
-                            // Setter
                             var AMOUNTS = {
                                 'CLEAN'     : 0.0,
                                 'CRUNCH'    : 0.5,
@@ -4434,10 +4373,8 @@
                         break;
                     case 'samples':
                         if (value === undefined) {
-                            // Getter
                             return this.numberOfSamples;
                         } else {
-                            // Setter
                             var v = parseInt(value);
 
                             if (v >= 0) {
@@ -4449,10 +4386,8 @@
                         break;
                     case 'drive':
                         if (value === undefined) {
-                            // Getter
                             return this.drive.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.drive.gain.minValue || 0;
                             var max = this.drive.gain.maxValue || 1;
@@ -4466,10 +4401,8 @@
                     case 'color':
                     case 'tone' :
                         if (value === undefined) {
-                            // Getter
                             return this[k].frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].frequency.minValue || 10;
                             var max = this[k].frequency.maxValue || (this.context.sampleRate / 2);
@@ -4583,10 +4516,8 @@
                     case 'frequency':
                     case 'cutoff'   :
                         if (value === undefined) {
-                            // Getter
                             return this.lowpass.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.lowpass.frequency.minValue || 10;
                             var max = this.lowpass.frequency.maxValue || (this.context.sampleRate / 2);
@@ -4600,10 +4531,8 @@
                         break;
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depthRate;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -4617,10 +4546,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -4633,10 +4560,8 @@
                         break;
                     case 'resonance':
                         if (value === undefined) {
-                            // Getter
                             return this.lowpass.Q.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.lowpass.Q.minValue || 0.0001;
                             var max = this.lowpass.Q.maxValue || 1000;
@@ -4771,10 +4696,8 @@
                     case 'treble'  :
                     case 'presence':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || -40;
                             var max = this[k].gain.maxValue ||  40;
@@ -4888,10 +4811,8 @@
                 switch (k) {
                     case 'type':
                         if (value === undefined) {
-                            // Getter
                             return this.filter.type;
                         } else {
-                            // Setter
                             var v = String(value).toLowerCase();
 
                             // for legacy browsers
@@ -4915,10 +4836,8 @@
                     case 'frequency':
                     case 'cutoff'   :
                         if (value === undefined) {
-                            // Getter
                             return this.filter.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.filter.frequency.minValue || 10;
                             var max = this.filter.frequency.maxValue || (this.context.sampleRate / 2);
@@ -4932,10 +4851,8 @@
                         break;
                     case 'gain':
                         if (value === undefined) {
-                            // Getter
                             return this.filter.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.filter.gain.minValue || -40;
                             var max = this.filter.gain.maxValue ||  40;
@@ -4948,10 +4865,8 @@
                         break;
                     case 'q':
                         if (value === undefined) {
-                            // Getter
                             return this.filter.Q.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.filter.Q.minValue || 0.0001;
                             var max = this.filter.Q.maxValue || 1000;
@@ -4964,10 +4879,8 @@
                         break;
                     case 'range':
                         if (value === undefined) {
-                            // Getter
                             return this.range;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -4983,10 +4896,8 @@
                     case 'sustain':
                     case 'release':
                         if (value === undefined) {
-                            // Getter
                             return this[k];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (v >= 0) {
@@ -5075,14 +4986,12 @@
         /** @override */
         Filter.prototype.state = function(state) {
             if (state === undefined) {
-                return this.isActive;  // Getter
+                return this.isActive;
             } else if (String(state).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  // Setter
+                this.isActive = !this.isActive;
             } else {
-                this.isActive = Boolean(state);  // Setter
+                this.isActive = Boolean(state);
             }
-
-            // in the case of setter
 
             // Change connection
             this.connect();
@@ -5157,10 +5066,8 @@
                 switch (k) {
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                            return this.depth.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
@@ -5173,10 +5080,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                            return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -5299,10 +5204,8 @@
                 switch (k) {
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depth.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
@@ -5315,10 +5218,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -5479,10 +5380,8 @@
                 switch (k) {
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depth.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
@@ -5495,10 +5394,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -5511,10 +5408,8 @@
                         break;
                     case 'wave':
                         if (value === undefined) {
-                            // Getter
                             return this.lfo.type;
                         } else {
-                            // Setter
                             var v = String(value).toLowerCase();
 
                             // for legacy browsers
@@ -5635,10 +5530,8 @@
                 switch (k) {
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depth.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.depth.gain.minValue || 0;
                             var max = this.depth.gain.maxValue || 1;
@@ -5651,10 +5544,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -5789,10 +5680,8 @@
                 switch (k) {
                     case 'stage':
                         if (value === undefined) {
-                            // Getter
                             return this.numberOfStages;
                         } else {
-                            // Setter
                             var v = parseInt(value);
 
                             switch (v) {
@@ -5814,16 +5703,13 @@
                     case 'frequency':
                     case 'cutoff'   :
                         if (value === undefined) {
-                            // Getter
                             return this.filters[0].frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.filters[0].frequency.minValue || 10;
                             var max = this.filters[0].frequency.maxValue || (this.context.sampleRate / 2);
 
                             if ((v >= min) && (v <= max)) {
-                                // Setter
                                 for (var i = 0; i < Phaser.MAXIMUM_STAGES; i++) {
                                     this.filters[i].frequency.value = v;
                                 }
@@ -5835,10 +5721,8 @@
                         break;
                     case 'resonance':
                         if (value === undefined) {
-                            // Getter
                             return this.filters[0].Q.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.filters[0].Q.minValue || 0.0001;
                             var max = this.filters[0].Q.maxValue || 1000;
@@ -5853,10 +5737,8 @@
                         break;
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depthRate;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -5870,10 +5752,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -5887,10 +5767,8 @@
                     case 'mix'     :
                     case 'feedback':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
@@ -5926,7 +5804,7 @@
 
             // Effect ON
             if (this.isActive && (this.numberOfStages > 0)) {
-                // GainNode (Input) -> BiquadFilterNode (All-Pass Filter x 12) -> GainNode (Mix) -> GainNode (Output)
+                // GainNode (Input) -> BiquadFilterNode (All-Pass Filter x N) -> GainNode (Mix) -> GainNode (Output)
                 this.input.connect(this.filters[0]);
 
                 for (var i = 0; i < this.numberOfStages; i++) {
@@ -5937,7 +5815,7 @@
                         this.mix.connect(this.output);
 
                         // Feedback
-                        // GainNode (Input) -> BiquadFilterNode (All-Pass Filter x 12) -> GainNode (Feedback) -> BiquadFilterNode (All-Pass Filter x 12) ...
+                        // GainNode (Input) -> BiquadFilterNode (All-Pass Filter x N) -> GainNode (Feedback) -> BiquadFilterNode (All-Pass Filter x N) ...
                         this.filters[i].connect(this.feedback);
                         this.feedback.connect(this.filters[0]);
                     }
@@ -6038,10 +5916,8 @@
                     case 'delaytime':
                     case 'time'     :
                         if (value === undefined) {
-                            // Getter
                             return this.delay.delayTime.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || 1;
@@ -6055,10 +5931,8 @@
                         break;
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depthRate;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -6072,10 +5946,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -6089,10 +5961,8 @@
                     case 'mix'     :
                     case 'feedback':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
@@ -6105,10 +5975,8 @@
                         break;
                     case 'tone':
                         if (value === undefined) {
-                            // Getter
                             return this.tone.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
@@ -6243,10 +6111,8 @@
                     case 'delaytime':
                     case 'time'     :
                         if (value === undefined) {
-                            // Getter
                             return this.delay.delayTime.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || 1;
@@ -6260,10 +6126,8 @@
                         break;
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depthRate;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -6277,10 +6141,8 @@
                         break;
                     case 'rate':
                         if (value === undefined) {
-                            // Getter
                             return this.rate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.rate.minValue || 0;
                             var max = this.rate.maxValue || 100000;
@@ -6294,10 +6156,8 @@
                     case 'mix'     :
                     case 'feedback':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
@@ -6310,10 +6170,8 @@
                         break;
                     case 'tone':
                         if (value === undefined) {
-                            // Getter
                             return this.tone.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
@@ -6447,10 +6305,8 @@
                     case 'delaytime':
                     case 'time'     :
                         if (value === undefined) {
-                            // Getter
                             return this.delay.delayTime.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.delay.delayTime.minValue || 0;
                             var max = this.delay.delayTime.maxValue || Delay.MAX_DELAY_TIME;
@@ -6465,10 +6321,8 @@
                     case 'wet'     :
                     case 'feedback':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
@@ -6481,10 +6335,8 @@
                         break;
                     case 'tone':
                         if (value === undefined) {
-                            // Getter
                             return this.tone.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
@@ -6520,7 +6372,7 @@
                 this.input.connect(this.dry);
                 this.dry.connect(this.output);
 
-                // (GainNode (Input)) -> BiquadFilterNode (Tone) -> DelayNode -> GainNode (Wet) -> GainNode (Output)
+                // GainNode (Input) -> BiquadFilterNode (Tone) -> DelayNode -> GainNode (Wet) -> GainNode (Output)
                 this.input.connect(this.tone);
                 this.tone.connect(this.delay);
                 this.delay.connect(this.wet);
@@ -6610,10 +6462,8 @@
                 switch (k) {
                     case 'type':
                         if (value === undefined) {
-                            // Getter
                             return this.convolver.buffer;
                         } else {
-                            // Setter
                             var v   = parseInt(value);
                             var min = 0;
                             var max = this.rirs.length - 1;
@@ -6635,10 +6485,8 @@
                     case 'dry':
                     case 'wet':
                         if (value === undefined) {
-                            // Getter
                             return this[k].gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this[k].gain.minValue || 0;
                             var max = this[k].gain.maxValue || 1;
@@ -6651,10 +6499,8 @@
                         break;
                     case 'tone':
                         if (value === undefined) {
-                            // Getter
                             return this.tone.frequency.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.tone.frequency.minValue || 10;
                             var max = this.tone.frequency.maxValue || (this.context.sampleRate / 2);
@@ -6853,14 +6699,12 @@
         /** @override */
         Reverb.prototype.state = function(state) {
             if (state === undefined) {
-                return this.isActive;  // Getter
+                return this.isActive;
             } else if (String(state).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  // Setter
+                this.isActive = !this.isActive;
             } else {
-                this.isActive = Boolean(state);  // Setter
+                this.isActive = Boolean(state);
             }
-
-            // in the case of setter
 
             // Change connection
             this.connect();
@@ -6940,10 +6784,8 @@
                     case 'y':
                     case 'z':
                         if (value === undefined) {
-                            // Getter
                             return this.positions[k];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -6957,10 +6799,8 @@
                     case 'oy':
                     case 'oz':
                         if (value === undefined) {
-                            // Getter
                             return this.orientations[k.charAt(1)];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -6974,10 +6814,8 @@
                     case 'vy':
                     case 'vz':
                         if (value === undefined) {
-                            // Getter
                             return this.velocities[k.charAt(1)];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -6989,10 +6827,8 @@
                         break;
                     case 'refdistance':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.refDistance;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7003,10 +6839,8 @@
                         break;
                     case 'maxdistance':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.maxDistance;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7017,10 +6851,8 @@
                         break;
                     case 'rollofffactor':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.rolloffFactor;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7031,10 +6863,8 @@
                         break;
                     case 'coneinnerangle':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.coneInnerAngle;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7045,10 +6875,8 @@
                         break;
                     case 'coneouterangle':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.coneOuterAngle;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7059,10 +6887,8 @@
                         break;
                     case 'coneoutergain':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.coneOuterGain;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7073,10 +6899,8 @@
                         break;
                     case 'panningmodel':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.panningModel;
                         } else {
-                            // Setter
                             var v = /HRTF/i.test(value) ? String(value).toUpperCase() : String(value).toLowerCase();
 
                             var MODELS = {
@@ -7092,10 +6916,8 @@
                         break;
                     case 'distancemodel':
                         if (value === undefined) {
-                            // Getter
                             return this.panner.distanceModel;
                         } else {
-                            // Setter
                             var v = String(value).replace(/-/g, '').toLowerCase();
 
                             var MODELS = {
@@ -7211,10 +7033,8 @@
                 switch (k) {
                     case 'dopplerfactor':
                         if (value === undefined) {
-                            // Getter
                             return this.listener.dopplerFactor;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (v >= 0) {
@@ -7225,10 +7045,8 @@
                         break;
                     case 'speedofsound':
                         if (value === undefined) {
-                            // Getter
                             return this.listener.speedOfSound;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (v >= 0) {
@@ -7241,10 +7059,8 @@
                     case 'y':
                     case 'z':
                         if (value === undefined) {
-                            // Getter
                             return this.positions[k];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7258,10 +7074,8 @@
                     case 'fy':
                     case 'fz':
                         if (value === undefined) {
-                            // Getter
                             return this.fronts[k.charAt(1)];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7275,10 +7089,8 @@
                     case 'uy':
                     case 'uz':
                         if (value === undefined) {
-                            // Getter
                             return this.ups[k.charAt(1)];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7292,10 +7104,8 @@
                     case 'vy':
                     case 'vz':
                         if (value === undefined) {
-                            // Setter
                             return this.velocities[k.charAt(1)];
                         } else {
-                            // Getter
                             var v = parseFloat(value);
 
                             if (!isNaN(v)) {
@@ -7391,10 +7201,8 @@
                     case 'sustain':
                     case 'release':
                         if (value === undefined) {
-                            // Getter
                             return this[k];
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (v >= 0) {
@@ -7664,10 +7472,8 @@
         switch (k) {
             case 'mastervolume':
                 if (value === undefined) {
-                    // Getter
                     return this.mastervolume.gain.value;
                 } else {
-                    // Setter
                     var v   = parseFloat(value);
                     var min = this.mastervolume.gain.minValue || 0;
                     var max = this.mastervolume.gain.maxValue || 1;
@@ -7886,7 +7692,7 @@
      */
     SoundModule.prototype.install = function(effector, CustomizedEffector) {
         if (Object.prototype.toString.call(CustomizedEffector) === '[object Function]') {
-            CustomizedEffector.prototype = new this.Effector(this.context, this.BUFFER_SIZE);
+            CustomizedEffector.prototype = new this.Effector(this.context, this.bufferSize);
             this.plugins.push({'name': String(effector).toLowerCase(), 'plugin': new CustomizedEffector(this.context)});
         }
 
@@ -7996,10 +7802,8 @@
                 switch (k) {
                     case 'time':
                         if (value === undefined) {
-                            // Getter
                             return this.time;
                         } else {
-                            // Setter
                             var v = parseFloat(value);
 
                             if (v >= 0) {
@@ -8010,10 +7814,8 @@
                         break;
                     case 'type':
                         if (value === undefined) {
-                            // Getter
                             return this.type;
                         } else {
-                            // Setter
                             var v = String(value).toUpperCase();
 
                             if (v in Glide.TYPES) {
@@ -8161,10 +7963,8 @@
                 switch (k) {
                     case 'type':
                         if (value === undefined) {
-                            // Getter
                             return this.source.type;
                         } else {
-                            // Setter
                             if (Object.prototype.toString.call(value) !== '[object Object]') {
                                 var v = String(value).toLowerCase();
 
@@ -8220,10 +8020,8 @@
                         break;
                     case 'octave':
                         if (value === undefined) {
-                            // Getter
                             return this.octave;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = (this.source.detune.minValue || -4800) / OCTAVE;
                             var max = (this.source.detune.maxValue ||  4800) / OCTAVE;
@@ -8237,10 +8035,8 @@
                         break;
                     case 'fine':
                         if (value === undefined) {
-                            // Getter
                             return this.fine;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = -OCTAVE;
                             var max =  OCTAVE;
@@ -8255,10 +8051,8 @@
                     case 'volume':
                     case 'gain'  :
                         if (value === undefined) {
-                            // Getter
                             return this.volume.gain.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.volume.gain.minValue || 0;
                             var max = this.volume.gain.maxValue || 1;
@@ -8363,14 +8157,13 @@
         /** @override */
         Oscillator.prototype.state = function(state) {
             if (state === undefined) {
-                return this.isActive;  // Getter
+                return this.isActive;
             } else if (String(state).toLowerCase() === 'toggle') {
-                this.isActive = !this.isActive;  // Setter
+                this.isActive = !this.isActive;
             } else {
-                this.isActive = Boolean(state);  // Setter
+                this.isActive = Boolean(state);
             }
 
-            // in the case of setter
             return this;
         };
 
@@ -8582,7 +8375,7 @@
 
     /**
      * This method gets the instance of Oscillator that is used in OscillatorModule.
-     * @param {number} index This argument is required in the case of designating OscillatorNode.
+     * @param {number} index This argument is required in the case of designating Oscillator.
      * @return {Array.<Oscillator>|Oscillator}
      * @override
      */
@@ -8850,16 +8643,13 @@
             var r = SoundModule.prototype.param.call(this, k, value);
 
             if (r !== undefined) {
-                // Getter
                 return r;
             } else {
                 switch (k) {
                     case 'transpose':
                         if (value === undefined) {
-                            // Getter
                             return this.transpose;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
 
@@ -9161,10 +8951,8 @@
                 switch (k) {
                     case 'depth':
                         if (value === undefined) {
-                            // Getter
                             return this.depth;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -9252,16 +9040,13 @@
             var r = SoundModule.prototype.param.call(this, k, value);
 
             if (r !== undefined) {
-                // Getter
                 return r;
             } else {
                 switch (k) {
                     case 'playbackrate':
                         if (value === undefined) {
-                            // Getter
                             return this.source.playbackRate.value;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = this.source.playbackRate.minValue || 0;
                             var max = this.source.playbackRate.maxValue || 1024;
@@ -9275,20 +9060,16 @@
                     case 'loop'   :
                     case 'looping':
                         if (value === undefined) {
-                            // Getter
                             return this.source.loop;
                         } else {
-                            // Setter
                             this.source.loop = Boolean(value);
                         }
 
                         break;
                     case 'currenttime':
                         if (value === undefined) {
-                            // Getter
                             return this.currentTime;
                         } else {
-                            // Setter
                             if (this.buffer instanceof AudioBuffer) {
                                 var v   = parseFloat(value);
                                 var max = this.buffer.duration;
@@ -9706,16 +9487,13 @@
             var r = SoundModule.prototype.param.call(this, k, value);
 
             if (r !== undefined) {
-                // Getter
                 return r;
             } else {
                 switch (k) {
                     case 'playbackrate':
                         if (value === undefined) {
-                            // Getter
                             return (this.media instanceof HTMLMediaElement) ? this.media.playbackRate : this.playbackRate;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0.5;  // for Chrome
 
@@ -9731,10 +9509,8 @@
                         break;
                     case 'currenttime':
                         if (value === undefined) {
-                            // Getter
                             return (this.media instanceof HTMLMediaElement) ? this.media.currentTime : 0;
                         } else {
-                            // Setter
                             if (this.media instanceof HTMLMediaElement) {
                                 var v   = parseFloat(value);
                                 var min = 0;
@@ -9751,10 +9527,8 @@
                     case 'muted'   :
                     case 'controls':
                         if (value === undefined) {
-                            // Getter
                             return (this.media instanceof HTMLMediaElement) ? this.media[k] : this[k];
                         } else {
-                            // Setter
                             if (this.media instanceof HTMLMediaElement) {
                                 this.media[k] = Boolean(value);
                             }
@@ -9766,10 +9540,8 @@
                     case 'width' :
                     case 'height':
                         if (value === undefined) {
-                            // Getter
                             return (this.media instanceof HTMLVideoElement) ? this.media[k] : 0;
                         } else {
-                            // Setter
                             var v   = parseInt(value);
                             var min = 0;
 
@@ -10018,10 +9790,8 @@
                 switch (k) {
                     case 'level':
                         if (value === undefined) {
-                            // Getter
                             return this.level;
                         } else {
-                            // Setter
                             var v   = parseFloat(value);
                             var min = 0;
                             var max = 1;
@@ -10052,7 +9822,7 @@
                 // The amplitude is equal to argument.
                 return d;
             } else {
-                // Because signal is detected as background noise, the amplitude is 0 .
+                // Because signal is detected as background noise, the amplitude is 0.
                 return 0;
             }
         };
@@ -10274,7 +10044,7 @@
 
     /**
      * This method mixes sound source.
-     * @param {Array.<OscillatorModule>|Array.<OneshotModule>|Array.<AudioModule>|Array.<MediaModule>|Array.<StreamModule>} sources This argument is array of sound source that is defined by this library.
+     * @param {Array.<OscillatorModule>|Array.<OneshotModule>|Array.<AudioModule>|Array.<MediaModule>|Array.<StreamModule>} sources This argument is the array of sound source that is defined by this library.
      * @return {MixerModule} This is returned for method chain.
      */
     MixerModule.prototype.mix = function(sources) {
@@ -10416,7 +10186,7 @@
 
         var self = this;
 
-        navigator.requestMIDIAccess({sysex : Boolean(sysex)}).then(function(midiAccess) {
+        navigator.requestMIDIAccess({sysex: Boolean(sysex)}).then(function(midiAccess) {
             self.midiAccess = midiAccess;
 
             if (Object.prototype.toString.call(midiAccess) === '[object Function]') {
@@ -10828,7 +10598,7 @@
             }
         }
 
-        return this.sequences;
+        return this;
     };
 
     /**
@@ -11268,7 +11038,7 @@
     };
 
     /** @override */
-    XSound.prototype.toString = function() {
+    XSound.toString = function() {
         return '[XSound]';
     };
 
