@@ -1,17 +1,19 @@
 {
   "name": "xsound",
-  "version": "1.11.0",
-  "homepage": "https://github.com/Korilakkuma/XSound",
+  "version": "1.12.0",
+  "homepage": "https://korilakkuma.github.io/XSound/",
   "authors": [
     "Korilakkuma <rilakkuma.san.xjapan@gmail.com>"
   ],
   "description": "HTML5 Web Audio API Library",
   "main": "build/xsound.min.js",
   "keywords": [
-    "Web Audio API",
-    "JavaScript",
     "XSound.js",
-    "XSound"
+    "XSound",
+    "JavaScript",
+    "HTML5",
+    "Web Audio API",
+    "Library"
   ],
   "license": "MIT",
   "ignore" : [
