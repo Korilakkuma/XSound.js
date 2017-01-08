@@ -254,7 +254,7 @@
         // Begin drawing
         switch (this.type) {
             case Time.TYPES.FLOAT:
-                svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, Mocks.SoundModule.Analyser.Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
+                svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, null, Mocks.SoundModule.Analyser.Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
                 break;
             case Time.TYPES.UINT:
             default:

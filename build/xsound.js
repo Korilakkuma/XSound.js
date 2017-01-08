@@ -1216,7 +1216,7 @@
                         context.beginPath();
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
+                            if ((nPlotInterval === null) || (nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -1239,7 +1239,7 @@
 
                         // Draw wave
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
+                            if ((nPlotInterval === null) || (nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = -1 * Math.floor(data[i] * (h / 2));
 
@@ -1299,7 +1299,7 @@
                         var d = '';
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
+                            if ((nPlotInterval === null) || (nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -1336,7 +1336,7 @@
                         }
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
+                            if ((nPlotInterval === null) || (nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
 
                                 x = Math.floor((i / len) * w) + this.styles.left;
@@ -2134,7 +2134,7 @@
                 // Begin drawing
                 switch (this.type) {
                     case Time.TYPES.FLOAT:
-                        svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
+                        svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, null, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME));
                         break;
                     case Time.TYPES.UINT:
                     default:
