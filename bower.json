@@ -1,6 +1,6 @@
 {
   "name": "xsound",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "homepage": "https://korilakkuma.github.io/XSound/",
   "authors": [
     "Korilakkuma <rilakkuma.san.xjapan@gmail.com>"
@@ -16,6 +16,5 @@
     "Library"
   ],
   "license": "MIT",
-  "ignore" : [
-  ]
+  "ignore": []
 }
