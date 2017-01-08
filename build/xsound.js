@@ -1181,9 +1181,9 @@
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
              * @param {number} middle This argument is the middle of drawing area.
-             * @param {number} nPlotinterval This argument is the interval of drawing.
+             * @param {number} nPlotInterval This argument is the interval of drawing.
              */
-            Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotinterval) {
+            Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotInterval) {
                 if (!(context instanceof CanvasRenderingContext2D)) {
                     return this;
                 }
@@ -1216,7 +1216,7 @@
                         context.beginPath();
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -1239,7 +1239,7 @@
 
                         // Draw wave
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = -1 * Math.floor(data[i] * (h / 2));
 
@@ -1275,11 +1275,11 @@
              * @param {number} innerWidth This argument is the width of drawing area.
              * @param {number} innerHeight This argument is the height of drawing area.
              * @param {number} middle This argument is the middle of drawing area.
-             * @param {number} nPlotinterval This argument is the interval of drawing.
+             * @param {number} nPlotInterval This argument is the interval of drawing.
              * @param {string} linearGradientId This argument is id attribute for SVGLinearGradientElement.
              * @return {SVGPathElement|SVGGElement} This is returned as SVGElement.
              */
-            Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotinterval, linearGradientId) {
+            Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotInterval, linearGradientId) {
                 var x = 0;
                 var y = 0;
 
@@ -1299,7 +1299,7 @@
                         var d = '';
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 x = Math.floor((i / len) * w) + this.styles.left;
                                 y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -1336,7 +1336,7 @@
                         }
 
                         for (var i = 0, len = data.length; i < len; i++) {
-                            if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                            if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                                 var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
 
                                 x = Math.floor((i / len) * w) + this.styles.left;
@@ -1505,21 +1505,21 @@
                 var t = '';
 
                 // Draw wave at intervals of "this.plotInterval"
-                var nPlotinterval = Math.floor(this.plotInterval * this.sampleRate);
+                var nPlotInterval = Math.floor(this.plotInterval * this.sampleRate);
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+                var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
 
                 // Begin drawing
-                this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle, nPlotinterval);
+                this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle, nPlotInterval);
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
                     for (var i = 0, len = data.length; i < len; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.sampleRate) / 60) + ' min';
 
@@ -1598,21 +1598,21 @@
                 var t = '';
 
                 // Draw wave at intervals of "this.plotInterval"
-                var nPlotinterval = Math.floor(this.plotInterval * this.sampleRate);
+                var nPlotInterval = Math.floor(this.plotInterval * this.sampleRate);
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+                var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
                 // Erase previous wave
                 svg.innerHTML = '';
 
                 // Begin drawing
-                svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, nPlotinterval, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW));
+                svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, nPlotInterval, Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW));
 
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
                     for (var i = 0, len = data.length; i < len; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.sampleRate) / 60) + ' min';
 
@@ -1979,7 +1979,7 @@
                 var t = '';
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+                var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
@@ -2055,7 +2055,7 @@
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
                     for (var i = 0, len = data.length; i < len; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.sampleRate) * 1000) + ' ms';
 
@@ -2126,7 +2126,7 @@
                 var t = '';
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+                var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
                 // Begin drawing
                 svg.innerHTML = '';
@@ -2218,7 +2218,7 @@
                 if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
                     // Draw grid and text (X axis)
                     for (var i = 0, len = data.length; i < len; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / len) * innerWidth) + this.styles.left;
                             t = Math.floor((i / this.sampleRate) * 1000) + ' ms';
 
@@ -2433,7 +2433,7 @@
                 var fsDivN = this.sampleRate / (2 * data.length);
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval / fsDivN);
+                var nTextInterval = Math.floor(this.textInterval / fsDivN);
 
                 // Erase previous wave
                 context.clearRect(0, 0, width, height);
@@ -2532,10 +2532,10 @@
                     var f = 0;
 
                     for (var i = 0; i < drawnSize; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                            f = Math.floor(this.textInterval * (i / nTextinterval));
+                            f = Math.floor(this.textInterval * (i / nTextInterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
                             // Draw grid
@@ -2645,7 +2645,7 @@
                 var fsDivN = this.sampleRate / (2 * data.length);
 
                 // Draw text at intervals of "this.textInterval"
-                var nTextinterval = Math.floor(this.textInterval / fsDivN);
+                var nTextInterval = Math.floor(this.textInterval / fsDivN);
 
                 // Erase previous wave
                 svg.innerHTML = '';
@@ -2766,10 +2766,10 @@
                     var f = 0;
 
                     for (var i = 0; i < drawnSize; i++) {
-                        if ((i % nTextinterval) === 0) {
+                        if ((i % nTextInterval) === 0) {
                             x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                            f = Math.floor(this.textInterval * (i / nTextinterval));
+                            f = Math.floor(this.textInterval * (i / nTextInterval));
                             t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
                             // Draw grid

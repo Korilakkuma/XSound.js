@@ -93,21 +93,21 @@
         var t = '';
 
         // Draw wave at intervals of "this.plotInterval"
-        var nPlotinterval = Math.floor(this.plotInterval * this.sampleRate);
+        var nPlotInterval = Math.floor(this.plotInterval * this.sampleRate);
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+        var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
         // Erase previous wave
         context.clearRect(0, 0, width, height);
 
         // Begin drawing
-        this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle, nPlotinterval);
+        this.drawTimeDomainFloat32ArrayToCanvas(context, data, innerWidth, innerHeight, middle, nPlotInterval);
 
         if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
             // Draw grid and text (X axis)
             for (var i = 0, len = data.length; i < len; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                     t = Math.floor((i / this.sampleRate) / 60) + ' min';
 
@@ -186,21 +186,21 @@
         var t = '';
 
         // Draw wave at intervals of "this.plotInterval"
-        var nPlotinterval = Math.floor(this.plotInterval * this.sampleRate);
+        var nPlotInterval = Math.floor(this.plotInterval * this.sampleRate);
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+        var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
         // Erase previous wave
         svg.innerHTML = '';
 
         // Begin drawing
-        svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, nPlotinterval, Mocks.SoundModule.Analyser.Mocks.SoundModule.Analyser.Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW));
+        svg.appendChild(this.drawTimeDomainFloat32ArrayToSVG(data, innerWidth, innerHeight, middle, nPlotInterval, Mocks.SoundModule.Analyser.Mocks.SoundModule.Analyser.Visualizer.SVG_LINEAR_GRADIENT_IDS.TIME_OVERVIEW));
 
         if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
             // Draw grid and text (X axis)
             for (var i = 0, len = data.length; i < len; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                     t = Math.floor((i / this.sampleRate) / 60) + ' min';
 

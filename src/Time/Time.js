@@ -99,7 +99,7 @@
         var t = '';
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+        var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
         // Erase previous wave
         context.clearRect(0, 0, width, height);
@@ -175,7 +175,7 @@
         if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
             // Draw grid and text (X axis)
             for (var i = 0, len = data.length; i < len; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                     t = Math.floor((i / this.sampleRate) * 1000) + ' ms';
 
@@ -246,7 +246,7 @@
         var t = '';
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval * this.sampleRate);
+        var nTextInterval = Math.floor(this.textInterval * this.sampleRate);
 
         // Begin drawing
         svg.innerHTML = '';
@@ -338,7 +338,7 @@
         if ((this.styles.grid !== 'none') || (this.styles.text !== 'none')) {
             // Draw grid and text (X axis)
             for (var i = 0, len = data.length; i < len; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / len) * innerWidth) + this.styles.left;
                     t = Math.floor((i / this.sampleRate) * 1000) + ' ms';
 

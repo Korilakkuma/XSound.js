@@ -124,7 +124,7 @@
         var fsDivN = this.sampleRate / (2 * data.length);
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval / fsDivN);
+        var nTextInterval = Math.floor(this.textInterval / fsDivN);
 
         // Erase previous wave
         context.clearRect(0, 0, width, height);
@@ -223,10 +223,10 @@
             var f = 0;
 
             for (var i = 0; i < drawnSize; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                    f = Math.floor(this.textInterval * (i / nTextinterval));
+                    f = Math.floor(this.textInterval * (i / nTextInterval));
                     t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
                     // Draw grid
@@ -336,7 +336,7 @@
         var fsDivN = this.sampleRate / (2 * data.length);
 
         // Draw text at intervals of "this.textInterval"
-        var nTextinterval = Math.floor(this.textInterval / fsDivN);
+        var nTextInterval = Math.floor(this.textInterval / fsDivN);
 
         // Erase previous wave
         svg.innerHTML = '';
@@ -457,10 +457,10 @@
             var f = 0;
 
             for (var i = 0; i < drawnSize; i++) {
-                if ((i % nTextinterval) === 0) {
+                if ((i % nTextInterval) === 0) {
                     x = Math.floor((i / drawnSize) * innerWidth) + this.styles.left;
 
-                    f = Math.floor(this.textInterval * (i / nTextinterval));
+                    f = Math.floor(this.textInterval * (i / nTextInterval));
                     t = (f < 1000) ? (f + ' Hz') : (String(f / 1000).slice(0, 3) + ' kHz');
 
                     // Draw grid

@@ -271,9 +271,9 @@
      * @param {number} innerWidth This argument is the width of drawing area.
      * @param {number} innerHeight This argument is the height of drawing area.
      * @param {number} middle This argument is the middle of drawing area.
-     * @param {number} nPlotinterval This argument is the interval of drawing.
+     * @param {number} nPlotInterval This argument is the interval of drawing.
      */
-    Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotinterval) {
+    Visualizer.prototype.drawTimeDomainFloat32ArrayToCanvas = function(context, data, innerWidth, innerHeight, middle, nPlotInterval) {
         if (!(context instanceof CanvasRenderingContext2D)) {
             return this;
         }
@@ -306,7 +306,7 @@
                 context.beginPath();
 
                 for (var i = 0, len = data.length; i < len; i++) {
-                    if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                    if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                         x = Math.floor((i / len) * w) + this.styles.left;
                         y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -329,7 +329,7 @@
 
                 // Draw wave
                 for (var i = 0, len = data.length; i < len; i++) {
-                    if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                    if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                         x = Math.floor((i / len) * w) + this.styles.left;
                         y = -1 * Math.floor(data[i] * (h / 2));
 
@@ -365,11 +365,11 @@
      * @param {number} innerWidth This argument is the width of drawing area.
      * @param {number} innerHeight This argument is the height of drawing area.
      * @param {number} middle This argument is the middle of drawing area.
-     * @param {number} nPlotinterval This argument is the interval of drawing.
+     * @param {number} nPlotInterval This argument is the interval of drawing.
      * @param {string} linearGradientId This argument is id attribute for SVGLinearGradientElement.
      * @return {SVGPathElement|SVGGElement} This is returned as SVGElement.
      */
-    Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotinterval, linearGradientId) {
+    Visualizer.prototype.drawTimeDomainFloat32ArrayToSVG = function(data, innerWidth, innerHeight, middle, nPlotInterval, linearGradientId) {
         var x = 0;
         var y = 0;
 
@@ -389,7 +389,7 @@
                 var d = '';
 
                 for (var i = 0, len = data.length; i < len; i++) {
-                    if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                    if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                         x = Math.floor((i / len) * w) + this.styles.left;
                         y = Math.floor((1 - data[i]) * (h / 2)) + this.styles.top;
 
@@ -426,7 +426,7 @@
                 }
 
                 for (var i = 0, len = data.length; i < len; i++) {
-                    if ((nPlotinterval === undefined) || ((i % nPlotinterval) === 0)) {
+                    if ((nPlotInterval === undefined) || ((i % nPlotInterval) === 0)) {
                         var rect = document.createElementNS(Visualizer.XMLNS, 'rect');
 
                         x = Math.floor((i / len) * w) + this.styles.left;
