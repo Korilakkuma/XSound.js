@@ -22,6 +22,10 @@ In concrete, this library may be useful to implement the following features.
 * Recording (Create WAVE file)
 * Session (by WebSocket)
   
+## Getting Started
+  
+    X('oscillator').setup(true).ready().start(440);
+  
 ## Demo
   
 The application that uses this library is in the following URL.  
