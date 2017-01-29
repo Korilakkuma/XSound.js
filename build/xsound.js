@@ -820,7 +820,7 @@
         }
 
         this.mastervolume = context.createGain();
-        this.processor    = context.createScriptProcessor(this.bufferSize, SoundModule.NUMBER_OF_INPUTS, SoundModule.NUMBRE_OF_OUTPUTS);
+        this.processor    = context.createScriptProcessor(this.bufferSize, SoundModule.NUMBER_OF_INPUTS, SoundModule.NUMBER_OF_OUTPUTS);
 
         /** @implements {Statable} */
         Session.prototype  = Object.create(Statable.prototype);
