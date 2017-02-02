@@ -38,6 +38,10 @@ Now, I'm creating website for Web Audio API. Please refer to the following site 
   
 * [WEB SOUNDER](http://curtaincall.weblike.jp/portfolio-web-sounder/)
   
+## API Document
+  
+* [XSound.js API Document](https://korilakkuma.github.io/XSound/)
+  
 ## Installation
   
     $ npm install xsound
@@ -79,10 +83,6 @@ For example,
 In the case of recording log, the path of log file must be designated by the 2nd argument.
   
     $ node xsound-server-session-websocket.js 8080 websocket.log
-  
-## API Document
-  
-* [XSound.js API Document](https://korilakkuma.github.io/XSound/)
   
 ## License
   
