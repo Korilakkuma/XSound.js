@@ -12,17 +12,12 @@
         this.listener = context.listener;
 
         // Set default value
-        this.listener.dopplerFactor = 1;
-        this.listener.speedOfSound  = 343.3;
-
-        this.positions  = {'x': 0, 'y': 0, 'z': 0};
-        this.fronts     = {'x': 0, 'y': 0, 'z': -1};
-        this.ups        = {'x': 0, 'y': 1, 'z': 0};
-        this.velocities = {'x': 0, 'y': 0, 'z': 0};
+        this.positions = {'x': 0, 'y': 0, 'z': 0};
+        this.fronts    = {'x': 0, 'y': 0, 'z': -1};
+        this.ups       = {'x': 0, 'y': 1, 'z': 0};
 
         this.listener.setPosition(this.positions.x, this.positions.y, this.positions.z);
         this.listener.setOrientation(this.fronts.x, this.fronts.y, this.fronts.z, this.ups.x, this.ups.y, this.ups.z);
-        this.listener.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
     }
 
     /**
@@ -42,30 +37,6 @@
             var k = String(key).replace(/-/g, '').toLowerCase();
 
             switch (k) {
-                case 'dopplerfactor':
-                    if (value === undefined) {
-                        return this.listener.dopplerFactor;
-                    } else {
-                        var v = parseFloat(value);
-
-                        if (v >= 0) {
-                            this.listener.dopplerFactor = v;
-                        }
-                    }
-
-                    break;
-                case 'speedofsound':
-                    if (value === undefined) {
-                        return this.listener.speedOfSound;
-                    } else {
-                        var v = parseFloat(value);
-
-                        if (v >= 0) {
-                            this.listener.speedOfSound = v;
-                        }
-                    }
-
-                    break;
                 case 'x':
                 case 'y':
                 case 'z':
@@ -111,21 +82,6 @@
                     }
 
                     break;
-                case 'vx':
-                case 'vy':
-                case 'vz':
-                    if (value === undefined) {
-                        return this.velocities[k.charAt(1)];
-                    } else {
-                        var v = parseFloat(value);
-
-                        if (!isNaN(v)) {
-                            this.velocities[k.charAt(1)] = v;
-                            this.listener.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
-                        }
-                    }
-
-                    break;
                 default:
                     break;
             }
@@ -140,12 +96,9 @@
      */
     Listener.prototype.params = function() {
         var params = {
-            'dopplerFactor': this.listener.dopplerFactor,
-            'speedOfSound' : this.listener.speedOfSound,
-            'positions'    : this.positions,
-            'fronts'       : this.fronts,
-            'ups'          : this.ups,
-            'velocities'   : this.velocities
+            'positions' : this.positions,
+            'fronts'    : this.fronts,
+            'ups'       : this.ups
         };
 
         return params;

@@ -15,7 +15,6 @@
 
         this.positions    = {'x': 0, 'y': 0, 'z': 0};
         this.orientations = {'x': 1, 'y': 0, 'z': 0};
-        this.velocities   = {'x': 0, 'y': 0, 'z': 0};
 
         this.panner.refDistance   = 1;
         this.panner.maxDistance   = 10000;
@@ -30,7 +29,6 @@
 
         this.panner.setPosition(this.positions.x, this.positions.y, this.positions.z);
         this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
-        this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
 
         // Panner is not connected by default
         this.state(false);
@@ -77,21 +75,6 @@
                         if (!isNaN(v)) {
                             this.orientations[k.charAt(1)] = v;
                             this.panner.setOrientation(this.orientations.x, this.orientations.y, this.orientations.z);
-                        }
-                    }
-
-                    break;
-                case 'vx':
-                case 'vy':
-                case 'vz':
-                    if (value === undefined) {
-                        return this.velocities[k.charAt(1)];
-                    } else {
-                        var v = parseFloat(value);
-
-                        if (!isNaN(v)) {
-                            this.velocities[k.charAt(1)] = v;
-                            this.panner.setVelocity(this.velocities.x, this.velocities.y, this.velocities.z);
                         }
                     }
 
@@ -237,7 +220,6 @@
             'state'         : this.isActive,
             'positions'     : this.positions,
             'orientations'  : this.orientations,
-            'velocities'    : this.velocities,
             'refDistance'   : this.panner.refDistance,
             'maxDistance'   : this.panner.maxDistance,
             'rolloffFactor' : this.panner.rolloffFactor,
