@@ -340,15 +340,10 @@ describe('Filter TEST', function() {
                 expect(filter.param('decay')).toEqual(0.5);
             });
 
-            it('should return 0', function() {
-                filter.param('decay', 0);
-                expect(filter.param('decay')).toEqual(0);
-            });
-
             // Negative
 
             it('should return 0.3', function() {
-                filter.param('decay', -0.1);
+                filter.param('decay', 0);
                 expect(filter.param('decay')).toEqual(0.3);
             });
 
@@ -422,15 +417,10 @@ describe('Filter TEST', function() {
                 expect(filter.param('release')).toEqual(0.5);
             });
 
-            it('should return 0', function() {
-                filter.param('release', 0);
-                expect(filter.param('release')).toEqual(0);
-            });
-
             // Negative
 
             it('should return 1', function() {
-                filter.param('release', -0.1);
+                filter.param('release', 0);
                 expect(filter.param('release')).toEqual(1);
             });
 

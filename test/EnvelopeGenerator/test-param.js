@@ -70,15 +70,10 @@ describe('EnvelopeGenerator TEST', function() {
                 expect(envelopegenerator.param('decay')).toEqual(0.5);
             });
 
-            it('should return 0', function() {
-                envelopegenerator.param('decay', 0);
-                expect(envelopegenerator.param('decay')).toEqual(0);
-            });
-
             // Negative
 
             it('should return 0.3', function() {
-                envelopegenerator.param('decay', -0.1);
+                envelopegenerator.param('decay', 0);
                 expect(envelopegenerator.param('decay')).toEqual(0.3);
             });
 
@@ -152,15 +147,10 @@ describe('EnvelopeGenerator TEST', function() {
                 expect(envelopegenerator.param('release')).toEqual(0.5);
             });
 
-            it('should return 0', function() {
-                envelopegenerator.param('release', 0);
-                expect(envelopegenerator.param('release')).toEqual(0);
-            });
-
             // Negative
 
             it('should return 1', function() {
-                envelopegenerator.param('release', -0.1);
+                envelopegenerator.param('release', 0);
                 expect(envelopegenerator.param('release')).toEqual(1);
             });
 
