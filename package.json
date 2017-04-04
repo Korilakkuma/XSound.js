@@ -1,6 +1,6 @@
 {
   "name": "xsound",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "description": "HTML5 Web Audio API Library",
   "main": "build/xsound.min.js",
   "scripts": {
