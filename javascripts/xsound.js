@@ -4892,15 +4892,26 @@
 
                         break;
                     case 'attack' :
-                    case 'decay'  :
                     case 'sustain':
-                    case 'release':
                         if (value === undefined) {
                             return this[k];
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
+                                this[k] = v;
+                            }
+                        }
+
+                        break;
+                    case 'decay'  :
+                    case 'release':
+                        if (value === undefined) {
+                            return this[k];
+                        } else {
+                            var v = parseFloat(value);
+
+                            if (v > 0) {
                                 this[k] = v;
                             }
                         }
@@ -7132,15 +7143,26 @@
 
                 switch (k) {
                     case 'attack' :
-                    case 'decay'  :
                     case 'sustain':
-                    case 'release':
                         if (value === undefined) {
                             return this[k];
                         } else {
                             var v = parseFloat(value);
 
                             if (v >= 0) {
+                                this[k] = v;
+                            }
+                        }
+
+                        break;
+                    case 'decay'  :
+                    case 'release':
+                        if (value === undefined) {
+                            return this[k];
+                        } else {
+                            var v = parseFloat(value);
+
+                            if (v > 0) {
                                 this[k] = v;
                             }
                         }
