@@ -91,4 +91,10 @@ $(function() {
             $(this).parent('h2').next('dl').slideDown('fast', 'swing');
         }
     });
+
+    // Social Buttons
+    $('#twitter').socialbutton('twitter', {lang : 'en_US'});
+    $('#facebook').socialbutton('facebook_like', {button : 'button_count', locale : 'en_US'});
+    $('#hatena').socialbutton('hatena');
+    $('#google').socialbutton('google_plusone', {size : 'medium'}).width(72);
 });

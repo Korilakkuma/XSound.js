@@ -118,8 +118,38 @@ h1 {
     display:none;
     position:absolute;
     top:8px;
-    right:170px;
+    right:172px;
     z-index:10;
+
+    > iframe {
+        width:80px;
+    }
+}
+
+#social-buttons {
+    display:none;
+    position:absolute;
+    top:8px;
+    right:324px;
+    z-index:10;
+
+    li {
+        display:inline-block;
+        margin-right:4px;
+
+        &#twitter {}
+
+        &#facebook {
+            > iframe {
+                width:60px !important;
+                height:20px !important;
+            }
+        }
+
+        &#hatena {}
+
+        &#google {}
+    }
 }
 
 #forkme-banner {
@@ -578,7 +608,7 @@ a {
         font-size:2rem;
     }
 
-    #github-buttons, #forkme-banner {
+    #github-buttons, #forkme-banner, #social-buttons {
         display:block;
     }
 
