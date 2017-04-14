@@ -64,7 +64,7 @@ or,
   
 In the case of development,
   
-    <script type="text/javascript" src="xsound.js></script>
+    <script type="text/javascript" src="xsound.js"></script>
   
 In the case of using WebSocket,
   
