@@ -29,7 +29,7 @@ In concrete, this library may be useful to implement the following features.
 ## Demo
   
 The application that uses this library is in the following URL.  
-Please use Chrome, Opera, Safari, Firefox.
+Please use one of Chrome, Opera, Firefox, Safari, Edge.
   
 * [X Sound](https://korilakkuma.github.io/X-Sound/)
 * [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
