@@ -1,0 +1,23 @@
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+# Set default charset
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# 4 space indentation
+[*.js]
+indent_style = space
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Matches the exact files one of package.json, bower.json, .travis.yml
+[{package.json,bower.json,.travis.yml}]
+indent_style = space
+indent_size = 2
