@@ -98,7 +98,7 @@
             if (isStop) {
                 var stopTime = self.context.currentTime;
 
-                self.stop(stopTime, true);
+                self.off(stopTime, true);
 
                 self.analyser.stop('time');
                 self.analyser.stop('fft');

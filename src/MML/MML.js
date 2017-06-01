@@ -443,24 +443,21 @@
                 }
 
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                    if (sequence.indexes[i] !== 'R') {
-                        this.callbacks.start(sequence, i);
-                    }
+                    this.callbacks.start(sequence, i);
                 }
             } else if (this.source instanceof Mocks.OscillatorModule) {
                 this.source.start(sequence.frequencies, connects, processCallback);
 
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                    if (sequence.indexes[i] !== 'R') {
-                        this.callbacks.start(sequence, i);
-                    }
+                    this.callbacks.start(sequence, i);
                 }
             } else if (this.source instanceof Mocks.OneshotModule) {
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                     if (sequence.indexes[i] !== 'R') {
                         this.source.start(sequence.indexes[i], connects, processCallback);
-                        this.callbacks.start(sequence, i);
                     }
+
+                    this.callbacks.start(sequence, i);
                 }
             }
 
@@ -469,24 +466,21 @@
             this.timerids[p] = global.setTimeout(function() {
                 if (Array.isArray(self.source)) {
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                        if (sequence.indexes[i] !== 'R') {
-                            self.callbacks.stop(sequence, i);
-                        }
+                        self.callbacks.stop(sequence, i);
                     }
                 } else if (self.source instanceof Mocks.OscillatorModule) {
-                    self.source.stop(sequence.frequencies, processCallback);
+                    self.source.stop();
 
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                        if (sequence.indexes[i] !== 'R') {
-                            self.callbacks.stop(sequence, i);
-                        }
+                        self.callbacks.stop(sequence, i);
                     }
                 } else if (self.source instanceof Mocks.OneshotModule) {
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                         if (sequence.indexes[i] !== 'R') {
                             self.source.stop(sequence.indexes[i], processCallback);
-                            self.callbacks.stop(sequence, i);
                         }
+
+                        self.callbacks.stop(sequence, i);
                     }
                 }
 
@@ -517,24 +511,21 @@
 
         if (Array.isArray(this.source)) {
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                if (sequence.indexes[i] !== 'R') {
-                    this.callbacks.stop(sequence, i);
-                }
+                this.callbacks.stop(sequence, i);
             }
         } else if (this.source instanceof Mocks.OscillatorModule) {
-            this.source.stop(sequence.frequencies, processCallback);
+            this.source.stop();
 
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                if (sequence.indexes[i] !== 'R') {
-                    this.callbacks.stop(sequence, i);
-                }
+                this.callbacks.stop(sequence, i);
             }
         } else if (this.source instanceof Mocks.OneshotModule) {
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                 if (sequence.indexes[i] !== 'R') {
                     this.source.stop(sequence.indexes[i], processCallback);
-                    this.callbacks.stop(sequence, i);
                 }
+
+                this.callbacks.stop(sequence, i);
             }
         }
 

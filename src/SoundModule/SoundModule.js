@@ -166,6 +166,14 @@
     };
 
     /**
+     * This method gets buffer size for ScriptProcessorNode.
+     * @return {number} This is returned as buffer size for ScriptProcessorNode.
+     */
+    SoundModule.prototype.getBufferSize = function() {
+        return this.processor.bufferSize;
+    };
+
+    /**
      * This method connects nodes that are defined by this library and Web Audio API.
      * @param {AudioNode} source This argument is AudioNode for input of sound.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
