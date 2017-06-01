@@ -154,6 +154,8 @@
             this.isAnalyser = true;
         }
 
+        var self = this;
+
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
             this.processor.onaudioprocess = processCallback;
         } else {
@@ -163,8 +165,28 @@
                 var outputLs = event.outputBuffer.getChannelData(0);
                 var outputRs = event.outputBuffer.getChannelData(1);
 
-                outputLs.set(inputLs);
-                outputRs.set(inputRs);
+                // Stop ?
+                if (self.envelopegenerator.isStop()) {
+                    // Stop
+                    var stopTime = self.context.currentTime;
+
+                    for (var i = 0, len = self.sources.length; i < len; i++) {
+                        self.sources[i].stop(stopTime);
+                    }
+
+                    self.off(stopTime);
+
+                    self.analyser.stop('time');
+                    self.analyser.stop('fft');
+                    self.isAnalyser = false;
+
+                    // Stop onaudioprocess event
+                    this.disconnect(0);
+                    this.onaudioprocess = null;
+                } else {
+                    outputLs.set(inputLs);
+                    outputRs.set(inputRs);
+                }
             };
         }
 
@@ -188,44 +210,6 @@
 
         for (var i = 0, len = this.plugins.length; i < len; i++) {
             this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.param('release'));
-        }
-
-        var self = this;
-
-        if (Object.prototype.toString.call(processCallback) === '[object Function]') {
-            this.processor.onaudioprocess = processCallback;
-        } else {
-            this.processor.onaudioprocess = function(event) {
-                var inputLs  = event.inputBuffer.getChannelData(0);
-                var inputRs  = event.inputBuffer.getChannelData(1);
-                var outputLs = event.outputBuffer.getChannelData(0);
-                var outputRs = event.outputBuffer.getChannelData(1);
-
-                outputLs.set(inputLs);
-                outputRs.set(inputRs);
-
-                // Stop ?
-                if (self.envelopegenerator.isStop()) {
-                    // Stop
-                    var stopTime = self.context.currentTime;
-
-                    for (var i = 0, len = self.sources.length; i < len; i++) {
-                        self.sources[i].stop(stopTime);
-                    }
-
-                    self.off(stopTime);
-
-                    self.analyser.stop('time');
-                    self.analyser.stop('fft');
-                    self.isAnalyser = false;
-
-                    // Stop onaudioprocess event
-                    this.disconnect(0);
-                    this.onaudioprocess = null;
-                } else {
-                    // Release
-                }
-            };
         }
 
         return this;
