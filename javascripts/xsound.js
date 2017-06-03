@@ -7474,6 +7474,14 @@
     };
 
     /**
+     * This method gets buffer size for ScriptProcessorNode.
+     * @return {number} This is returned as buffer size for ScriptProcessorNode.
+     */
+    SoundModule.prototype.getBufferSize = function() {
+        return this.processor.bufferSize;
+    };
+
+    /**
      * This method connects nodes that are defined by this library and Web Audio API.
      * @param {AudioNode} source This argument is AudioNode for input of sound.
      * @param {Array.<Effector>} connects This argument is array for changing the default connection.
@@ -8253,42 +8261,6 @@
             this.isAnalyser = true;
         }
 
-        if (Object.prototype.toString.call(processCallback) === '[object Function]') {
-            this.processor.onaudioprocess = processCallback;
-        } else {
-            this.processor.onaudioprocess = function(event) {
-                var inputLs  = event.inputBuffer.getChannelData(0);
-                var inputRs  = event.inputBuffer.getChannelData(1);
-                var outputLs = event.outputBuffer.getChannelData(0);
-                var outputRs = event.outputBuffer.getChannelData(1);
-
-                outputLs.set(inputLs);
-                outputRs.set(inputRs);
-            };
-        }
-
-        return this;
-    };
-
-    /**
-     * This method stops active sounds.
-     * @param {function} processCallback This argument is in order to change "onaudioprocess" event handler in the instance of ScriptProcessorNode.
-     * @return {OscillatorModule} This is returned for method chain.
-     * @override
-     */
-    OscillatorModule.prototype.stop = function(processCallback) {
-        var stopTime = this.context.currentTime + this.times.stop;
-
-        // Attack or Decay or Sustain -> Release
-        this.envelopegenerator.stop(stopTime);
-
-        this.glide.stop();
-        this.filter.stop(stopTime);
-
-        for (var i = 0, len = this.plugins.length; i < len; i++) {
-            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.param('release'));
-        }
-
         var self = this;
 
         if (Object.prototype.toString.call(processCallback) === '[object Function]') {
@@ -8299,9 +8271,6 @@
                 var inputRs  = event.inputBuffer.getChannelData(1);
                 var outputLs = event.outputBuffer.getChannelData(0);
                 var outputRs = event.outputBuffer.getChannelData(1);
-
-                outputLs.set(inputLs);
-                outputRs.set(inputRs);
 
                 // Stop ?
                 if (self.envelopegenerator.isStop()) {
@@ -8322,9 +8291,31 @@
                     this.disconnect(0);
                     this.onaudioprocess = null;
                 } else {
-                    // Release
+                    outputLs.set(inputLs);
+                    outputRs.set(inputRs);
                 }
             };
+        }
+
+        return this;
+    };
+
+    /**
+     * This method stops active sounds.
+     * @return {OscillatorModule} This is returned for method chain.
+     * @override
+     */
+    OscillatorModule.prototype.stop = function() {
+        var stopTime = this.context.currentTime + this.times.stop;
+
+        // Attack or Decay or Sustain -> Release
+        this.envelopegenerator.stop(stopTime);
+
+        this.glide.stop();
+        this.filter.stop(stopTime);
+
+        for (var i = 0, len = this.plugins.length; i < len; i++) {
+            this.plugins[i].plugin.stop(stopTime, this.envelopegenerator.param('release'));
         }
 
         return this;
@@ -9620,12 +9611,12 @@
     };
 
     /**
-     * This method gets the instance of HTMLMediaElement.
-     * @return {HTMLMediaElement}
+     * This method gets the instance of MediaElementAudioSourceNode.
+     * @return {MediaElementAudioSourceNode}
      * @override
      */
     MediaModule.prototype.get = function() {
-        return this.media;
+        return this.source;
     };
 
     /**
@@ -10077,7 +10068,7 @@
             if (isStop) {
                 var stopTime = self.context.currentTime;
 
-                self.stop(stopTime, true);
+                self.on(stopTime, true);
 
                 self.analyser.stop('time');
                 self.analyser.stop('fft');
@@ -10631,24 +10622,21 @@
                 }
 
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                    if (sequence.indexes[i] !== 'R') {
-                        this.callbacks.start(sequence, i);
-                    }
+                    this.callbacks.start(sequence, i);
                 }
             } else if (this.source instanceof OscillatorModule) {
                 this.source.start(sequence.frequencies, connects, processCallback);
 
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                    if (sequence.indexes[i] !== 'R') {
-                        this.callbacks.start(sequence, i);
-                    }
+                    this.callbacks.start(sequence, i);
                 }
             } else if (this.source instanceof OneshotModule) {
                 for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                     if (sequence.indexes[i] !== 'R') {
                         this.source.start(sequence.indexes[i], connects, processCallback);
-                        this.callbacks.start(sequence, i);
                     }
+
+                    this.callbacks.start(sequence, i);
                 }
             }
 
@@ -10657,24 +10645,21 @@
             this.timerids[p] = global.setTimeout(function() {
                 if (Array.isArray(self.source)) {
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                        if (sequence.indexes[i] !== 'R') {
-                            self.callbacks.stop(sequence, i);
-                        }
+                        self.callbacks.stop(sequence, i);
                     }
                 } else if (self.source instanceof OscillatorModule) {
-                    self.source.stop(sequence.frequencies, processCallback);
+                    self.source.stop();
 
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                        if (sequence.indexes[i] !== 'R') {
-                            self.callbacks.stop(sequence, i);
-                        }
+                        self.callbacks.stop(sequence, i);
                     }
                 } else if (self.source instanceof OneshotModule) {
                     for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                         if (sequence.indexes[i] !== 'R') {
                             self.source.stop(sequence.indexes[i], processCallback);
-                            self.callbacks.stop(sequence, i);
                         }
+
+                        self.callbacks.stop(sequence, i);
                     }
                 }
 
@@ -10705,24 +10690,21 @@
 
         if (Array.isArray(this.source)) {
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                if (sequence.indexes[i] !== 'R') {
-                    this.callbacks.stop(sequence, i);
-                }
+                this.callbacks.stop(sequence, i);
             }
         } else if (this.source instanceof OscillatorModule) {
-            this.source.stop(sequence.frequencies, processCallback);
+            this.source.stop();
 
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
-                if (sequence.indexes[i] !== 'R') {
-                    this.callbacks.stop(sequence, i);
-                }
+                this.callbacks.stop(sequence, i);
             }
         } else if (this.source instanceof OneshotModule) {
             for (var i = 0, len = sequence.indexes.length; i < len; i++) {
                 if (sequence.indexes[i] !== 'R') {
                     this.source.stop(sequence.indexes[i], processCallback);
-                    this.callbacks.stop(sequence, i);
                 }
+
+                this.callbacks.stop(sequence, i);
             }
         }
 
