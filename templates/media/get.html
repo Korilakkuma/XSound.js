@@ -1,9 +1,9 @@
         <section>
             <section>
-                <h1>get <span class="returns">Returns : <span>HTMLAudioElement | HTMLVideoElement</span></span></h1>
+                <h1>get <span class="returns">Returns : <span>MediaElementAudioSourceNode</span></span></h1>
                 <hr />
                 <p>
-                    This method gets the instance of HTMLAudioElement or HTMLVideoElement.
+                    This method gets the instance of MediaElementAudioSourceNode.
                 </p>
             </section>
             <section>
@@ -18,9 +18,11 @@ if (X.IS_XSOUND) {
     mediaPlayer = X(&apos;media&apos;);
 }
 
+var audio = document.querySelector(&apos;audio&apos;);
+
 try {
     X(&apos;media&apos;).setup({
-        media   : document.querySelector(&apos;audio&apos;),
+        media   : audio,
         type    : &apos;audio&apos;,
         formats : [&apos;wav&apos;, &apos;ogg&apos;, &apos;mp3&apos;]
     });
@@ -29,8 +31,10 @@ try {
     window.alert(error.message);
 }
 
-console.dir(X(&apos;media&apos;).get());
+audio.addEventListener(&apos;loadstart&apos;, function() {
+    console.dir(X(&apos;media&apos;).get());
+}, false);
 </textarea>
-                <p><audio controls></audio></p>
+                <p><audio src="resources/audio/forever-love-piano-instruments.wav" controls></audio></p>
             </section>
         </section>
