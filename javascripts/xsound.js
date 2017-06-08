@@ -7331,7 +7331,8 @@
             this.activeCounter = 0;
 
             for (var i = 0, len = this.generators.length; i < len; i++) {
-                this.generators[i].gain.value = 1;
+                this.generators[i].gain.cancelScheduledValues(this.context.currentTime);
+                this.generators[i].disconnect(0);
             }
 
             return this;
