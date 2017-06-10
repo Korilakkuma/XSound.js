@@ -226,15 +226,20 @@
 
     /**
      * This method clears variables for managing the instance of GainNode.
+     * @param {boolean} isDisconnect This argument is in order to determine whether disconnect AudioNode.
      * @return {EnvelopeGenerator} This is returned for method chain.
      */
-    EnvelopeGenerator.prototype.clear = function() {
+    EnvelopeGenerator.prototype.clear = function(isDisconnect) {
         this.activeIndexes.length = 0;
         this.activeCounter = 0;
 
         for (var i = 0, len = this.generators.length; i < len; i++) {
             this.generators[i].gain.cancelScheduledValues(this.context.currentTime);
-            this.generators[i].disconnect(0);
+            this.generators[i].gain.value = 1;
+
+            if (isDisconnect) {
+                this.generators[i].disconnect(0);
+            }
         }
 
         return this;

@@ -90,7 +90,7 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(true);
 
         return this;
     };
@@ -117,7 +117,7 @@
         }
 
         // Clear previous
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(true);
         this.processor.disconnect(0);
         this.processor.onaudioprocess = null;
 

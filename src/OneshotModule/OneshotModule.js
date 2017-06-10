@@ -255,7 +255,7 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(false);
 
         return this;
     };
@@ -310,7 +310,7 @@
 
         this.volumes[selectedIndex].gain.value = volume;
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(false);
 
         // AudioBufferSourceNode (Input) -> GainNode (Envelope Generator) -> GainNode (Volume) -> ScriptProcessorNode -> ... -> AudioDestinationNode (Output)
         this.envelopegenerator.ready(selectedIndex, source, this.volumes[selectedIndex]);
@@ -363,7 +363,7 @@
 
                     self.off(self.context.currentTime);
 
-                    self.envelopegenerator.clear();
+                    self.envelopegenerator.clear(false);
 
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
