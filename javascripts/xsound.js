@@ -7324,15 +7324,20 @@
 
         /**
          * This method clears variables for managing the instance of GainNode.
+         * @param {boolean} isDisconnect This argument is in order to determine whether disconnect AudioNode.
          * @return {EnvelopeGenerator} This is returned for method chain.
          */
-        EnvelopeGenerator.prototype.clear = function() {
+        EnvelopeGenerator.prototype.clear = function(isDisconnect) {
             this.activeIndexes.length = 0;
             this.activeCounter = 0;
 
             for (var i = 0, len = this.generators.length; i < len; i++) {
                 this.generators[i].gain.cancelScheduledValues(this.context.currentTime);
-                this.generators[i].disconnect(0);
+                this.generators[i].gain.value = 1;
+
+                if (isDisconnect) {
+                    this.generators[i].disconnect(0);
+                }
             }
 
             return this;
@@ -8198,7 +8203,7 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(true);
 
         return this;
     };
@@ -8225,7 +8230,7 @@
         }
 
         // Clear previous
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(true);
         this.processor.disconnect(0);
         this.processor.onaudioprocess = null;
 
@@ -8631,7 +8636,7 @@
         if (st >=  0) {this.times.start = st;} else {this.times.start = 0;}
         if (sp >= st) {this.times.stop  = sp;} else {this.times.stop  = 0;}
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(false);
 
         return this;
     };
@@ -8686,7 +8691,7 @@
 
         this.volumes[selectedIndex].gain.value = volume;
 
-        this.envelopegenerator.clear();
+        this.envelopegenerator.clear(false);
 
         // AudioBufferSourceNode (Input) -> GainNode (Envelope Generator) -> GainNode (Volume) -> ScriptProcessorNode -> ... -> AudioDestinationNode (Output)
         this.envelopegenerator.ready(selectedIndex, source, this.volumes[selectedIndex]);
@@ -8739,7 +8744,7 @@
 
                     self.off(self.context.currentTime);
 
-                    self.envelopegenerator.clear();
+                    self.envelopegenerator.clear(false);
 
                     self.analyser.stop('time');
                     self.analyser.stop('fft');
