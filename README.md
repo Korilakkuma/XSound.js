@@ -33,6 +33,7 @@ Please use one of Chrome, Opera, Firefox, Safari, Edge.
   
 * [X Sound](https://korilakkuma.github.io/X-Sound/)
 * [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
+* [Music Tweet](https://github.com/Korilakkuma/Music-Tweet)
   
 Now, I'm creating website for Web Audio API. Please refer to the following site for understanding API Document.
   
@@ -40,7 +41,7 @@ Now, I'm creating website for Web Audio API. Please refer to the following site 
   
 ## API Document
   
-* [XSound.js API Document](https://korilakkuma.github.io/XSound/)
+* [XSound API Document](https://korilakkuma.github.io/XSound/)
   
 ## Installation
   
