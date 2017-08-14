@@ -32,12 +32,12 @@ The application that uses this library is in the following URL.
 Please use one of Chrome, Opera, Firefox, Safari, Edge.
   
 * [X Sound](https://korilakkuma.github.io/X-Sound/)
-* [Music V](http://curtaincall.weblike.jp/portfolio-music-v/)
+* [Music V](https://weblike-curtaincall.ssl-lolipop.jp/portfolio-music-v/)
 * [Music Tweet](https://github.com/Korilakkuma/Music-Tweet)
   
 Now, I'm creating website for Web Audio API. Please refer to the following site for understanding API Document.
   
-* [WEB SOUNDER](http://curtaincall.weblike.jp/portfolio-web-sounder/)
+* [WEB SOUNDER](https://weblike-curtaincall.ssl-lolipop.jp/portfolio-web-sounder/)
   
 ## API Document
   
