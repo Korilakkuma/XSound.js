@@ -9699,13 +9699,11 @@
     function StreamModule(context) {
         SoundModule.call(this, context);
 
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
-
         // for the instance of MediaStreamAudioSourceNode
         this.source = null;
 
-        // for navigator.getUserMedia
-        this.medias = {
+        // for navigator.mediaDevices.getUserMedia
+        this.constraints = {
             'audio': true,
             'video': false
         };
@@ -9774,7 +9772,7 @@
 
             if (d > this.level) {
                 // The amplitude is equal to argument.
-                return d;
+                return data;
             } else {
                 // Because signal is detected as background noise, the amplitude is 0.
                 return 0;
@@ -9795,15 +9793,15 @@
 
     /**
      * This method sets up for using WebRTC.
-     * @param {boolean} isVideo If this argument is true, WebRTC streams video.
+     * @param {object} constraints This argument is the 1st argument for getUserMedia.
      * @param {function} streamCallback This argument is invoked on streaming.
      * @param {function} errorCallback This argument is invoked when error occurs on streaming.
      * @return {StreamModule} This is returned for method chain.
      * @override
      */
-    StreamModule.prototype.setup = function(isVideo, streamCallback, errorCallback) {
-        if (Boolean(isVideo)) {
-            this.medias.video = true;
+    StreamModule.prototype.setup = function(constraints, streamCallback, errorCallback) {
+        if (Object.prototype.toString.call(constraints) === '[object Object]') {
+            this.constraints = constraints;
         }
 
         if (Object.prototype.toString.call(streamCallback) === '[object Function]') {this.callbacks.stream = streamCallback;}
@@ -9848,7 +9846,7 @@
      * @override
      */
     StreamModule.prototype.start = function(connects, processCallback) {
-        if (navigator.getUserMedia === undefined) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             throw new Error('Cannot use WebRTC.');
         }
 
@@ -9890,14 +9888,14 @@
 
         this.isStop = false;
 
-        navigator.getUserMedia(this.medias, function(stream) {
+        navigator.mediaDevices.getUserMedia(this.constraints).then(function(stream) {
             if (self.isStop) {
                 return;
             }
 
             start(stream, connects, processCallback);
             self.callbacks.stream(stream);
-        }, function(error) {
+        }).catch(function(error) {
             self.callbacks.error(error);
         });
 
