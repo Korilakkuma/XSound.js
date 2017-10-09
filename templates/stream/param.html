@@ -38,8 +38,13 @@
 <textarea class="codemirror">
 console.log(&quot;X(&apos;stream&apos;).param&quot;);
 
+var constraints = {
+    audio : true,
+    video : true
+};
+
 try {
-    X(&apos;stream&apos;).setup(false, function(){}, function(){}).ready().start();
+    X(&apos;stream&apos;).setup(constraints, function(){}, function(){}).ready().start();
 } catch (error) {
     window.alert(error.message);
 }

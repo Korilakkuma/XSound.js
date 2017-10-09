@@ -10,8 +10,13 @@
 <textarea class="codemirror">
 console.log(&quot;X(&apos;stream&apos;).ready&quot;);
 
+var constraints = {
+    audio : true,
+    video : true
+};
+
 try {
-    X(&apos;stream&apos;).setup(false, function(){}, function(){});
+    X(&apos;stream&apos;).setup(constraints, function(){}, function(){});
     X(&apos;stream&apos;).ready();
 } catch (error) {
     window.alert(error.message);

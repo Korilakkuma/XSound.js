@@ -11,8 +11,8 @@
                     <tbody>
                         <tr>
                             <th>1st</th>
-                            <td><span class="type">boolean</span></td>
-                            <td>This value is to determine whether video is used or is not used.</td>
+                            <td><span class="type">object</span></td>
+                            <td>This value is to determine constraints for WebRTC.</td>
                         </tr>
                         <tr>
                             <th>2nd</th>
@@ -31,12 +31,16 @@
 <textarea class="codemirror">
 console.log(&quot;X(&apos;stream&apos;).setup&quot;);
 
-var isVideo        = false;
+var constraints = {
+    audio : true,
+    video : true
+};
+
 var streamCallback = function() {console.log(&apos;Streaming ...&apos;);};
 var errorCallback  = function() {console.log(&apos;Error&apos;);};
 
 try {
-    X(&apos;stream&apos;).setup(isVideo, streamCallback, errorCallback);
+    X(&apos;stream&apos;).setup(constraints, streamCallback, errorCallback);
 
     X(&apos;stream&apos;).ready().start();
 } catch (error) {
