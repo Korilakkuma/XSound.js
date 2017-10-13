@@ -3,8 +3,6 @@ XSound
   
 HTML5 Web Audio API Library
   
-[![Build Status](https://travis-ci.org/Korilakkuma/XSound.svg?branch=master)](https://travis-ci.org/Korilakkuma/XSound)
-  
 ## Overview
   
 This is full stack library for Web Audio API.  
