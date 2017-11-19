@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Korilakkuma/XSound.git"
+    "url": "https://github.com/Korilakkuma/XSound.js.git"
   },
   "keywords": [
     "XSound.js",
@@ -25,7 +25,7 @@
   "author": "Korilakkuma <rilakkuma.san.xjapan@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Korilakkuma/XSound/issues"
+    "url": "https://github.com/Korilakkuma/XSound.js/issues"
   },
   "homepage": "https://korilakkuma.github.io/XSound/",
   "devDependencies": {
