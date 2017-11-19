@@ -1,87 +1,9 @@
-XSound
+XSound.js
 =========
   
-HTML5 Web Audio API Library
+This repository **deprecated**. Please refer to the following repository.
   
-## Overview
-  
-This is full stack library for Web Audio API.  
-In concrete, this library may be useful to implement the following features.
-  
-* Create Sound
-* Play the One-Shot Audio
-* Play the Audio
-* Play the Media (Fallback by HTML5 MediaElement)
-* Streaming (by WebRTC)
-* MIDI (by Web MIDI API)
-* MML (Music Macro Language)
-* Effectors (Compressor / Wah / Equalizer / Tremolo / Phaser / Chorus / Delay / Reverb ...etc)
-* Visualization (Overview in Time Domain / Time Domain / Spectrum)
-* Recording (Create WAVE file)
-* Session (by WebSocket)
-  
-## Getting Started
-  
-    X('oscillator').setup(true).ready().start(440);
-  
-## Demo
-  
-The application that uses this library is in the following URL.  
-Please use one of Chrome, Opera, Firefox, Safari, Edge.
-  
-* [X Sound](https://korilakkuma.github.io/X-Sound/)
-* [Music V](https://weblike-curtaincall.ssl-lolipop.jp/portfolio-music-v/)
-* [Music Tweet](https://github.com/Korilakkuma/Music-Tweet)
-  
-Now, I'm creating website for Web Audio API. Please refer to the following site for understanding API Document.
-  
-* [WEB SOUNDER](https://weblike-curtaincall.ssl-lolipop.jp/portfolio-web-sounder/)
-  
-## API Document
-  
-* [XSound API Document](https://korilakkuma.github.io/XSound/)
-  
-## Installation
-  
-    $ npm install xsound
-  
-or,
-  
-    $ bower install xsound
-  
-In the case of using WebSocket,
-  
-    $ npm install websocket
-  
-or,
-  
-    $ npm install ws
-  
-## Usage
-  
-    <script type="text/javascript" src="xsound.min.js"></script>
-  
-In the case of development,
-  
-    <script type="text/javascript" src="xsound.js"></script>
-  
-In the case of using WebSocket,
-  
-    $ node xsound-server-session-websocket.js
-  
-or,
-  
-    $ node xsound-server-session-ws.js
-  
-Default port number is 8000.  
-This port number can be changed by designating argument.  
-For example,
-  
-    $ node xsound-server-session-websocket.js 8080
-  
-In the case of recording log, the path of log file must be designated by the 2nd argument.
-  
-    $ node xsound-server-session-websocket.js 8080 websocket.log
+- [XSound](https://github.com/Korilakkuma/XSound)
   
 ## License
   
